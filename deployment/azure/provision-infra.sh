@@ -31,14 +31,24 @@ az network nsg rule create \
     --destination-port-range 22 \
     --access allow
 
-## Add network security group rule to allow connection to nexus
+## Add network security group rule to allow HTTP traffic to nginx
 az network nsg rule create \
     --resource-group "pis-rg" \
     --nsg-name "pis-nsg" \
-    --name "pis-nsg-rule-nexus" \
+    --name "pis-nsg-rule-http" \
     --protocol tcp \
-    --priority 1010 \
-    --destination-port-range 8081 \
+    --priority 1020 \
+    --destination-port-range 80 \
+    --access allow
+
+## Add network security group rule to allow HTTPS traffic to nginx
+az network nsg rule create \
+    --resource-group "pis-rg" \
+    --nsg-name "pis-nsg" \
+    --name "pis-nsg-rule-http3" \
+    --protocol tcp \
+    --priority 1030 \
+    --destination-port-range 443 \
     --access allow
 
 # Create subnet

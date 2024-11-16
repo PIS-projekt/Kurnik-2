@@ -22,6 +22,7 @@ pip install ansible
 ```shell
 ansible-playbook -u azureuser -i deployment/inventory.ini deployment/install-docker.yaml
 ansible-playbook -u azureuser -i deployment/inventory.ini deployment/users.yaml
+ansible-playbook -u azureuser -i deployment/inventory.ini deployment/nginx.yaml
 ansible-playbook -i deployment/inventory.ini deployment/nexus.yaml
 ```
 
@@ -35,11 +36,11 @@ ansible-playbook -i deployment/inventory.ini deployment/nexus.yaml
 ### Upload pliku do Nexusa
 
 ```shell
-curl -u "admin:password" --upload-file ./index.html http://nexus.mgarbowski.pl:8081/repository/test-repository/website/index.html
+curl -u "admin:password" --upload-file ./index.html http://nexus.mgarbowski.pl/repository/test-repository/website/index.html
 ```
 
 ### Pobranie pliku z Nexusa
 
 ```shell
-curl -u "admin:password" http://nexus.mgarbowski.pl:8081/repository/test-repository/website/index.html -o index.html
+curl -u "admin:password" http://nexus.mgarbowski.pl/repository/test-repository/website/index.html -o index.html
 ```
