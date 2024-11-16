@@ -1,6 +1,9 @@
 # Kurnik-2
 
+
+## Linki
 * [Jira](https://michluszcz.atlassian.net/jira/software/projects/SCRUM/boards/1/backlog)
+* [Nexus](https://nexus.mgarbowski.pl)
 
 ## Korzystanie z Ansible
 
@@ -32,6 +35,9 @@ ansible-playbook -i deployment/inventory.ini deployment/nexus.yaml
 * Jest utworzone jedno repozytorium typu raw (hosted)
   * test-repository
   * na zwykłe pliki
+* Jest utworzone jedno repozytorium typu docker (hosted)
+  * docker-images
+  * na obrazy dockerowe
 
 ### Upload pliku do Nexusa
 
