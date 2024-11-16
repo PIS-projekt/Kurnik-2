@@ -73,3 +73,11 @@ docker pull nexus.mgarbowski.pl/docker-images/pis-frontend:latest
 ## Nginx
 * Volume `certs` musi zawierać pliki wygenerowane przez letsencrypt - nie mogą się znajdować w repozytorium
   * Pytania -> Mikołaj Garbowski
+
+## Backup serwera CI/CD
+* Wszystkie dane, które mają być przechowywane w sposób trwały, muszą być zapisane w docker volume.
+
+### Wykonanie i pobranie backupu
+```shell
+./deployment/backup-ci-cd-vm.sh
+```
