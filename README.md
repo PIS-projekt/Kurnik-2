@@ -5,6 +5,13 @@
 * [Jira](https://michluszcz.atlassian.net/jira/software/projects/SCRUM/boards/1/backlog)
 * [Nexus](https://nexus.mgarbowski.pl)
 
+## DNS
+* ci-cd-vm.mgarbowski.pl
+  * 51.136.34.212
+  * nexus.mgarbowski.pl
+* deployment-vm.mgarbowski.pl
+  * 104.40.144.201
+
 ## Korzystanie z Ansible
 
 ### Instalacja
