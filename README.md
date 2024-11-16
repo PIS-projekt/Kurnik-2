@@ -45,6 +45,25 @@ curl -u "admin:password" --upload-file ./index.html https://nexus.mgarbowski.pl/
 curl -u "admin:password" https://nexus.mgarbowski.pl/repository/test-repository/website/index.html -o index.html
 ```
 
+### Upload docker image do Nexusa
+
+```shell
+# Zbudowanie obrazu
+docker build --tag pis-frontend:latest frontend/
+
+# Nadanie tagu obrazowi
+docker tag pis-frontend:latest nexus.mgarbowski.pl/docker-images/pis-frontend:latest
+
+# Logowanie do Nexusa
+docker login nexus.mgarbowski.pl
+
+# Wysłanie obrazu do Nexusa
+docker push nexus.mgarbowski.pl/docker-images/pis-frontend:latest
+
+# Pobranie obrazu z Nexusa
+docker pull nexus.mgarbowski.pl/docker-images/pis-frontend:latest
+```
+
 ## Nginx
 * Volume `certs` musi zawierać pliki wygenerowane przez letsencrypt - nie mogą się znajdować w repozytorium
   * Pytania -> Mikołaj Garbowski
