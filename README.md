@@ -36,11 +36,15 @@ ansible-playbook -i deployment/inventory.ini deployment/nexus.yaml
 ### Upload pliku do Nexusa
 
 ```shell
-curl -u "admin:password" --upload-file ./index.html http://nexus.mgarbowski.pl/repository/test-repository/website/index.html
+curl -u "admin:password" --upload-file ./index.html https://nexus.mgarbowski.pl/repository/test-repository/website/index.html
 ```
 
 ### Pobranie pliku z Nexusa
 
 ```shell
-curl -u "admin:password" http://nexus.mgarbowski.pl/repository/test-repository/website/index.html -o index.html
+curl -u "admin:password" https://nexus.mgarbowski.pl/repository/test-repository/website/index.html -o index.html
 ```
+
+## Nginx
+* Volume `certs` musi zawierać pliki wygenerowane przez letsencrypt - nie mogą się znajdować w repozytorium
+  * Pytania -> Mikołaj Garbowski
