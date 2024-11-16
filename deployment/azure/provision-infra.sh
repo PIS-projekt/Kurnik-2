@@ -31,6 +31,16 @@ az network nsg rule create \
     --destination-port-range 22 \
     --access allow
 
+## Add network security group rule to allow connection to nexus
+az network nsg rule create \
+    --resource-group "pis-rg" \
+    --nsg-name "pis-nsg" \
+    --name "pis-nsg-rule-nexus" \
+    --protocol tcp \
+    --priority 1010 \
+    --destination-port-range 8081 \
+    --access allow
+
 # Create subnet
 az network vnet subnet create \
         --resource-group "pis-rg" \

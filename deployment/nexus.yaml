@@ -1,0 +1,19 @@
+# Sonatype Nexus
+# https://hub.docker.com/r/sonatype/nexus3
+# When stopping container, it should be given enough time to fully shut down databases
+# docker stop --time=120 nexus
+
+- name: Setup Nexus, runs in Docker container
+  hosts: ci-cd
+  tasks:
+    - name: Create a volume to store persistent data
+      community.docker.docker_volume:
+        name: nexus-data
+
+    - name: Start Nexus in a Docker container
+      community.docker.docker_container:
+        name: nexus
+        image: sonatype/nexus3
+        volumes: nexus-data:/nexus-data
+        ports:
+          - "8081:8081"

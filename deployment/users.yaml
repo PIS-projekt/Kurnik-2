@@ -1,5 +1,5 @@
 - name: Create users and add SSH keys
-  hosts: myhosts
+  hosts: ci-cd
   become: yes
   vars:
     users:
