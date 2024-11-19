@@ -1,0 +1,12 @@
+- name: Setup & run jenkins container
+  hosts: ci-cd
+  tasks:
+    - name: Run jenkisn container
+      docker_container:
+        name: jenkins
+        image: jenkins/jenkins:lts-jdk17
+        state: started
+        ports:
+          - "8080:8080"
+        volumes:
+          - jenkins-data:/var/jenkins_home
