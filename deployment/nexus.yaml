@@ -9,7 +9,6 @@
     - name: Create a volume to store persistent data
       community.docker.docker_volume:
         name: nexus-data
-
     - name: Start Nexus in a Docker container
       community.docker.docker_container:
         name: nexus
@@ -19,3 +18,5 @@
           - "8081:8081"
         networks:
           - name: ci_network
+        restart_policy: "always"
+

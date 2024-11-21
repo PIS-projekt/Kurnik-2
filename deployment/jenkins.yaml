@@ -1,7 +1,7 @@
 - name: Setup & run jenkins container
   hosts: ci-cd
   tasks:
-    - name: Run jenkisn container
+    - name: Run jenkins container
       docker_container:
         name: jenkins
         image: jenkins/jenkins:lts-jdk17
@@ -12,3 +12,4 @@
           - jenkins-data:/var/jenkins_home
         networks:
           - name: ci_network
+        restart_policy: "always"
