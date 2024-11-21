@@ -47,12 +47,12 @@ docker build -t pis-backend --target prod .
 
 ### Build Docker image for testing
 ```bash
-docker build -t pis-backend --target test .
+docker build -t pis-backend-test --target test .
 ```
 
 ### Run Docker development container
 ```bash
-docker run pis-backend [COMMAND]
+docker run pis-backend-test [COMMAND]
 COMMAND:
     test - run tests
     lint - run linter
