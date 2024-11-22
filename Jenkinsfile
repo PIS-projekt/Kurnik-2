@@ -2,6 +2,13 @@ pipeline {
     agent any
 
     stages {
+        stage('Checkout Code') {
+            steps {
+                checkout scm
+                sh 'cd frontend'
+            }
+        }
+
         stage('Setup node and install frontend dependencies') {
             steps {
                 nodejs(nodeJSInstallationName: 'node-23') {
