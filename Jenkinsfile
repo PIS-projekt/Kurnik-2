@@ -5,46 +5,54 @@ pipeline {
         stage('Checkout Code') {
             steps {
                 checkout scm
-                sh 'cd frontend'
             }
         }
 
         stage('Setup node and install frontend dependencies') {
             steps {
-                script {
-                    echo 'Workspace Contents:'
-                    sh 'ls -la'
-                }
-
-                nodejs(nodeJSInstallationName: 'node-23') {
-                    sh 'npm install'
+                dir('frontend') {
+                    nodejs(nodeJSInstallationName: 'node-23') {
+                        sh 'npm install'
+                    }
                 }
             }
         }
 
         stage('Lint frontend') {
             steps {
-                script {
-                    echo 'Running ESLint...'
-                    sh 'npm run lint'
+                dir('frontend') {
+                    nodejs(nodeJSInstallationName: 'node-23') {
+                        script {
+                            echo 'Running ESLint...'
+                            sh 'npm run lint'
+                        }
+                    }
                 }
             }
         }
 
         stage('Run frontend tests') {
             steps {
-                script {
-                    echo 'Running tests...'
-                    sh 'npm run test'
+                dir('frontend') {
+                    nodejs(nodeJSInstallationName: 'node-23') {
+                        script {
+                            echo 'Running tests...'
+                            sh 'npm run test'
+                        }
+                    }
                 }
             }
         }
 
         stage('Build frontend') {
             steps {
-                script {
-                    echo 'Building the project...'
-                    sh 'npm run build'
+                dir('frontend') {
+                    nodejs(nodeJSInstallationName: 'node-23') {
+                        script {
+                            echo 'Building the project...'
+                            sh 'npm run build'
+                        }
+                    }
                 }
             }
         }
