@@ -2,11 +2,16 @@ pipeline {
     agent any
 
     stages {
+        stage('Setup node and install frontend dependencies') {
+        steps {
+            nodejs(nodeJSInstallationName: 'node-23')
+            sh 'npm install'
+            }
+        }
         stage('Lint frontend') {
             steps {
                 script {
                     echo 'Running ESLint...'
-                    sh 'npm install'
                     sh 'npm run lint'
                 }
             }
