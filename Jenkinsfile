@@ -3,11 +3,13 @@ pipeline {
 
     stages {
         stage('Setup node and install frontend dependencies') {
-        steps {
-            nodejs(nodeJSInstallationName: 'node-23') {
-                sh 'npm install'
+            steps {
+                nodejs(nodeJSInstallationName: 'node-23') {
+                    sh 'npm install'
+                }
             }
         }
+
         stage('Lint frontend') {
             steps {
                 script {
