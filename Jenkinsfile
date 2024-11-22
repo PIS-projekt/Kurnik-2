@@ -14,6 +14,11 @@ pipeline {
                 nodejs(nodeJSInstallationName: 'node-23') {
                     sh 'npm install'
                 }
+
+                script {
+                    echo 'Workspace Contents:'
+                    sh 'ls -la'
+                }
             }
         }
 
