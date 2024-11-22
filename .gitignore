@@ -1,2 +1,4 @@
 .idea
 .vscode
+.venv
+docker_volume_backups
