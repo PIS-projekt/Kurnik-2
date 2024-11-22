@@ -11,13 +11,13 @@ pipeline {
 
         stage('Setup node and install frontend dependencies') {
             steps {
-                nodejs(nodeJSInstallationName: 'node-23') {
-                    sh 'npm install'
-                }
-
                 script {
                     echo 'Workspace Contents:'
                     sh 'ls -la'
+                }
+
+                nodejs(nodeJSInstallationName: 'node-23') {
+                    sh 'npm install'
                 }
             }
         }
