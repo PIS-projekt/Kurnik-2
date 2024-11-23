@@ -59,6 +59,10 @@ pipeline {
 
         stage('Build Backend Image') {
             steps {
+                docker.image('maven:3.3.3-jdk-8').inside {
+                    sh 'Inside the maven container'
+                }
+
                 script {
                     customImage = docker.build("backend-image:${env.BUILD_ID}", '-f backend/Dockerfile backend/')
                 }
