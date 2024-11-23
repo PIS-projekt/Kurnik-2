@@ -56,12 +56,50 @@ pipeline {
                 }
             }
         }
-    }
 
-    post {
-        always {
-            echo 'Cleaning up...'
-            cleanWs()
+        stage('Build Backend Image') {
+            steps {
+                script {
+                    customImage = docker.build("backend-image:${env.BUILD_ID}", '-f backend/Dockerfile backend/')
+                }
+            }
+        }
+
+        stage('Run Backend Tests') {
+            steps {
+                script {
+                    customImage.inside {
+                        sh 'pdm run test'
+                    }
+                }
+            }
+        }
+
+        stage('Lint Backend') {
+            steps {
+                script {
+                    customImage.inside {
+                        sh 'pdm run lint'
+                    }
+                }
+            }
+        }
+
+        stage('Generate Test Coverage Report') {
+            steps {
+                script {
+                    customImage.inside {
+                        sh 'pdm run coverage'
+                    }
+                }
+            }
+        }
+
+        post {
+            always {
+                echo 'Cleaning up...'
+                cleanWs()
+            }
         }
     }
 }
