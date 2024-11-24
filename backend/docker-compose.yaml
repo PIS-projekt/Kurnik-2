@@ -1,0 +1,19 @@
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: prod
+    ports:
+      - "8000:8000"
+    environment:
+      - PYTHONUNBUFFERED=1
+    restart: always
+
+  backend-tests:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: test
+    environment:
+      - PYTHONUNBUFFERED=1
