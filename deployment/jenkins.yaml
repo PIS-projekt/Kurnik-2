@@ -1,15 +1,36 @@
-- name: Setup & run jenkins container
+- name: Install Jenkins on Ubuntu
   hosts: ci-cd
+  become: yes
   tasks:
-    - name: Run jenkins container
-      docker_container:
+    - name: Download and add Jenkins GPG key
+      get_url:
+        url: https://pkg.jenkins.io/debian-stable/jenkins.io-2023.key
+        dest: /usr/share/keyrings/jenkins-keyring.asc
+        mode: '0644'
+
+    - name: Add Jenkins apt repository
+      copy:
+        content: 'deb [signed-by=/usr/share/keyrings/jenkins-keyring.asc] https://pkg.jenkins.io/debian-stable binary/'
+        dest: /etc/apt/sources.list.d/jenkins.list
+
+    - name: Update apt package index
+      apt:
+        update_cache: yes
+
+    - name: Install required packages
+      apt:
+        name:
+          - fontconfig
+          - openjdk-17-jre
+        state: present
+
+    - name: Install Jenkins
+      apt:
         name: jenkins
-        image: jenkins/jenkins:lts-jdk17
+        state: present
+
+    - name: Start and enable Jenkins service
+      systemd:
+        name: jenkins
         state: started
-        ports:
-          - "8080:8080"
-        volumes:
-          - jenkins-data:/var/jenkins_home
-        networks:
-          - name: ci_network
-        restart_policy: "always"
+        enabled: yes
