@@ -22,7 +22,7 @@
         name:
           - fontconfig
           - openjdk-17-jre
-        state: present
+        state: present~
 
     - name: Install Jenkins
       apt:
