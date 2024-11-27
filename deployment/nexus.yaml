@@ -16,7 +16,5 @@
         volumes: nexus-data:/nexus-data
         ports:
           - "8081:8081"
-        networks:
-          - name: ci_network
         restart_policy: "always"
 

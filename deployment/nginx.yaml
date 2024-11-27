@@ -29,7 +29,7 @@
           - "443:443"
         volumes:
           - certs:/etc/letsencrypt
-        networks:
-          - name: ci_network
         restart_policy: "always"
+        networks:
+          - name: host
 
