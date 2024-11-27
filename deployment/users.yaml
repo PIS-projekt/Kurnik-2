@@ -25,7 +25,7 @@
       user:
         name: "{{ item.username }}"
         shell: /bin/bash
-        groups: docker,pis
+        groups: docker,pis,sudo
         append: yes
         comment: "{{ item.full_name }}"
 
