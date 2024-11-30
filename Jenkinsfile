@@ -102,6 +102,7 @@ pipeline {
         stage('Build for Production') {
             steps {
                 script {
+                    sh "docker stop prod_container && docker rm prod_container"
                     sh "docker build --target prod -t backend-prod -f backend/Dockerfile backend/"
                 }
             }
@@ -111,7 +112,6 @@ pipeline {
             steps {
                 script {
                     // Verify the production build by running it temporarily
-                    ssh "docker stop prod_container && docker rm prod_container"
                     sh "docker run -p 8000:8000 -d --name prod_container backend-prod"
 
                     // Run a health check or test endpoint if needed
