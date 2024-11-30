@@ -111,7 +111,7 @@ pipeline {
             steps {
                 script {
                     // Verify the production build by running it temporarily
-                    sh "docker run -p 8000:8000 -d --name prod_container backend-prod"
+                    sh "if [ $(docker ps -aq -f name=prod_container) ]; then docker stop prod_container && docker rm prod_container; fi && docker run --rm -d -p 8000:8000 --name prod_container backend-prod"
 
                     // Run a health check or test endpoint if needed
                     sh "sleep 10" // Wait for the container to start
