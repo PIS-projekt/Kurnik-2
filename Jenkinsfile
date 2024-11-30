@@ -111,11 +111,11 @@ pipeline {
             steps {
                 script {
                     // Verify the production build by running it temporarily
-                    sh "docker run -d --name prod_container backend-prod"
+                    sh "docker run -p 8000:8000 -d --name prod_container backend-prod"
 
                     // Run a health check or test endpoint if needed
                     sh "sleep 10" // Wait for the container to start
-                    sh "curl -f http://localhost:8000 || exit 1"
+                    sh "curl -f http://0.0.0.0:8000 || exit 1"
 
                     // Clean up
                     sh "docker stop prod_container && docker rm prod_container"
