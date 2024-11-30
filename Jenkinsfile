@@ -64,10 +64,17 @@ pipeline {
             }
         }
 
+    stages {
+        stage('Checkout') {
+            steps {
+                checkout scm
+            }
+        }
+
         stage('Build for Testing') {
             steps {
                 script {
-                    sh "docker build --target test -t $DOCKER_TEST_IMAGE -f $DOCKERFILE_PATH ."
+                    sh "docker build --target test -t backend-tests -f backend/Dockerfile backend/"
                 }
             }
         }
@@ -75,7 +82,7 @@ pipeline {
         stage('Run Tests') {
             steps {
                 script {
-                    sh "docker run --rm $DOCKER_TEST_IMAGE"
+                    sh "docker run --rm backend-tests"
                 }
             }
         }
@@ -83,7 +90,7 @@ pipeline {
         stage('Test Coverage') {
             steps {
                 script {
-                    sh "docker run --rm $DOCKER_TEST_IMAGE pdm run coverage"
+                    sh "docker run --rm backend-tests pdm run coverage"
                 }
             }
         }
@@ -92,8 +99,8 @@ pipeline {
             steps {
                 script {
                     // Adjust the linting/formatting tools as per your setup
-                    sh "docker run --rm $DOCKER_TEST_IMAGE pdm run lint"
-                    sh "docker run --rm $DOCKER_TEST_IMAGE pdm run format"
+                    sh "docker run --rm backend-tests pdm run lint"
+                    sh "docker run --rm backend-tests pdm run format"
                 }
             }
         }
@@ -101,7 +108,7 @@ pipeline {
         stage('Build for Production') {
             steps {
                 script {
-                    sh "docker build --target prod -t $DOCKER_PROD_IMAGE -f $DOCKERFILE_PATH ."
+                    sh "docker build --target prod -t backend-prod -f backend/Dockerfile backend/"
                 }
             }
         }
@@ -110,7 +117,7 @@ pipeline {
             steps {
                 script {
                     // Verify the production build by running it temporarily
-                    sh "docker run -d --name prod_container $DOCKER_PROD_IMAGE"
+                    sh "docker run -d --name prod_container backend-prod"
 
                     // Run a health check or test endpoint if needed
                     sh "sleep 10" // Wait for the container to start
@@ -121,6 +128,7 @@ pipeline {
                 }
             }
         }
+    }
     }
 
 
