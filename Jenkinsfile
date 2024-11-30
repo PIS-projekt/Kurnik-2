@@ -1,6 +1,13 @@
 pipeline {
     agent any
 
+    environment {
+        DOCKER_COMPOSE_FILE = "docker-compose.yaml"
+        DOCKER_BACKEND_TESTS = "backend-tests"
+        DOCKER_BACKEND_PROD = "backend"
+    }
+
+
     stages {
         stage('Checkout Code') {
             steps {
@@ -57,44 +64,49 @@ pipeline {
             }
         }
 
-        stage('Build Backend Image') {
+        stage('Build for Testing') {
             steps {
                 script {
-                    customImage = docker.build("backend-image:${env.BUILD_ID}", '-f backend/Dockerfile backend/')
+                    sh "docker-compose -f $DOCKER_COMPOSE_FILE run --rm $DOCKER_BACKEND_TESTS"
                 }
             }
         }
 
-        stage('Run Backend Tests') {
+        stage('Linting and Formatting') {
             steps {
                 script {
-                    customImage.inside {
-                        sh 'pdm run test'
-                    }
+                    // Adjust the linting/formatting tools as per your setup
+                    sh "docker-compose -f $DOCKER_COMPOSE_FILE run --rm $DOCKER_BACKEND_TESTS pdm run lint"
+                    sh "docker-compose -f $DOCKER_COMPOSE_FILE run --rm $DOCKER_BACKEND_TESTS pdm run format"
                 }
             }
         }
 
-        stage('Lint Backend') {
+        stage('Build for Production') {
             steps {
                 script {
-                    customImage.inside {
-                        sh 'pdm run lint'
-                    }
+                    sh "docker-compose -f $DOCKER_COMPOSE_FILE build $DOCKER_BACKEND_PROD"
                 }
             }
         }
 
-        stage('Generate Test Coverage Report') {
+        stage('Verify Production Build') {
             steps {
                 script {
-                    customImage.inside {
-                        sh 'pdm run coverage'
-                    }
+                    // Verify the production build by running it temporarily
+                    sh "docker-compose -f $DOCKER_COMPOSE_FILE up -d $DOCKER_BACKEND_PROD"
+
+                    // Run a health check or test endpoint if needed
+                    sh "sleep 10" // Wait for the container to start
+                    sh "curl -f http://localhost:8000 || exit 1"
+
+                    // Clean up
+                    sh "docker-compose -f $DOCKER_COMPOSE_FILE down"
                 }
             }
         }
     }
+
 
     post {
         always {
