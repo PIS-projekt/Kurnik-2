@@ -96,7 +96,6 @@ pipeline {
         stage('Build for Production') {
             steps {
                 script {
-                    sh "docker stop prod_container && docker rm prod_container"
                     sh "docker build --target prod -t backend-prod -f backend/Dockerfile backend/"
                 }
             }
