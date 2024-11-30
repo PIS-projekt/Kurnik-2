@@ -1,12 +1,6 @@
 pipeline {
     agent any
 
-    environment {
-        DOCKER_COMPOSE_FILE = "docker-compose.yaml"
-        DOCKER_BACKEND_TESTS = "backend-tests"
-        DOCKER_BACKEND_PROD = "backend"
-    }
-
 
     stages {
         stage('Checkout Code') {
@@ -124,9 +118,6 @@ pipeline {
             }
         }
     }
-    }
-
-
 
     post {
         always {
@@ -134,3 +125,4 @@ pipeline {
             cleanWs()
         }
     }
+}
