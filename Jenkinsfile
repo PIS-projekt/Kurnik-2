@@ -64,12 +64,6 @@ pipeline {
             }
         }
 
-    stages {
-        stage('Checkout') {
-            steps {
-                checkout scm
-            }
-        }
 
         stage('Build for Testing') {
             steps {
