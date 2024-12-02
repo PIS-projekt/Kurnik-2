@@ -22,14 +22,14 @@ resource "azurerm_public_ip" "ci_cd_ip" {
   name                = "ci-cd-ip"
   location            = azurerm_resource_group.pis_rg.location
   resource_group_name = azurerm_resource_group.pis_rg.name
-  allocation_method   = "Dynamic"
+  allocation_method   = "Static"
 }
 
 resource "azurerm_public_ip" "deployment_ip" {
   name                = "deployment-ip"
   location            = azurerm_resource_group.pis_rg.location
   resource_group_name = azurerm_resource_group.pis_rg.name
-  allocation_method   = "Dynamic"
+  allocation_method   = "Static"
 }
 
 resource "azurerm_virtual_network" "pis_vnet" {
@@ -187,7 +187,7 @@ resource "azurerm_network_interface_security_group_association" "deployment_nic_
   network_security_group_id = azurerm_network_security_group.pis_nsg.id
 }
 
-resource "azurerm_dev_test_global_vm_shutdown_schedule" "ci_cd_shuitdown" {
+resource "azurerm_dev_test_global_vm_shutdown_schedule" "ci_cd_shutdown" {
   virtual_machine_id = azurerm_linux_virtual_machine.ci_cd_vm.id
   location           = azurerm_resource_group.pis_rg.location
   enabled            = true
@@ -200,7 +200,7 @@ resource "azurerm_dev_test_global_vm_shutdown_schedule" "ci_cd_shuitdown" {
   }
 }
 
-resource "azurerm_dev_test_global_vm_shutdown_schedule" "deployment_shuitdown" {
+resource "azurerm_dev_test_global_vm_shutdown_schedule" "deployment_shutdown" {
   virtual_machine_id = azurerm_linux_virtual_machine.deployment_vm.id
   location           = azurerm_resource_group.pis_rg.location
   enabled            = true
