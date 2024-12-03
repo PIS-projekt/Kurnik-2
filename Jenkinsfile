@@ -57,7 +57,7 @@ pipeline {
                         }
                     }
                 }
-                def frontend-build = docker.build("frontend-image:${env.BUILD_ID}", '-f Dockerfile')
+                frontend-build = docker.build("frontend-image:${env.BUILD_ID}", '-f Dockerfile')
             }
         }
 
