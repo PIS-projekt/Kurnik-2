@@ -122,8 +122,11 @@ pipeline {
                 script {
                     // Verify the production build by running it temporarily
                     echo "Starting the production container from the built image..."
-                    def containerId = sh(script: "docker run -p 8000:8000 -d --name prod_container ${backendBuild.id}", returnStdout: true).trim()
-
+                    def containerId = sh(
+                        script: "docker run -p 8000:8000 -d --name prod_container ${backendBuild.imageName}",
+                        returnStdout: true
+                    ).trim()
+                    
                     try {
                         // Run a health check or test endpoint
                         sh "sleep 10" // Wait for the container to start
