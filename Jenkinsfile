@@ -112,7 +112,7 @@ pipeline {
         stage('Build for Production') {
             steps {
                 script {
-                    backend_build = docker.build("docker-images/pis-backend}", "--target prod -f backend/Dockerfile backend")
+                    backend_build = docker.build("docker-images/pis-backend", "--target prod -f backend/Dockerfile backend")
                     echo "Done building"
                 }
             }
