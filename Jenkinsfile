@@ -120,22 +120,22 @@ pipeline {
         stage('Verify Production Build') {
             steps {
                 script {
-                    // Verify the production build by running it temporarily
+                    // Verify the production build using Docker plugin methods
                     echo "Starting the production container from the built image..."
-                    def containerId = sh(
-                        script: "docker run -p 8000:8000 -d --name prod_container ${backendBuild.imageName}",
-                        returnStdout: true
-                    ).trim()
                     
+                    // Start the container
+                    def prodContainer = backendBuild.run("-p 8000:8000")
+
                     try {
                         // Run a health check or test endpoint
-                        sh "sleep 10" // Wait for the container to start
-                        sh "curl -f http://0.0.0.0:8000 || exit 1"
+                        echo "Waiting for the container to initialize..."
+                        sleep(10) // Adjust sleep time as needed
+                        prodContainer.exec(["curl", "-f", "http://0.0.0.0:8000"])
                     } finally {
-                        // Clean up
+                        // Clean up the container
                         echo "Stopping and removing the container..."
-                        sh "docker stop ${containerId}"
-                        sh "docker rm ${containerId}"
+                        prodContainer.stop()
+                        prodContainer.remove()
                     }
                 }
             }
