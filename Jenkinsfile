@@ -66,7 +66,7 @@ pipeline {
         stage('Upload frontend image to Nexus') {
             steps {
                 script {
-                    docker.withRegistry('nexus.mgarbowski.pl', 'nexus-registry-credentials') {
+                    docker.withRegistry('https://nexus.mgarbowski.pl', 'nexus-registry-credentials') {
                         frontend_build.push("${env.BUILD_NUMBER}")
                         frontend_build.push("latest")
                 }
