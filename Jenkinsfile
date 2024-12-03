@@ -131,7 +131,7 @@ pipeline {
                         // Run a health check or test endpoint
                         echo "Waiting for the container to initialize..."
                         sleep(10) // Adjust sleep time as needed
-                        sh "docker exec ${containerId} curl -f http://0.0.0.0:8000"
+                        sh "curl -f http://0.0.0.0:8000 || exit 1"
                     } finally {
                         // Clean up the container using shell commands
                         echo "Stopping and removing the container..."
