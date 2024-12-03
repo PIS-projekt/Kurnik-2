@@ -3,6 +3,10 @@ pipeline {
 
 
     stages {
+
+        def frontend-build
+        def backend-build
+
         stage('Checkout Code') {
             steps {
                 checkout scm
@@ -100,7 +104,18 @@ pipeline {
                     // Adjust the linting/formatting tools as per your setup
                     sh "docker run --rm backend-tests pdm run lint"
                     sh "docker run --rm backend-tests pdm run format"
+                }Upload frontend image to Nexus') {
+            steps {
+                docker.withRegistry('nexus.mgarbowski.pl', 'nexus-registry-credentials') {
+                    frontend-build.push("${env.BUILD_NUMBER}")
+                    frontend-build.push("latest")
                 }
+
+            }
+        }
+
+
+        stage('Build for Testing
             }
         }
 
