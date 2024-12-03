@@ -4,8 +4,6 @@ pipeline {
 
     stages {
 
-        def frontend-build
-        def backend-build
 
         stage('Checkout Code') {
             steps {
@@ -59,7 +57,7 @@ pipeline {
                         }
                     }
                 }
-                frontend-build = docker.build("frontend-image:${env.BUILD_ID}", '-f Dockerfile')
+                def frontend-build = docker.build("frontend-image:${env.BUILD_ID}", '-f Dockerfile')
             }
         }
 
