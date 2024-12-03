@@ -1,31 +1,20 @@
----
 - name: Setup Nginx in Docker
   hosts: ci-cd
   become: true
-
   tasks:
     - name: Copy Nginx configuration file
       copy:
         src: ./nginx/nginx.conf
         dest: /home/azureuser/nginx.conf
-
     - name: Copy Dockerfile
       copy:
         src: ./nginx/Dockerfile
         dest: /home/azureuser/Dockerfile
-
     - name: Build Nginx Docker image
       command: docker build -t my-nginx /home/azureuser
-
     - name: Create a volume to store SSL certificates
       community.docker.docker_volume:
         name: certs
-
-    - name: Create a Docker network
-      docker_network:
-        name: ci_network
-        state: present
-
     - name: Run Nginx container
       docker_container:
         name: nginx-proxy
@@ -36,5 +25,7 @@
           - "443:443"
         volumes:
           - certs:/etc/letsencrypt
+        restart_policy: "always"
         networks:
-          - name: ci_network
+          - name: host
+

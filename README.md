@@ -9,6 +9,7 @@
 * ci-cd-vm.mgarbowski.pl
   * 51.136.34.212
   * nexus.mgarbowski.pl
+  * jenkins.mgarbowski.pl
 * deployment-vm.mgarbowski.pl
   * 104.40.144.201
 
@@ -33,6 +34,7 @@ pip install ansible
 ansible-playbook -u azureuser -i deployment/inventory.ini deployment/install-docker.yaml
 ansible-playbook -u azureuser -i deployment/inventory.ini deployment/users.yaml
 ansible-playbook -u azureuser -i deployment/inventory.ini deployment/nginx.yaml
+ansible-playbook -i deployment/inventory.ini deployment/jenkins.yaml
 ansible-playbook -i deployment/inventory.ini deployment/nexus.yaml
 ```
 
