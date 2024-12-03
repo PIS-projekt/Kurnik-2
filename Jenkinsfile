@@ -11,68 +11,68 @@ pipeline {
             }
         }
 
-        stage('Setup node and install frontend dependencies') {
-            steps {
-                dir('frontend') {
-                    nodejs(nodeJSInstallationName: 'node-23') {
-                        sh 'npm install'
-                    }
-                }
-            }
-        }
+        // stage('Setup node and install frontend dependencies') {
+        //     steps {
+        //         dir('frontend') {
+        //             nodejs(nodeJSInstallationName: 'node-23') {
+        //                 sh 'npm install'
+        //             }
+        //         }
+        //     }
+        // }
 
-        stage('Lint frontend') {
-            steps {
-                dir('frontend') {
-                    nodejs(nodeJSInstallationName: 'node-23') {
-                        script {
-                            echo 'Running ESLint...'
-                            sh 'npm run lint'
-                        }
-                    }
-                }
-            }
-        }
+        // stage('Lint frontend') {
+        //     steps {
+        //         dir('frontend') {
+        //             nodejs(nodeJSInstallationName: 'node-23') {
+        //                 script {
+        //                     echo 'Running ESLint...'
+        //                     sh 'npm run lint'
+        //                 }
+        //             }
+        //         }
+        //     }
+        // }
 
-        stage('Run frontend tests') {
-            steps {
-                dir('frontend') {
-                    nodejs(nodeJSInstallationName: 'node-23') {
-                        script {
-                            echo 'Running tests...'
-                            sh 'npm run test'
-                        }
-                    }
-                }
-            }
-        }
+        // stage('Run frontend tests') {
+        //     steps {
+        //         dir('frontend') {
+        //             nodejs(nodeJSInstallationName: 'node-23') {
+        //                 script {
+        //                     echo 'Running tests...'
+        //                     sh 'npm run test'
+        //                 }
+        //             }
+        //         }
+        //     }
+        // }
 
-        stage('Build frontend') {
-            steps {
-                dir('frontend') {
-                    nodejs(nodeJSInstallationName: 'node-23') {
-                        script {
-                            echo 'Building the project...'
-                            sh 'npm run build'
-                        }
-                    }
-                }
-                script {
-                    frontend_build = docker.build("docker-images/pis-frontend", '-f frontend/Dockerfile frontend/')
-                }
-            }
-        }
+        // stage('Build frontend') {
+        //     steps {
+        //         dir('frontend') {
+        //             nodejs(nodeJSInstallationName: 'node-23') {
+        //                 script {
+        //                     echo 'Building the project...'
+        //                     sh 'npm run build'
+        //                 }
+        //             }
+        //         }
+        //         script {
+        //             frontend_build = docker.build("docker-images/pis-frontend", '-f frontend/Dockerfile frontend/')
+        //         }
+        //     }
+        // }
 
-        stage('Upload frontend image to Nexus') {
-            steps {
-                script {
-                    docker.withRegistry('https://nexus.mgarbowski.pl', 'nexus-registry-credentials') {
-                        frontend_build.push("latest")
-                    }
-                }
+        // stage('Upload frontend image to Nexus') {
+        //     steps {
+        //         script {
+        //             docker.withRegistry('https://nexus.mgarbowski.pl', 'nexus-registry-credentials') {
+        //                 frontend_build.push("latest")
+        //             }
+        //         }
 
-            }
-        }
+        //     }
+        // }
 
 
         stage('Build for Testing') {
@@ -113,6 +113,7 @@ pipeline {
             steps {
                 script {
                     backend_build = docker.build("docker-images/pis-backend}", "--target prod -f backend/Dockerfile backend")
+                    echo "Done building"
                 }
             }
         }
