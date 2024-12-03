@@ -112,7 +112,7 @@ pipeline {
         stage('Build for Production') {
             steps {
                 script {
-                    backendBuild = docker.build("docker-images/pis-backend}", "--target prod -f backend/Dockerfile backend")
+                    backend_build = docker.build("docker-images/pis-backend}", "--target prod -f backend/Dockerfile backend")
                 }
             }
         }
@@ -124,7 +124,7 @@ pipeline {
                     echo "Starting the production container from the built image..."
                     
                     // Start the container
-                    def prodContainer = backendBuild.run("-p 8000:8000")
+                    prodContainer = backend_build.run("-p 8000:8000")
 
                     try {
                         // Run a health check or test endpoint
@@ -144,7 +144,7 @@ pipeline {
             steps {
                 script {
                     docker.withRegistry('https://nexus.mgarbowski.pl', 'nexus-registry-credentials') {
-                        backendBuild.push("latest")
+                        backend_build.push("latest")
                     }
                 }
 
