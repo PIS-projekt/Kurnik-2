@@ -58,7 +58,7 @@ pipeline {
                     }
                 }
                 script {
-                    frontend_build = docker.build("frontend-image:${env.BUILD_ID}", '-f frontend/Dockerfile frontend/')
+                    frontend_build = docker.build("docker-images/pis-frontend", '-f frontend/Dockerfile frontend/')
                 }
             }
         }
@@ -67,9 +67,8 @@ pipeline {
             steps {
                 script {
                     docker.withRegistry('https://nexus.mgarbowski.pl', 'nexus-registry-credentials') {
-                        frontend_build.push("${env.BUILD_NUMBER}")
                         frontend_build.push("latest")
-                }
+                    }
                 }
 
             }
@@ -113,7 +112,7 @@ pipeline {
         stage('Build for Production') {
             steps {
                 script {
-                    sh "docker build --target prod -t backend-prod -f backend/Dockerfile backend/"
+                    backendBuild = docker.build("docker-images/pis-backend}", "--target prod -f backend/Dockerfile backend")
                 }
             }
         }
@@ -122,15 +121,30 @@ pipeline {
             steps {
                 script {
                     // Verify the production build by running it temporarily
-                    sh "docker run -p 8000:8000 -d --name prod_container backend-prod"
+                    echo "Starting the production container from the built image..."
+                    def containerId = sh(script: "docker run -p 8000:8000 -d --name prod_container ${backendBuild.id}", returnStdout: true).trim()
 
-                    // Run a health check or test endpoint if needed
-                    sh "sleep 10" // Wait for the container to start
-                    sh "curl -f http://0.0.0.0:8000 || exit 1"
-
-                    // Clean up
-                    sh "docker stop prod_container && docker rm prod_container"
+                    try {
+                        // Run a health check or test endpoint
+                        sh "sleep 10" // Wait for the container to start
+                        sh "curl -f http://0.0.0.0:8000 || exit 1"
+                    } finally {
+                        // Clean up
+                        echo "Stopping and removing the container..."
+                        sh "docker stop ${containerId}"
+                        sh "docker rm ${containerId}"
+                    }
                 }
+            }
+        }
+        stage('Upload backend image to Nexus') {
+            steps {
+                script {
+                    docker.withRegistry('https://nexus.mgarbowski.pl', 'nexus-registry-credentials') {
+                        backendBuild.push("latest")
+                    }
+                }
+
             }
         }
     }
