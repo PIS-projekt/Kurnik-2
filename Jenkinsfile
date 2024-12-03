@@ -1,6 +1,7 @@
 pipeline {
     agent any
 
+
     stages {
         stage('Checkout Code') {
             steps {
@@ -68,40 +69,61 @@ pipeline {
             }
         }
 
-        stage('Build Backend Image') {
+
+        stage('Build for Testing') {
             steps {
                 script {
-                    customImage = docker.build("backend-image:${env.BUILD_ID}", '-f backend/Dockerfile backend/')
+                    sh "docker build --target test -t backend-tests -f backend/Dockerfile backend/"
                 }
             }
         }
 
-        stage('Run Backend Tests') {
+        stage('Run Tests') {
             steps {
                 script {
-                    customImage.inside {
-                        sh 'pdm run test'
-                    }
+                    sh "docker run --rm backend-tests"
                 }
             }
         }
 
-        stage('Lint Backend') {
+        stage('Test Coverage') {
             steps {
                 script {
-                    customImage.inside {
-                        sh 'pdm run lint'
-                    }
+                    sh "docker run --rm backend-tests pdm run coverage"
                 }
             }
         }
 
-        stage('Generate Test Coverage Report') {
+        stage('Linting and Formatting') {
             steps {
                 script {
-                    customImage.inside {
-                        sh 'pdm run coverage'
-                    }
+                    // Adjust the linting/formatting tools as per your setup
+                    sh "docker run --rm backend-tests pdm run lint"
+                    sh "docker run --rm backend-tests pdm run format"
+                }
+            }
+        }
+
+        stage('Build for Production') {
+            steps {
+                script {
+                    sh "docker build --target prod -t backend-prod -f backend/Dockerfile backend/"
+                }
+            }
+        }
+
+        stage('Verify Production Build') {
+            steps {
+                script {
+                    // Verify the production build by running it temporarily
+                    sh "docker run -p 8000:8000 -d --name prod_container backend-prod"
+
+                    // Run a health check or test endpoint if needed
+                    sh "sleep 10" // Wait for the container to start
+                    sh "curl -f http://0.0.0.0:8000 || exit 1"
+
+                    // Clean up
+                    sh "docker stop prod_container && docker rm prod_container"
                 }
             }
         }
