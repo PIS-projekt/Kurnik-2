@@ -54,17 +54,22 @@ pipeline {
                         }
                     }
                 }
+                frontend-build = docker.build("frontend-image:${env.BUILD_ID}", '-f Dockerfile')
+            }
+        }
+
+        stage('Upload frontend image to Nexus') {
+            steps {
+                docker.withRegistry('nexus.mgarbowski.pl', 'nexus-registry-credentials') {
+                    frontend-build.push("${env.BUILD_NUMBER}")
+                    frontend-build.push("latest")
+                }
+
             }
         }
 
         stage('Build Backend Image') {
             steps {
-                script {
-                    docker.image('maven:3.3.3-jdk-8').inside {
-                        sh 'Inside the maven container'
-                    }
-                }
-
                 script {
                     customImage = docker.build("backend-image:${env.BUILD_ID}", '-f backend/Dockerfile backend/')
                 }
