@@ -121,26 +121,27 @@ pipeline {
         stage('Verify Production Build') {
             steps {
                 script {
-                    // Verify the production build using Docker plugin methods
                     echo "Starting the production container from the built image..."
                     
                     // Start the container
-                    prodContainer = backend_build.run("-p 8000:8000")
+                    def prodContainer = backendBuild.run("-p 8000:8000")
+                    def containerId = prodContainer.id
 
                     try {
                         // Run a health check or test endpoint
                         echo "Waiting for the container to initialize..."
                         sleep(10) // Adjust sleep time as needed
-                        prodContainer.exec(["curl", "-f", "http://0.0.0.0:8000"])
+                        sh "docker exec ${containerId} curl -f http://0.0.0.0:8000"
                     } finally {
-                        // Clean up the container
+                        // Clean up the container using shell commands
                         echo "Stopping and removing the container..."
-                        prodContainer.stop()
-                        prodContainer.remove()
+                        sh "docker stop ${containerId}"
+                        sh "docker rm -f ${containerId}"
                     }
                 }
             }
         }
+
         stage('Upload backend image to Nexus') {
             steps {
                 script {
