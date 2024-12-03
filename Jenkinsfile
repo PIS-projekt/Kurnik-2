@@ -124,7 +124,7 @@ pipeline {
                     echo "Starting the production container from the built image..."
                     
                     // Start the container
-                    def prodContainer = backendBuild.run("-p 8000:8000")
+                    def prodContainer = backend_build.run("-p 8000:8000")
                     def containerId = prodContainer.id
 
                     try {
