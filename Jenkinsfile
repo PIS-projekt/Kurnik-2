@@ -57,15 +57,15 @@ pipeline {
                         }
                     }
                 }
-                frontend-build = docker.build("frontend-image:${env.BUILD_ID}", '-f Dockerfile')
+                frontend_build = docker.build("frontend-image:${env.BUILD_ID}", '-f Dockerfile')
             }
         }
 
         stage('Upload frontend image to Nexus') {
             steps {
                 docker.withRegistry('nexus.mgarbowski.pl', 'nexus-registry-credentials') {
-                    frontend-build.push("${env.BUILD_NUMBER}")
-                    frontend-build.push("latest")
+                    frontend_build.push("${env.BUILD_NUMBER}")
+                    frontend_build.push("latest")
                 }
 
             }
