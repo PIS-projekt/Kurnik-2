@@ -168,10 +168,10 @@ variable "vms_admin_username" {
   default     = "azureuser"
 }
 
-variable "vms_ssh_keys" {
-  description = "The public SSH keys that are used to authenticate to VMs."
+variable "vms_ssh_keys_file" {
+  description = "The file with public SSH keys that are used to authenticate to VMs."
   type        = string
-  default     = file("./ssh-keys")
+  default     = "./ssh-keys"
 }
 
 variable "vms_auto_shutdown_time" {

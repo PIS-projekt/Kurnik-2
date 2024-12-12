@@ -107,7 +107,7 @@ resource "azurerm_linux_virtual_machine" "ci_cd_vm" {
 
   admin_ssh_key {
     username   = var.vms_admin_username
-    public_key = var.vms_ssh_keys
+    public_key = file(var.vms_ssh_keys_file)
   }
 
   os_disk {
@@ -134,7 +134,7 @@ resource "azurerm_linux_virtual_machine" "deployment_vm" {
 
   admin_ssh_key {
     username   = var.vms_admin_username
-    public_key = var.vms_ssh_keys
+    public_key = file(var.vms_ssh_keys_file)
   }
 
   os_disk {
