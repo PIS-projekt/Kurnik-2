@@ -1,187 +1,187 @@
-variable "rg_name" {
-  description = "The name of the resource group in which to create the resources."
-  type        = string
-  default     = "pis-rg-2"
-}
-
-variable "location" {
-  description = "The location/region where the resources will be created."
-  type        = string
-  default     = "westeurope"
-}
-
-variable "ci_cd_vm_public_ip_name" {
-  description = "The name of the public IP address for the CI/CD VM."
-  type        = string
-  default     = "ci-cd-ip"
-}
-
-variable "deployment_vm_public_ip_name" {
-  description = "The name of the public IP address for the deployment VM."
-  type        = string
-  default     = "deployment-ip"
-}
-
-variable "vnet_name" {
-  description = "The name of the virtual network."
-  type        = string
-  default     = "pis-vnet"
-}
-
-variable "vnet_address_space" {
-  description = "The address space that is used by the virtual network."
-  type        = list(string)
-  default     = ["10.0.0.0/16"]
-}
-
-variable "nsg_name" {
-  description = "The name of the network security group."
-  type        = string
-  default     = "pis-nsg"
-}
-
-variable "nsg_rules" {
-  description = "A list of network security rules."
-  type = list(object({
-    name                       = string
-    priority                   = number
-    direction                  = string
-    access                     = string
-    protocol                   = string
-    source_port_range          = string
-    destination_port_range     = string
-    source_address_prefix      = string
-    destination_address_prefix = string
-  }))
-  default = [
-    {
-      name                       = "pis-nsg-rule-ssh"
-      priority                   = 1000
-      direction                  = "Inbound"
-      access                     = "Allow"
-      protocol                   = "Tcp"
-      source_port_range          = "*"
-      destination_port_range     = "22"
-      source_address_prefix      = "*"
-      destination_address_prefix = "*"
-    },
-    {
-      name                       = "pis-nsg-rule-http"
-      priority                   = 1020
-      direction                  = "Inbound"
-      access                     = "Allow"
-      protocol                   = "Tcp"
-      source_port_range          = "*"
-      destination_port_range     = "80"
-      source_address_prefix      = "*"
-      destination_address_prefix = "*"
-    },
-    {
-      name                       = "pis-nsg-rule-https"
-      priority                   = 1030
-      direction                  = "Inbound"
-      access                     = "Allow"
-      protocol                   = "Tcp"
-      source_port_range          = "*"
-      destination_port_range     = "443"
-      source_address_prefix      = "*"
-      destination_address_prefix = "*"
+terraform {
+  required_providers {
+    azurerm = {
+      source  = "hashicorp/azurerm"
+      version = "~> 3.0.2"
     }
-  ]
+  }
+
+  required_version = ">= 1.1.0"
 }
 
-variable "subnet_name" {
-  description = "The name of the subnet."
-  type        = string
-  default     = "pis-subnet"
+provider "azurerm" {
+  features {}
 }
 
-variable "subnet_address_prefixes" {
-  description = "A list of address prefixes that are used by the subnet."
-  type        = list(string)
-  default     = ["10.0.1.0/24"]
+resource "azurerm_resource_group" "pis_rg" {
+  name     = var.rg_name
+  location = "westeurope"
 }
 
-variable "ci_cd_vm_nic_name" {
-  description = "The name of the network interface for the CI/CD VM."
-  type        = string
-  default     = "ci-cd-nic"
+resource "azurerm_public_ip" "ci_cd_ip" {
+  name                = var.ci_cd_vm_public_ip_name
+  location            = azurerm_resource_group.pis_rg.location
+  resource_group_name = azurerm_resource_group.pis_rg.name
+  allocation_method   = "Static"
 }
 
-variable "ci_cd_vm_nic_ip_conf_name" {
-  description = "The name of the IP configuration for the network interface for the CI/CD VM."
-  type        = string
-  default     = "ci-cd-ip-config"
+resource "azurerm_public_ip" "deployment_ip" {
+  name                = var.deployment_vm_public_ip_name
+  location            = azurerm_resource_group.pis_rg.location
+  resource_group_name = azurerm_resource_group.pis_rg.name
+  allocation_method   = "Static"
 }
 
-variable "ci_cd_vm_nic_ip_conf_address" {
-  description = "The private IP address that is used by the network interface for the CI/CD VM."
-  type        = string
-  default     = "10.0.1.4"
+resource "azurerm_virtual_network" "pis_vnet" {
+  name                = var.vnet_name
+  location            = azurerm_resource_group.pis_rg.location
+  resource_group_name = azurerm_resource_group.pis_rg.name
+  address_space       = var.vnet_address_space
 }
 
-variable "deployment_vm_nic_name" {
-  description = "The name of the network interface for the deployment VM."
-  type        = string
-  default     = "deployment-nic"
+resource "azurerm_network_security_group" "pis_nsg" {
+  name                = var.nsg_name
+  location            = azurerm_resource_group.pis_rg.location
+  resource_group_name = azurerm_resource_group.pis_rg.name
 }
 
-variable "deployment_vm_nic_ip_conf_name" {
-  description = "The name of the IP configuration for the network interface for the deployment VM."
-  type        = string
-  default     = "deployment-ip-config"
+resource "azurerm_network_security_rule" "name" {
+  for_each = { for rule in var.nsg_rules : rule.name => rule }
+
+  name                        = each.value.name
+  priority                    = each.value.priority
+  direction                   = each.value.direction
+  access                      = each.value.access
+  protocol                    = each.value.protocol
+  source_port_range           = each.value.source_port_range
+  destination_port_range      = each.value.destination_port_range
+  source_address_prefix       = each.value.source_address_prefix
+  destination_address_prefix  = each.value.destination_address_prefix
+  network_security_group_name = azurerm_network_security_group.pis_nsg.name
+  resource_group_name         = azurerm_resource_group.pis_rg.name
 }
 
-variable "deployment_vm_nic_ip_conf_address" {
-  description = "The private IP address that is used by the network interface for the deployment VM."
-  type        = string
-  default     = "10.0.1.5"
+resource "azurerm_subnet" "pis_subnet" {
+  name                 = var.subnet_name
+  resource_group_name  = azurerm_resource_group.pis_rg.name
+  virtual_network_name = azurerm_virtual_network.pis_vnet.name
+  address_prefixes     = var.vnet_address_space
 }
 
-variable "ci_cd_vm_name" {
-  description = "The name of the CI/CD VM."
-  type        = string
-  default     = "ci-cd-vm"
+resource "azurerm_network_interface" "ci_cd_nic" {
+  name                = var.ci_cd_vm_nic_name
+  location            = azurerm_resource_group.pis_rg.location
+  resource_group_name = azurerm_resource_group.pis_rg.name
+
+  ip_configuration {
+    name                          = var.ci_cd_vm_nic_ip_conf_name
+    subnet_id                     = azurerm_subnet.pis_subnet.id
+    private_ip_address_allocation = "Static"
+    private_ip_address            = var.ci_cd_vm_nic_ip_conf_address
+    public_ip_address_id          = azurerm_public_ip.ci_cd_ip.id
+  }
 }
 
-variable "ci_cd_vm_size" {
-  description = "The size of the CI/CD VM."
-  type        = string
-  default     = "Standard_B1s"
+resource "azurerm_network_interface" "deployment_nic" {
+  name                = var.deployment_vm_nic_name
+  location            = azurerm_resource_group.pis_rg.location
+  resource_group_name = azurerm_resource_group.pis_rg.name
+
+  ip_configuration {
+    name                          = var.deployment_vm_nic_ip_conf_name
+    subnet_id                     = azurerm_subnet.pis_subnet.id
+    private_ip_address_allocation = "Static"
+    private_ip_address            = var.deployment_vm_nic_ip_conf_address
+    public_ip_address_id          = azurerm_public_ip.deployment_ip.id
+  }
 }
 
-variable "deployment_vm_name" {
-  description = "The name of the deployment VM."
-  type        = string
-  default     = "deployment-vm"
+resource "azurerm_linux_virtual_machine" "ci_cd_vm" {
+  name                            = var.ci_cd_vm_name
+  location                        = azurerm_resource_group.pis_rg.location
+  resource_group_name             = azurerm_resource_group.pis_rg.name
+  size                            = var.ci_cd_vm_size
+  admin_username                  = var.vms_admin_username
+  network_interface_ids           = [azurerm_network_interface.ci_cd_nic.id]
+  disable_password_authentication = true
+
+  admin_ssh_key {
+    username   = var.vms_admin_username
+    public_key = var.vms_ssh_keys
+  }
+
+  os_disk {
+    caching              = "ReadWrite"
+    storage_account_type = "Standard_LRS"
+  }
+
+  source_image_reference {
+    publisher = "Canonical"
+    offer     = "0001-com-ubuntu-server-focal"
+    sku       = "20_04-lts"
+    version   = "latest"
+  }
 }
 
-variable "deployment_vm_size" {
-  description = "The size of the deployment VM."
-  type        = string
-  default     = "Standard_B1s"
+resource "azurerm_linux_virtual_machine" "deployment_vm" {
+  name                            = var.deployment_vm_name
+  location                        = azurerm_resource_group.pis_rg.location
+  resource_group_name             = azurerm_resource_group.pis_rg.name
+  size                            = var.deployment_vm_size
+  admin_username                  = var.vms_admin_username
+  network_interface_ids           = [azurerm_network_interface.deployment_nic.id]
+  disable_password_authentication = true
+
+  admin_ssh_key {
+    username   = var.vms_admin_username
+    public_key = var.vms_ssh_keys
+  }
+
+  os_disk {
+    caching              = "ReadWrite"
+    storage_account_type = "Standard_LRS"
+  }
+
+  source_image_reference {
+    publisher = "Canonical"
+    offer     = "0001-com-ubuntu-server-focal"
+    sku       = "20_04-lts"
+    version   = "latest"
+  }
 }
 
-variable "vms_admin_username" {
-  description = "The username of created user."
-  type        = string
-  default     = "azureuser"
+resource "azurerm_network_interface_security_group_association" "ci_cd_nic_nsg" {
+  network_interface_id      = azurerm_network_interface.ci_cd_nic.id
+  network_security_group_id = azurerm_network_security_group.pis_nsg.id
 }
 
-variable "vms_ssh_keys" {
-  description = "The public SSH keys that are used to authenticate to VMs."
-  type        = string
-  default     = file("./ssh-keys")
+resource "azurerm_network_interface_security_group_association" "deployment_nic_nsg" {
+  network_interface_id      = azurerm_network_interface.deployment_nic.id
+  network_security_group_id = azurerm_network_security_group.pis_nsg.id
 }
 
-variable "vms_auto_shutdown_time" {
-  description = "Time string in format HHMM."
-  type        = string
-  default     = "1500"
+resource "azurerm_dev_test_global_vm_shutdown_schedule" "ci_cd_shutdown" {
+  virtual_machine_id = azurerm_linux_virtual_machine.ci_cd_vm.id
+  location           = azurerm_resource_group.pis_rg.location
+  enabled            = true
+
+  daily_recurrence_time = var.vms_auto_shutdown_time
+  timezone              = var.vms_auto_shutdown_timezone
+
+  notification_settings {
+    enabled = false
+  }
 }
 
-variable "vms_auto_shutdown_timezone" {
-  description = "Timezone string."
-  type        = string
-  default     = "Pacific Standard Time"
+resource "azurerm_dev_test_global_vm_shutdown_schedule" "deployment_shutdown" {
+  virtual_machine_id = azurerm_linux_virtual_machine.deployment_vm.id
+  location           = azurerm_resource_group.pis_rg.location
+  enabled            = true
+
+  daily_recurrence_time = var.vms_auto_shutdown_time
+  timezone              = var.vms_auto_shutdown_timezone
+
+  notification_settings {
+    enabled = false
+  }
 }
