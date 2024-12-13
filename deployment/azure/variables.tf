@@ -86,6 +86,17 @@ variable "nsg_rules" {
       destination_port_range     = "443"
       source_address_prefix      = "*"
       destination_address_prefix = "*"
+    },
+    {
+      name                       = "pis-nsg-rule-8080-dev"
+      priority                   = 1040
+      direction                  = "Inbound"
+      access                     = "Allow"
+      protocol                   = "Tcp"
+      source_port_range          = "*"
+      destination_port_range     = "8080"
+      source_address_prefix      = "*"
+      destination_address_prefix = "*"
     }
   ]
 }
@@ -147,7 +158,7 @@ variable "ci_cd_vm_name" {
 variable "ci_cd_vm_size" {
   description = "The size of the CI/CD VM."
   type        = string
-  default     = "Standard_B1s"
+  default     = "Standard_DS1_v2"
 }
 
 variable "deployment_vm_name" {
@@ -159,7 +170,7 @@ variable "deployment_vm_name" {
 variable "deployment_vm_size" {
   description = "The size of the deployment VM."
   type        = string
-  default     = "Standard_B1s"
+  default     = "Standard_DS1_v2"
 }
 
 variable "vms_admin_username" {
