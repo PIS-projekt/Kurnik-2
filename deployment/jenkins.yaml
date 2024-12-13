@@ -21,7 +21,7 @@
           - "8080:8080"
           - "50000:50000"
         networks:
-          - name: jenkins
+          - name: ci_network
         restart_policy: unless-stopped
 
     - name: Create dind certs volume
@@ -33,7 +33,7 @@
         name: jenkins-docker
         image: docker:dind
         networks:
-          - name: jenkins
+          - name: ci_network
             aliases:
               - docker
         privileged: true
@@ -72,7 +72,7 @@
         name: jenkins-ssh-agent
         image: jenkins-ssh-agent-with-dind
         networks:
-          - name: jenkins
+          - name: ci_network
             aliases:
               - ssh-agent
         restart_policy: unless-stopped
