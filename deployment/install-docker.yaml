@@ -1,5 +1,6 @@
 - name: Install docker
   hosts: ci-cd
+  remote_user: azureuser
   become: yes
   vars:
     pkgstoinstall: [ libffi-dev, libssl-dev, python3, python3-pip ]
