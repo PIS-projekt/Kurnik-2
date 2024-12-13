@@ -95,3 +95,16 @@ Konfiguracaj samego Jenkinsa nie jest robiona automatycznie i musi być wykonana
   - Github Classic Token - do automatycznego ustawiania webhooków przez Jenkinsa
 - Dodanie agenta w Jenkinsie (`Manage Jenkins` -> `Manage Nodes and Clouds` -> `New Node`)
 - Utworzenie multibranch pipeline dla projektu i odpowiednie skonfigurowanie `Sources` w tymże pipelinie
+
+## Generowanie certyfikatów SSL
+Przy konfiguracji nginxa tylko z obsługą HTTP
+
+W kontenerze nginx-proxy wykonujesz:
+
+```shell
+certbot --non-interactive --nginx --email 'mikolaj.garbowski@gmail.com' --agree-tos -d 'nexus.mgarbowski.pl,jenkins.mgarbowski.pl'
+```
+
+Kopiujesz zawartość /etc/nginx/nginx.conf do repo
+
+Redeploy kontenera nginx-proxy
