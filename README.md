@@ -7,10 +7,10 @@
 
 ## DNS
 * ci-cd-vm.mgarbowski.pl
-  * 51.136.34.212
+  * 52.174.52.106
   * nexus.mgarbowski.pl
 * deployment-vm.mgarbowski.pl
-  * 104.40.144.201
+  * 52.166.240.157
 
 ## Korzystanie z Ansible
 
