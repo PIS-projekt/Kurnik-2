@@ -53,10 +53,24 @@
         mode: '0600'
       register: ssh_key
 
-    - name: Start jenkins ssh agent in docker
+    - name: Copy custom jenkins ssh agent Dockerfile
+      ansible.builtin.copy:
+        src: ./Dockerfile.jenkins-ssh-agent
+        dest: /home/azureuser/Dockerfile
+        mode: '0644'
+
+      # Like this because ansible community.general.docker_image is buggy and does not properly build multi stage images. ¯\_(ツ)_/¯
+    - name: Build jenkins ssh agent Docker image
+      ansible.builtin.shell: |
+        docker stop jenkins-ssh-agent
+        docker rm jenkins-ssh-agent
+        docker rmi jenkins-ssh-agent-with-dind
+        docker build -t jenkins-ssh-agent-with-dind /home/azureuser
+
+    - name: Start custom jenkins ssh agent in docker
       community.docker.docker_container:
         name: jenkins-ssh-agent
-        image: jenkins/ssh-agent:latest
+        image: jenkins-ssh-agent-with-dind
         networks:
           - name: jenkins
             aliases:
@@ -69,16 +83,3 @@
           DOCKER_TLS_VERIFY: "1"
         volumes:
           - jenkins-docker-certs:/certs/client:ro
-
-    # - name: Start Jenkins agent in a Docker container
-    #   community.docker.docker_container:
-    #     name: jenkins-agent
-    #     image: jenkins/jnlp-agent-docker:latest
-    #     networks:
-    #       - name: jenkins
-    #     env:
-    #       DOCKER_HOST: "tcp://docker:2376"
-    #       DOCKER_CERT_PATH: "/certs/client"
-    #       DOCKER_TLS_VERIFY: "1"
-    #     volumes:
-    #       - jenkins-docker-certs:/certs/client:ro
