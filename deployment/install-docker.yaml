@@ -24,3 +24,9 @@
       shell: sh /home/azureuser/get-docker.sh
       args:
         creates: /usr/bin/docker
+
+    - name: Ensure user is in docker group
+      user:
+        name: azureuser
+        groups: docker
+        append: yes

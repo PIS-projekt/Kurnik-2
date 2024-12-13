@@ -31,7 +31,6 @@ pip install ansible
 
 ```shell
 ansible-playbook -u azureuser -i deployment/inventory.ini deployment/install-docker.yaml
-ansible-playbook -u azureuser -i deployment/inventory.ini deployment/users.yaml
 ansible-playbook -u azureuser -i deployment/inventory.ini deployment/nginx.yaml
 ansible-playbook -i deployment/inventory.ini deployment/nexus.yaml
 ```
