@@ -88,3 +88,13 @@ docker pull nexus.mgarbowski.pl/docker-images/pis-frontend:latest
 ```shell
 ./deployment/backup-ci-cd-vm.sh
 ```
+
+## Jenkins
+Playbook `jenkins-docker.yaml` instaluje Jenkinsa w wraz z agentem w kontenerze.
+Konfiguracaj samego Jenkinsa nie jest robiona automatycznie i musi być wykonana ręcznie w nastepujących krokach:
+- Przejście przez proces aktywacji Jenkinsa
+- Dodanie credentiaili:
+  - Prywatny klucz SSH wygenerowany na maszynie `ci-cd-vm` w `/home/azureuser/.ssh/id_rsa`
+  - Github Classic Token - do automatycznego ustawiania webhooków przez Jenkinsa
+- Dodanie agenta w Jenkinsie (`Manage Jenkins` -> `Manage Nodes and Clouds` -> `New Node`)
+- Utworzenie multibranch pipeline dla projektu i odpowiednie skonfigurowanie `Sources` w tymże pipelinie
