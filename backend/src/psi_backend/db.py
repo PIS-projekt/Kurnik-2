@@ -1,5 +1,7 @@
-from sqlalchemy import Column, Integer, String, BigInteger, ForeignKey, create_engine
-from sqlalchemy.orm import Session, declarative_base
+from datetime import datetime
+from sqlmodel import Field, SQLModel, create_engine, Session, select
+from typing import Optional
+
 
 DB_PROVIDER = "postgresql"
 DB_DRIVER = "psycopg2"
@@ -10,39 +12,43 @@ DB_PASSWORD = "admin"
 DB_HOST = "0.0.0.0"
 
 
-Base = declarative_base()
 engine = create_engine(
     f"{DB_PROVIDER}+{DB_DRIVER}://{DB_USER}:{DB_PASSWORD}@{DB_HOST}/{DB_NAME}",
-    echo=True,
 )
 
 
-class Message(Base):
-    __tablename__ = "messages"
+class Message(SQLModel, table=True):
+    """A message in a chatroom. This class is used to interface
+    with the DB."""
 
-    id = Column(Integer, primary_key=True, autoincrement=True)
-    user_id = Column(Integer, nullable=False)
-    chatroom_id = Column(Integer, nullable=False)
-    timestamp = Column(BigInteger, nullable=False)  # Unix timestamp in milliseconds
-    contents = Column(String, nullable=False)
-
-
-def setup_schema():
-    Base.metadata.create_all(engine)
+    id: Optional[int] = Field(default=None, primary_key=True)
+    user_id: int = Field(nullable=False)
+    chatroom_id: int = Field(nullable=False)
+    timestamp: datetime = Field(
+        nullable=False,
+        default_factory=lambda: datetime.now(),
+    )
+    contents: str = Field(nullable=False)
 
 
 def main():
-    setup_schema()
-    session = Session(engine)
-    msg = Message(
-        user_id=1, chatroom_id=1, timestamp=1638422400000, contents="Hello, world!"
-    )
-    session.add(msg)
-    session.commit()
-    # select all messages
-    messages = session.query(Message).all()
-    for message in messages:
-        print(message.contents)
+
+    with Session(engine) as session:
+
+        msg = Message(
+            user_id=1,
+            chatroom_id=1,
+            contents="Hello, world!",
+        )
+        session.add(msg)
+        session.commit()
+
+        statement = select(Message).where(Message.user_id == 1)
+        messages = session.exec(statement).all()
+
+        for message in messages:
+            print(message.contents)
+            print(message.timestamp)
 
 
 if __name__ == "__main__":

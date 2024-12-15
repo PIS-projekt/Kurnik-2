@@ -12,6 +12,8 @@ dependencies = [
     "attrs>=24.2.0",
     "psycopg2-binary>=2.9.10",
     "sqlalchemy>=2.0.36",
+    "sqlmodel>=0.0.22",
+    "pydantic>=2.10.3",
 ]
 requires-python = "==3.12.*"
 readme = "README.md"
