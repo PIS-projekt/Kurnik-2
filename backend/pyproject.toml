@@ -14,6 +14,8 @@ dependencies = [
     "sqlalchemy>=2.0.36",
     "sqlmodel>=0.0.22",
     "pydantic>=2.10.3",
+    "pytest>=8.3.4",
+    "pytest-cov>=6.0.0",
 ]
 requires-python = "==3.12.*"
 readme = "README.md"
@@ -37,8 +39,8 @@ format = {shell = "black src tests && isort src tests"}
 test = {shell = "pytest"}
 cov= {shell = "pytest --cov=src"}
 
-[tool.pytest.ini_options]
-addopts = "--cov=src --cov-report=term-missing"
+# [tool.pytest.ini_options]
+# addopts = "--cov=src --cov-report=term-missing"
 
 [tool.coverage.run]
 branch = true
