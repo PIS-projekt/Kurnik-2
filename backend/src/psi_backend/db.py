@@ -1,5 +1,7 @@
 from datetime import datetime
-from sqlmodel import Field, SQLModel, create_engine, Session, select
+from sqlalchemy import Engine
+from sqlmodel import Field, SQLModel, Session, create_engine, select
+from attrs import define
 from typing import Optional
 
 
@@ -18,8 +20,7 @@ engine = create_engine(
 
 
 class Message(SQLModel, table=True):
-    """A message in a chatroom. This class is used to interface
-    with the DB."""
+    """A message in a chatroom."""
 
     id: Optional[int] = Field(default=None, primary_key=True)
     user_id: int = Field(nullable=False)
@@ -31,25 +32,34 @@ class Message(SQLModel, table=True):
     contents: str = Field(nullable=False)
 
 
-def main():
-
-    with Session(engine) as session:
-
-        msg = Message(
-            user_id=1,
-            chatroom_id=1,
-            contents="Hello, world!",
-        )
-        session.add(msg)
-        session.commit()
-
-        statement = select(Message).where(Message.user_id == 1)
-        messages = session.exec(statement).all()
-
-        for message in messages:
-            print(message.contents)
-            print(message.timestamp)
+class MessageNotFoundError(Exception):
+    """Raised when a message is not found."""
 
 
-if __name__ == "__main__":
-    main()
+@define
+class MessageRepository:
+    """An abstraction over the database for messages."""
+
+    engine: Engine
+
+    def add_message(self, message: Message):
+        """Adds a message to the database."""
+        with Session(self.engine) as session:
+            session.add(message)
+            session.commit()
+
+    def get_messages(self):
+        """Gets all messages from the database."""
+        with Session(self.engine) as session:
+            messages = session.exec(select(Message)).all()
+            return messages
+
+    def delete_message(self, message_id: int):
+        """Deletes a message from the database."""
+        with Session(self.engine) as session:
+            msg = session.get(Message, message_id)
+            if msg is None:
+                raise MessageNotFoundError(f"Message with id {message_id} not found")
+
+            session.delete(msg)
+            session.commit()
