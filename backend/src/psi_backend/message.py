@@ -24,6 +24,11 @@ def create_database(engine: Engine):
     SQLModel.metadata.create_all(engine)
 
 
+def close_database(engine: Engine):
+    """Closes the database connection."""
+    engine.dispose()
+
+
 class Message(SQLModel, table=True):
     """A message in a chatroom."""
 

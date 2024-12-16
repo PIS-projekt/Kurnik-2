@@ -1,16 +1,17 @@
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
-from sqlmodel import SQLModel, Session, select
-from src.psi_backend.db import Message, engine
+from sqlmodel import Session, select
+from src.psi_backend.message import Message, close_database, create_database, engine
 
 
 @asynccontextmanager
 async def lifespan(_: FastAPI):
-    SQLModel.metadata.create_all(engine)
+    create_database(engine)
     """Sets up the database schema before
     starting the app"""
     yield
+    close_database(engine)
 
 
 app = FastAPI(lifespan=lifespan)
