@@ -1,4 +1,4 @@
-import {useState, useEffect, FormEvent} from "react";
+import {useState, FormEvent} from "react";
 import useWebSocket from "react-use-websocket";
 
 
@@ -13,35 +13,28 @@ export const Chat = () => {
   const apiUrl = "localhost:8000/ws/";
   const handleOpen = () => console.log("WebSocket connection opened.");
   const handleClose = () => console.log("WebSocket connection closed.");
-  const handleSendMessage = () => {
-    sendMessage(currentMessage);
-    setCurrentMessage("");
-  };
 
   const handleMessage = (message: { data: string }) => {
-    const msg = message.data as string;
 
+    const msg = message.data as string;
     if (msg.startsWith("Close connection")) {
       setSocketUrl(null);
     }
   };
 
-  let sendMessage = useWebSocket(socketUrl, {
+  // The sockets url will change when the socketUrl changes. it will establish a new connection
+  const {sendMessage} = useWebSocket(socketUrl, {
     onOpen: handleOpen,
     onClose: handleClose,
     onMessage: handleMessage,
-    shouldReconnect: () => false,
+    shouldReconnect: () => true,
   });
 
-  // maybe you can only set the url?
-  useEffect(() => {
-    sendMessage = useWebSocket(socketUrl, {
-      onOpen: handleOpen,
-      onClose: handleClose,
-      onMessage: handleMessage,
-      shouldReconnect: () => false,
-    });
-  }, [socketUrl]);
+  const handleSendMessage = () => {
+    sendMessage(currentMessage);
+    setCurrentMessage("");
+
+  };
 
 
   const handleJoinRoom = (event:FormEvent) => {
