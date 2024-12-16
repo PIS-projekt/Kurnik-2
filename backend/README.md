@@ -2,7 +2,7 @@
 
 ## Running locally using docker
 
-The docker compose consista of 3 targets:
+The docker compose consists of 3 targets:
 
 * `backend` - runs the database & backend server in development mode
 
