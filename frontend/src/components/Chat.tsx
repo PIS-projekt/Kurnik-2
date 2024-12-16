@@ -8,18 +8,21 @@ export const Chat = () => {
   const [roomId, setRoomId] = useState<number>(1);
   const [userId, setUserId] = useState<number>(1);
   const [socketUrl, setSocketUrl] = useState<string | null>(null);
+  const [messageList, setMessageList] = useState<Array<{ data: string }>>([]);
 
-
-  const apiUrl = "localhost:8000/ws/";
+  const apiUrl = "http://localhost:8000/ws/";
   const handleOpen = () => console.log("WebSocket connection opened.");
   const handleClose = () => console.log("WebSocket connection closed.");
 
   const handleMessage = (message: { data: string }) => {
-
+    console.log(messageList);
+    messageList.push(message);
+    setMessageList(messageList);
     const msg = message.data as string;
     if (msg.startsWith("Close connection")) {
       setSocketUrl(null);
     }
+
   };
 
   // The sockets url will change when the socketUrl changes. it will establish a new connection
@@ -31,15 +34,18 @@ export const Chat = () => {
   });
 
   const handleSendMessage = () => {
-    sendMessage(currentMessage);
-    setCurrentMessage("");
+    if (currentMessage){
+      sendMessage(currentMessage);
+      setCurrentMessage("");
+    }
 
   };
 
 
-  const handleJoinRoom = (event:FormEvent) => {
+  const handleJoinRoom = (event: FormEvent) => {
     event.preventDefault();
     setSocketUrl(apiUrl + roomId + "?user_id=" + userId);
+    // setSocketUrl(apiUrl);
   };
 
 
@@ -71,7 +77,12 @@ export const Chat = () => {
         placeholder="Type your message here..."
         value={currentMessage}
         onChange={(e) => setCurrentMessage(e.target.value)}/>
-      <button onClick={(() => handleSendMessage())}>Send Message</button>
+      <div id="Chat">
+        {messageList.map( message => <p className="skibido" key={message.data.length}>{message.data}</p>)}
+      </div>
+      <button onClick={(() => handleSendMessage())}>Send Message
+      </button>
+
       <p>You clicked {count} times</p>
       <button onClick={() => setCount(count + 1)}>Click me</button>
     </div>
