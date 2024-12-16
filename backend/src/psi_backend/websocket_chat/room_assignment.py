@@ -2,6 +2,7 @@ from dataclasses import dataclass
 from fastapi import WebSocket
 from collections import defaultdict
 
+# TODO Add logging the messages to a database.
 
 UserID = int
 
