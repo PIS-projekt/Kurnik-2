@@ -1,5 +1,7 @@
 services:
   backend:
+    depends_on:
+      - database
     build:
       context: .
       dockerfile: Dockerfile
@@ -8,6 +10,7 @@ services:
       - "8000:8000"
     environment:
       - PYTHONUNBUFFERED=1
+      - DB_HOST=pis-db
     restart: always
   backend-tests:
     build:
@@ -16,6 +19,7 @@ services:
       target: test
     environment:
       - PYTHONUNBUFFERED=1
+      - DB_HOST=pis-db
   database:
     image: "postgres:16"
     container_name: pis-db
