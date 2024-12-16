@@ -39,8 +39,6 @@ format = {shell = "black src tests && isort src tests"}
 test = {shell = "pytest"}
 cov= {shell = "pytest --cov=src"}
 
-# [tool.pytest.ini_options]
-# addopts = "--cov=src --cov-report=term-missing"
 
 [tool.coverage.run]
 branch = true

@@ -1,8 +1,7 @@
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
-from sqlmodel import Session, select
-from src.psi_backend.message import Message, close_database, create_database, engine
+from src.psi_backend.message import close_database, create_database, engine
 
 
 @asynccontextmanager
