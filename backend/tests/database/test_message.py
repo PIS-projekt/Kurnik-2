@@ -1,6 +1,6 @@
 from sqlmodel import create_engine
 from copy import deepcopy
-from src.psi_backend.message import (
+from src.psi_backend.database.message import (
     Message,
     MessageNotFoundError,
     MessageRepository,
@@ -29,7 +29,7 @@ def weak_message_eq(msg1, msg2):
     performing insertion tests, so added here not to clutter the message class."""
     return (
         msg1.user_id == msg2.user_id
-        and msg1.chatroom_id == msg2.chatroom_id
+        and msg1.chatroom_code == msg2.chatroom_code
         and msg1.contents == msg2.contents
         and msg1.timestamp == msg2.timestamp
     )
@@ -39,10 +39,10 @@ def weak_message_eq(msg1, msg2):
 def prepopulated_repo():
     """A pre-populated message repository for testing purposes."""
     messages = [
-        Message(user_id=1, chatroom_id=1, contents="Hello, world!"),
-        Message(user_id=2, chatroom_id=1, contents="Goodbye, world!"),
-        Message(user_id=1, chatroom_id=2, contents="Hello, universe!"),
-        Message(user_id=1, chatroom_id=2, contents="Hello, szmozo de la dziobo!"),
+        Message(user_id=1, chatroom_code="1", contents="Hello, world!"),
+        Message(user_id=2, chatroom_code="1", contents="Goodbye, world!"),
+        Message(user_id=1, chatroom_code="2", contents="Hello, universe!"),
+        Message(user_id=1, chatroom_code="2", contents="Hello, szmozo de la dziobo!"),
     ]
     yield temporary_repo(messages)
 
@@ -53,7 +53,7 @@ def test_add_message():
     Since its deepcopy implementation does not copy the id, weak_message_eq has
     to be used."""
     repo = temporary_repo()
-    message = Message(user_id=1, chatroom_id=1, contents="Hello, world!")
+    message = Message(user_id=1, chatroom_code="1", contents="Hello, world!")
     copy = deepcopy(message)
     repo.add_message(message)
     assert weak_message_eq(repo.get_messages()[0], copy)
@@ -64,8 +64,8 @@ def test_add_messages():
     for explanation of the way it's tested"""
     repo = temporary_repo()
     messages = [
-        Message(user_id=1, chatroom_id=1, contents="Hello, world!"),
-        Message(user_id=2, chatroom_id=1, contents="Goodbye, world!"),
+        Message(user_id=1, chatroom_code="1", contents="Hello, world!"),
+        Message(user_id=2, chatroom_code="1", contents="Goodbye, world!"),
     ]
     copies = deepcopy(messages)
     repo.add_messages(messages)  # Messages get cleared upon save, have to copy them

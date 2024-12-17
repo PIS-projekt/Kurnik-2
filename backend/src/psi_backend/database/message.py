@@ -36,7 +36,7 @@ class Message(SQLModel, table=True):
 
     id: Optional[int] = Field(default=None, primary_key=True)
     user_id: int = Field(nullable=False)
-    chatroom_id: int = Field(nullable=False)
+    chatroom_code: str = Field(nullable=False)
     timestamp: datetime = Field(
         nullable=False,
         default_factory=lambda: datetime.now(),
