@@ -1,5 +1,5 @@
-import {useState, FormEvent} from "react";
-import useWebSocket from "react-use-websocket";
+import {FormEvent, useState} from "react";
+import useWebSocket, {ReadyState} from "react-use-websocket";
 
 
 export const Chat = () => {
@@ -37,7 +37,7 @@ export const Chat = () => {
   };
 
   // The sockets url will change when the socketUrl changes. it will establish a new connection
-  const {sendMessage} = useWebSocket(socketUrl, {
+  const {sendMessage, readyState} = useWebSocket(socketUrl, {
     onOpen: handleOpen,
     onClose: handleClose,
     onMessage: handleMessage,
@@ -45,7 +45,7 @@ export const Chat = () => {
   });
 
   const handleSendMessage = () => {
-    if (currentMessage){
+    if (currentMessage && readyState == ReadyState.OPEN){
       sendMessage(currentMessage);
       setCurrentMessage("");
     }
