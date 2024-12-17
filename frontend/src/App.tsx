@@ -9,7 +9,6 @@ function App() {
       <p>Profile: {process.env.NODE_ENV}</p>
       <p>Hello world</p>
       <Chat/>
-      <ClickCounter/>
       {/*TODO: API call*/}
     </div>
   );
