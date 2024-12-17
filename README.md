@@ -7,10 +7,10 @@
 
 ## DNS
 * ci-cd-vm.mgarbowski.pl
-  * 51.136.34.212
+  * 52.174.52.106
   * nexus.mgarbowski.pl
 * deployment-vm.mgarbowski.pl
-  * 104.40.144.201
+  * 52.166.240.157
 
 ## Korzystanie z Ansible
 
@@ -30,10 +30,7 @@ pip install ansible
 * Instalacja Nexusa i uruchomienie
 
 ```shell
-ansible-playbook -u azureuser -i deployment/inventory.ini deployment/install-docker.yaml
-ansible-playbook -u azureuser -i deployment/inventory.ini deployment/users.yaml
-ansible-playbook -u azureuser -i deployment/inventory.ini deployment/nginx.yaml
-ansible-playbook -i deployment/inventory.ini deployment/nexus.yaml
+ansible-playbook -i deployment/inventory.ini deployment/site.yaml
 ```
 
 ## Korzystanie z Nexus
@@ -88,3 +85,26 @@ docker pull nexus.mgarbowski.pl/docker-images/pis-frontend:latest
 ```shell
 ./deployment/backup-ci-cd-vm.sh
 ```
+
+## Jenkins
+Playbook `jenkins-docker.yaml` instaluje Jenkinsa w wraz z agentem w kontenerze.
+Konfiguracaj samego Jenkinsa nie jest robiona automatycznie i musi być wykonana ręcznie w nastepujących krokach:
+- Przejście przez proces aktywacji Jenkinsa
+- Dodanie credentiaili:
+  - Prywatny klucz SSH wygenerowany na maszynie `ci-cd-vm` w `/home/azureuser/.ssh/id_rsa`
+  - Github Classic Token - do automatycznego ustawiania webhooków przez Jenkinsa
+- Dodanie agenta w Jenkinsie (`Manage Jenkins` -> `Manage Nodes and Clouds` -> `New Node`)
+- Utworzenie multibranch pipeline dla projektu i odpowiednie skonfigurowanie `Sources` w tymże pipelinie
+
+## Generowanie certyfikatów SSL
+Przy konfiguracji nginxa tylko z obsługą HTTP
+
+W kontenerze nginx-proxy wykonujesz:
+
+```shell
+certbot --non-interactive --nginx --email 'mikolaj.garbowski@gmail.com' --agree-tos -d 'nexus.mgarbowski.pl,jenkins.mgarbowski.pl'
+```
+
+Kopiujesz zawartość /etc/nginx/nginx.conf do repo
+
+Redeploy kontenera nginx-proxy

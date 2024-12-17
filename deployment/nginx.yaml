@@ -1,6 +1,7 @@
 ---
 - name: Setup Nginx in Docker
   hosts: ci-cd
+  remote_user: azureuser
   become: true
 
   tasks:
@@ -20,11 +21,6 @@
     - name: Create a volume to store SSL certificates
       community.docker.docker_volume:
         name: certs
-
-    - name: Create a Docker network
-      docker_network:
-        name: ci_network
-        state: present
 
     - name: Run Nginx container
       docker_container:

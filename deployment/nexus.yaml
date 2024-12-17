@@ -5,6 +5,8 @@
 
 - name: Setup Nexus, runs in Docker container
   hosts: ci-cd
+  remote_user: azureuser
+  become: true
   tasks:
     - name: Create a volume to store persistent data
       community.docker.docker_volume:
