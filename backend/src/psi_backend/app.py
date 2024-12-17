@@ -1,8 +1,12 @@
 from contextlib import asynccontextmanager
-from fastapi import Depends, FastAPI, WebSocket, WebSocketDisconnect
-from fastapi.responses import HTMLResponse
+from fastapi import FastAPI
 
-from src.psi_backend.message import close_database, create_database, engine
+from src.psi_backend.message import (
+    close_database,
+    create_database,
+    engine,
+    message_repository,
+)
 from src.psi_backend.routes.ws import ws_router
 
 
@@ -22,3 +26,8 @@ app.include_router(ws_router, prefix="/ws")
 @app.get("/")
 async def read_root():
     return {"Hello": "World"}
+
+
+@app.get("/messages")
+async def read_messages():
+    return message_repository.get_messages()
