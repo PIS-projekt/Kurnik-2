@@ -1,8 +1,7 @@
 from dataclasses import dataclass
 from fastapi import WebSocket
 from collections import defaultdict
-
-# TODO Add logging the messages to a database.
+from src.psi_backend.message import Message, message_repository
 
 UserID = int
 
@@ -37,6 +36,9 @@ async def broadcast_message(room_id: int, user_id: int, message: str):
     for websocket_user in rooms[room_id]:
         await websocket_user.websocket_connection.send_text(
             f"User[{user_id}] said: {message}."
+        )
+        message_repository.add_message(
+            Message(user_id=user_id, chatroom_id=room_id, contents=message)
         )
 
 

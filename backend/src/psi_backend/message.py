@@ -1,3 +1,4 @@
+from __future__ import annotations
 from datetime import datetime
 from sqlalchemy import Engine
 from sqlmodel import Field, SQLModel, Session, create_engine, select
@@ -94,3 +95,6 @@ class MessageRepository:
             for msg in messages:
                 session.delete(msg)
             session.commit()
+
+
+message_repository = MessageRepository(engine)
