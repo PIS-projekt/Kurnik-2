@@ -5,14 +5,25 @@ import useWebSocket from "react-use-websocket";
 export const Chat = () => {
   const [count, setCount] = useState(0);
   const [currentMessage, setCurrentMessage] = useState("");
-  const [roomId, setRoomId] = useState<number>(1);
+  const [selectedRoomId, setSelectedRoomId] = useState<number>(1);
   const [userId, setUserId] = useState<number>(1);
   const [socketUrl, setSocketUrl] = useState<string | null>(null);
   const [messageList, setMessageList] = useState<Array<{ data: string }>>([]);
+  const [loggedRoomId, setLoggedRoomId] = useState<number|null>(null);
+  const [loggedUserId, setLoggedUserId] = useState<number|null>(null);
 
   const apiUrl = "http://localhost:8000/ws/";
-  const handleOpen = () => console.log("WebSocket connection opened.");
-  const handleClose = () => console.log("WebSocket connection closed.");
+  const handleOpen = () => {
+    console.log("WebSocket connection opened.");
+    setLoggedRoomId(selectedRoomId);
+    setLoggedUserId(userId);
+  };
+  const handleClose = () => {
+    console.log("WebSocket connection closed.");
+    setMessageList([]);
+    setLoggedRoomId(null);
+    setLoggedUserId(null);
+  };
 
   const handleMessage = (message: { data: string }) => {
     console.log(messageList);
@@ -44,7 +55,7 @@ export const Chat = () => {
 
   const handleJoinRoom = (event: FormEvent) => {
     event.preventDefault();
-    setSocketUrl(apiUrl + roomId + "?user_id=" + userId);
+    setSocketUrl(apiUrl + selectedRoomId + "?user_id=" + userId);
     // setSocketUrl(apiUrl);
   };
 
@@ -57,8 +68,8 @@ export const Chat = () => {
         <label htmlFor="room">Room Name:</label>
         <input
           type="text"
-          value={roomId}
-          onChange={(e) => setRoomId(parseInt(e.target.value))}
+          value={selectedRoomId}
+          onChange={(e) => setSelectedRoomId(parseInt(e.target.value))}
           required
         />
         <label htmlFor="user_id">User ID:</label>
@@ -71,6 +82,7 @@ export const Chat = () => {
         />
         <button>Join Room</button>
       </form>
+      <div> Logged in as user: {loggedUserId} in room {loggedRoomId} </div>
       <div id="chat"></div>
       <input type="text"
         id="message"
