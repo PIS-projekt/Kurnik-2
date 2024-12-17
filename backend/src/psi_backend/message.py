@@ -4,6 +4,7 @@ from sqlalchemy import Engine
 from sqlmodel import Field, SQLModel, Session, create_engine, select
 from attrs import define
 from typing import Optional
+import os
 
 
 DB_PROVIDER = "postgresql"
@@ -12,7 +13,7 @@ DB_DRIVER = "psycopg2"
 DB_NAME = "pis"
 DB_USER = "admin"
 DB_PASSWORD = "admin"
-DB_HOST = "0.0.0.0"
+DB_HOST = os.getenv("DB_HOST") or "0.0.0.0"
 
 
 engine = create_engine(
