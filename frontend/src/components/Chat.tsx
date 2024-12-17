@@ -67,14 +67,14 @@ export const Chat = () => {
         onSubmit={(event) => handleJoinRoom(event)}>
         <label htmlFor="room">Room Name:</label>
         <input
-          type="text"
+          type="number"
           value={selectedRoomId}
           onChange={(e) => setSelectedRoomId(parseInt(e.target.value))}
           required
         />
         <label htmlFor="user_id">User ID:</label>
         <input
-          type="text"
+          type="number"
           id="user_id"
           value={userId}
           onChange={(e) => setUserId(parseInt(e.target.value))}
