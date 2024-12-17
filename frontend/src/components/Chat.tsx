@@ -78,9 +78,13 @@ export const Chat = () => {
           onChange={(e) => setUserId(parseInt(e.target.value))}
           required
         />
+        <br/>
+        <br/>
         <button>Join Room</button>
       </form>
+      <br/>
       <div> Logged in as user: {loggedUserId} in room {loggedRoomId} </div>
+      <br/>
       <div id="chat"></div>
       <input type="text"
         id="message"
