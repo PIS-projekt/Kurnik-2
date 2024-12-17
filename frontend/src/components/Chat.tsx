@@ -89,11 +89,11 @@ export const Chat = () => {
         placeholder="Type your message here..."
         value={currentMessage}
         onChange={(e) => setCurrentMessage(e.target.value)}/>
+      <button onClick={(() => handleSendMessage())}>Send Message
+      </button>
       <div id="Chat">
         {messageList.map( message => <p className="skibido" key={message.data.length}>{message.data}</p>)}
       </div>
-      <button onClick={(() => handleSendMessage())}>Send Message
-      </button>
 
       <p>You clicked {count} times</p>
       <button onClick={() => setCount(count + 1)}>Click me</button>
