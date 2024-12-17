@@ -3,7 +3,6 @@ import useWebSocket, {ReadyState} from "react-use-websocket";
 
 
 export const Chat = () => {
-  const [count, setCount] = useState(0);
   const [currentMessage, setCurrentMessage] = useState("");
   const [selectedRoomId, setSelectedRoomId] = useState<number>(1);
   const [userId, setUserId] = useState<number>(1);
@@ -56,7 +55,6 @@ export const Chat = () => {
   const handleJoinRoom = (event: FormEvent) => {
     event.preventDefault();
     setSocketUrl(apiUrl + selectedRoomId + "?user_id=" + userId);
-    // setSocketUrl(apiUrl);
   };
 
 
