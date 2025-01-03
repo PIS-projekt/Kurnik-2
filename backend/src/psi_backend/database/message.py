@@ -1,3 +1,4 @@
+from __future__ import annotations
 from datetime import datetime
 from sqlalchemy import Engine
 from sqlmodel import Field, SQLModel, Session, create_engine, select
@@ -35,7 +36,7 @@ class Message(SQLModel, table=True):
 
     id: Optional[int] = Field(default=None, primary_key=True)
     user_id: int = Field(nullable=False)
-    chatroom_id: int = Field(nullable=False)
+    chatroom_code: str = Field(nullable=False)
     timestamp: datetime = Field(
         nullable=False,
         default_factory=lambda: datetime.now(),
@@ -95,3 +96,6 @@ class MessageRepository:
             for msg in messages:
                 session.delete(msg)
             session.commit()
+
+
+message_repository = MessageRepository(engine)
