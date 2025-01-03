@@ -17,7 +17,7 @@ RUN pip install --no-cache-dir pdm
 COPY src ./src
 
 # Production target
-FROM base as prod
+FROM base AS prod
 
 # Install production dependencies
 RUN pdm install --prod --no-editable --no-lock
@@ -29,7 +29,7 @@ EXPOSE 8000
 CMD ["pdm", "run", "start"]
 
 # Production target
-FROM base as test
+FROM base AS test
 
 # Install dev dependencies
 RUN pdm install --no-editable --no-lock
