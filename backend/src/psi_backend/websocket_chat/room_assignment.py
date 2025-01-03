@@ -75,6 +75,7 @@ def create_room() -> RoomCode:
         RoomCode: The unique 6-digit alphanumeric code of the room.
     """
     room_code = generate_room_code()
+
     rooms[room_code] = []
     return room_code
 

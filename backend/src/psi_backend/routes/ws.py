@@ -44,7 +44,7 @@ async def websocket_client_simulation():
                     event.preventDefault();
                     const room = document.getElementById('room').value;
                     const user_id = document.getElementById('user_id').value;
-                    websocket = new WebSocket(`ws://localhost:8000/ws/${room}?user_id=${user_id}`);
+                    websocket = new WebSocket(`ws://localhost:8000/ws/connect/${room}?user_id=${user_id}`);
 
                     websocket.onopen = function() {
                         const chat = document.getElementById('chat');

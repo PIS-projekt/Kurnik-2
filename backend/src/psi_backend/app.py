@@ -1,6 +1,6 @@
 from contextlib import asynccontextmanager
-from email.policy import HTTP
 from fastapi import FastAPI, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
 
 from src.psi_backend.database.message import (
     close_database,
@@ -27,6 +27,14 @@ async def lifespan(_: FastAPI):
 app = FastAPI(lifespan=lifespan)
 app.include_router(ws_router, prefix="/ws")
 
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://0.0.0.0"],  # Replace with the actual URL of your frontend
+    allow_credentials=True,
+    allow_methods=["*"],  # Allow all HTTP methods
+    allow_headers=["*"],  # Allow all headers
+)
+
 
 @app.get("/")
 async def read_root():
@@ -37,7 +45,7 @@ async def read_root():
 async def create_room_endpoint(
     user_id: int,  # user_id=Depends(get_current_user_id) -> This should be used when introducing server-side user authentication. Right now, user_id is passed as a query parameter.
 ):
-    room_code = create_room(user_id)
+    room_code = create_room()
 
     return {"message": "Room created successfully", "room_code": room_code}
 
