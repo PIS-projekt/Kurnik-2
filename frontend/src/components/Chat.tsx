@@ -1,42 +1,38 @@
-import {FormEvent, useState} from "react";
-import useWebSocket, {ReadyState} from "react-use-websocket";
-
+import { FormEvent, useState } from "react";
+import useWebSocket, { ReadyState } from "react-use-websocket";
+import axios from "axios";
 
 export const Chat = () => {
   const [currentMessage, setCurrentMessage] = useState("");
-  const [selectedRoomId, setSelectedRoomId] = useState<number>(1);
+  const [roomCode, setRoomCode] = useState<string>("");
   const [userId, setUserId] = useState<number>(1);
   const [socketUrl, setSocketUrl] = useState<string | null>(null);
   const [messageList, setMessageList] = useState<Array<{ data: string }>>([]);
-  const [loggedRoomId, setLoggedRoomId] = useState<number|null>(null);
-  const [loggedUserId, setLoggedUserId] = useState<number|null>(null);
+  const [loggedRoomCode, setLoggedRoomCode] = useState<string | null>(null);
+  const [loggedUserId, setLoggedUserId] = useState<number | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
-  const apiUrl = "http://localhost:8000/ws/";
+  const apiBaseUrl = "http://0.0.0.0:8000";
+  
   const handleOpen = () => {
     console.log("WebSocket connection opened.");
-    setLoggedRoomId(selectedRoomId);
+    setLoggedRoomCode(roomCode);
     setLoggedUserId(userId);
+    setError(null);
   };
+
   const handleClose = () => {
     console.log("WebSocket connection closed.");
     setMessageList([]);
-    setLoggedRoomId(null);
+    setLoggedRoomCode(null);
     setLoggedUserId(null);
   };
 
   const handleMessage = (message: { data: string }) => {
-    console.log(messageList);
-    messageList.push(message);
-    setMessageList(messageList);
-    const msg = message.data as string;
-    if (msg.startsWith("Close connection")) {
-      setSocketUrl(null);
-    }
-
+    setMessageList((prevMessages) => [...prevMessages, message]);
   };
 
-  // The sockets url will change when the socketUrl changes. it will establish a new connection
-  const {sendMessage, readyState} = useWebSocket(socketUrl, {
+  const { sendMessage, readyState } = useWebSocket(socketUrl, {
     onOpen: handleOpen,
     onClose: handleClose,
     onMessage: handleMessage,
@@ -44,32 +40,49 @@ export const Chat = () => {
   });
 
   const handleSendMessage = () => {
-    if (currentMessage && readyState == ReadyState.OPEN){
+    if (currentMessage && readyState === ReadyState.OPEN) {
       sendMessage(currentMessage);
       setCurrentMessage("");
     }
-
   };
 
+  const handleCreateRoom = async () => {
+    try {
+      const response = await axios.get(`${apiBaseUrl}/create-new-room`, {
+        // eslint-disable-next-line camelcase
+        params: { user_id: userId },
+      });
+      const newRoomCode = response.data.room_code;
+      setRoomCode(newRoomCode);
+      setSocketUrl(`${apiBaseUrl}/ws/connect/${newRoomCode}?user_id=${userId}`);
+      setError("Room created and joined successfully.");
+    } catch (error) {
+      console.error("Failed to create room:", error);
+      setError("Failed to create room. Please try again.");
+    }
+  };
 
-  const handleJoinRoom = (event: FormEvent) => {
+  const handleJoinRoom = async (event: FormEvent) => {
     event.preventDefault();
-    setSocketUrl(apiUrl + selectedRoomId + "?user_id=" + userId);
+    try {
+      const response = await axios.get(`${apiBaseUrl}/join-room`, {
+        // eslint-disable-next-line camelcase
+        params: { room_code: roomCode, user_id: userId },
+      });
+      if (response.data.room_exists) {
+        setSocketUrl(`${apiBaseUrl}/ws/connect/${roomCode}?user_id=${userId}`);
+        setError("Joined room successfully.");
+      }
+    } catch (error) {
+      console.error("Failed to join room:", error);
+      setError("Room not found. Please check the room code.");
+    }
   };
-
 
   return (
     <div className="Chatroom">
       <h1>Chatroom</h1>
-      <form action=""
-        onSubmit={(event) => handleJoinRoom(event)}>
-        <label htmlFor="room">Room Name:</label>
-        <input
-          type="number"
-          value={selectedRoomId}
-          onChange={(e) => setSelectedRoomId(parseInt(e.target.value))}
-          required
-        />
+      <div>
         <label htmlFor="user_id">User ID:</label>
         <input
           type="number"
@@ -78,23 +91,42 @@ export const Chat = () => {
           onChange={(e) => setUserId(parseInt(e.target.value))}
           required
         />
-        <br/>
-        <br/>
-        <button>Join Room</button>
+      </div>
+      <br />
+      <div>
+        <button onClick={handleCreateRoom}>Create Room</button>
+      </div>
+      <br />
+      <form onSubmit={handleJoinRoom}>
+        <label htmlFor="room_code">Room Code:</label>
+        <input
+          type="text"
+          id="room_code"
+          value={roomCode}
+          onChange={(e) => setRoomCode(e.target.value)}
+          required
+        />
+        <button type="submit">Join Room</button>
       </form>
-      <br/>
-      <div> Logged in as user: {loggedUserId} in room {loggedRoomId} </div>
-      <br/>
+      <br />
+      <div>Logged in as user: {loggedUserId} in room: {loggedRoomCode}</div>
+      {error && <div style={{ color: "red" }}>{error}</div>}
+      <br />
       <div id="chat"></div>
-      <input type="text"
+      <input
+        type="text"
         id="message"
         placeholder="Type your message here..."
         value={currentMessage}
-        onChange={(e) => setCurrentMessage(e.target.value)}/>
-      <button onClick={(() => handleSendMessage())}>Send Message
-      </button>
+        onChange={(e) => setCurrentMessage(e.target.value)}
+      />
+      <button onClick={handleSendMessage}>Send Message</button>
       <div id="Chat">
-        {messageList.map( message => <p className="skibido" key={message.data.length}>{message.data}</p>)}
+        {messageList.map((message, index) => (
+          <p className="skibido" key={index}>
+            {message.data}
+          </p>
+        ))}
       </div>
     </div>
   );
