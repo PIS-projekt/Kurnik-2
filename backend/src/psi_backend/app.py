@@ -29,7 +29,7 @@ app.include_router(ws_router, prefix="/ws")
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://0.0.0.0"],  # Replace with the actual URL of your frontend
+    allow_origins=["*"],  # Replace with the actual URL of your frontend
     allow_credentials=True,
     allow_methods=["*"],  # Allow all HTTP methods
     allow_headers=["*"],  # Allow all headers
