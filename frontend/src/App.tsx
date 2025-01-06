@@ -1,13 +1,45 @@
 import "./App.css";
-import {Chat} from "./components/Chat";
+import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { Chat } from "./components/Chat";
+import { Login } from "./components/Login";
+import { Register } from "./components/Register";
 
 function App() {
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+
+  useEffect(() => {
+    // Check for token in localStorage to determine authentication status
+    const token = localStorage.getItem("access_token");
+    if (token) {
+      setIsAuthenticated(true);
+    }
+  }, []);
+
   return (
-    <div className="App">
-      <h1>Projekt PIS 2024Z</h1>
-      <p>Profile: {process.env.NODE_ENV}</p>
-      <Chat/>
-    </div>
+    <Router>
+      <div className="App">
+        <h1>Projekt PIS 2024Z</h1>
+        <p>Profile: {process.env.NODE_ENV}</p>
+
+        <Routes>
+          {/* Redirect to chat if authenticated, otherwise go to login */}
+          <Route
+            path="/"
+            element={isAuthenticated ? <Navigate to="/chat" /> : <Navigate to="/login" />}
+          />
+          <Route
+            path="/chat"
+            element={isAuthenticated ? <Chat /> : <Navigate to="/login" />}
+          />
+          <Route
+            path="/login"
+            element={<Login setIsAuthenticated={setIsAuthenticated} />}
+          />
+          <Route path="/register" element={<Register />} />
+        </Routes>
+      </div>
+    </Router>
   );
 }
 
