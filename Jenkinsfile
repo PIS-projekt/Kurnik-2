@@ -151,6 +151,38 @@ pipeline {
 
             }
         }
+
+        stage('deploy to production') {
+            when {
+                branch 'main'
+            }
+            stages {
+                stage('Get user confirmation') {
+                    steps {
+                        script {
+                            def userInput = input(
+                                id: 'userInput',
+                                message: 'Do you want to deploy to production?',
+                                parameters: [
+                                    booleanParam(defaultValue: false, description: 'Deploy to production?', name: 'deployToProduction')
+                                ]
+                            )
+                            if (!userInput.deployToProduction) {
+                                error('Production deployment cancelled by the user')
+                            }
+                        }
+                    }
+                }
+                stage('Deploy to production') {
+                    steps {
+                        script {
+                            echo 'Deploying to production...'
+                            // Add deployment steps here
+                        }
+                    }
+                }
+            }
+        }
     }
 
     post {

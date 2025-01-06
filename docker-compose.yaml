@@ -13,7 +13,7 @@ services:
       - PYTHONUNBUFFERED=1
       - DB_HOST=pis-db
     restart: always
-  
+
   backend-tests:
     build:
       context: backend/
@@ -22,7 +22,7 @@ services:
     environment:
       - PYTHONUNBUFFERED=1
       - DB_HOST=pis-db
-  
+
   database:
     image: "postgres:16"
     container_name: pis-db
@@ -43,4 +43,3 @@ services:
     environment:
       - NODE_ENV=production
     restart: always
-
