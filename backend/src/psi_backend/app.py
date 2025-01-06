@@ -1,12 +1,17 @@
 from contextlib import asynccontextmanager
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Depends
 from fastapi.middleware.cors import CORSMiddleware
+from typing import Annotated
 
-from src.psi_backend.database.message import (
+from src.psi_backend.database.db import (
     close_database,
     create_database,
     engine,
 )
+
+from src.psi_backend.database.user import User
+
+from src.psi_backend.routes.auth import auth_router, get_current_user
 
 from src.psi_backend.routes.ws import ws_router
 from src.psi_backend.websocket_chat.room_assignment import (
@@ -26,6 +31,7 @@ async def lifespan(_: FastAPI):
 
 app = FastAPI(lifespan=lifespan)
 app.include_router(ws_router, prefix="/ws")
+app.include_router(auth_router, prefix="/auth")
 
 app.add_middleware(
     CORSMiddleware,
@@ -43,8 +49,10 @@ async def read_root():
 
 @app.get("/create-new-room")
 async def create_room_endpoint(
-    user_id: int,  # user_id=Depends(get_current_user_id) -> This should be used when introducing server-side user authentication. Right now, user_id is passed as a query parameter.
+    current_user: Annotated[User, Depends(get_current_user)]
 ):
+    print(current_user.username)
+
     room_code = create_room()
 
     return {"message": "Room created successfully", "room_code": room_code}
