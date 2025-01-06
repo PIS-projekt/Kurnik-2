@@ -154,7 +154,7 @@ pipeline {
 
         stage('deploy to production') {
             when {
-                branch 'main'
+                branch 'SCRUM-37-Deployment-on-remote-server-script'
             }
             stages {
                 stage('Get user confirmation') {
