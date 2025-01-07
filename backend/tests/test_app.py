@@ -1,5 +1,5 @@
-import pytest
 from fastapi.testclient import TestClient
+
 from src.psi_backend.app import app
 
 client = TestClient(app)
@@ -14,7 +14,7 @@ def test_read_root():
 
 # Test join room failure
 def test_join_room_failure(monkeypatch):
-    def mock_check_room_exists(room_code):
+    def mock_check_room_exists(_):
         return False
 
     monkeypatch.setattr(
