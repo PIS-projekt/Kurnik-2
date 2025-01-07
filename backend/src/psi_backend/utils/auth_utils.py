@@ -3,7 +3,8 @@ import random
 
 def get_current_user_id() -> (
     int
-):  # TODO If we want user authentication, this should return the id of an authenticated user.
+):  # TODO If we want user authentication, this should return the id of
+    # an authenticated user.
     """Mock function to simulate an authenticated user.
 
     Returns:
