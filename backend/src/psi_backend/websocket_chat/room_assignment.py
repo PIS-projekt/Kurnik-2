@@ -3,6 +3,7 @@ from __future__ import annotations
 import random
 import string
 from dataclasses import dataclass, field
+import asyncio
 
 from fastapi import WebSocket
 
@@ -11,29 +12,26 @@ from src.psi_backend.database.message import Message, message_repository
 UserID = int
 RoomCode = str
 rooms: dict[RoomCode, Chatroom] = dict()
+room_lock = asyncio.Lock()
 
 
-def delete_room(room_code: RoomCode):
+async def delete_room(room_code: RoomCode):
     """Remove a room from the rooms dictionary."""
-    del rooms[room_code]
+    async with room_lock:
+        del rooms[room_code]
 
 
-def delete_room_if_empty(room_code: RoomCode):
+async def delete_room_if_empty(room_code: RoomCode):
     """Remove a room from the rooms dictionary if it is empty."""
-    if rooms[room_code].is_empty():
-        delete_room(room_code)
+    async with room_lock:
+        if rooms[room_code].is_empty():
+            del rooms[room_code]
 
 
-def check_room_exists(room_code: RoomCode) -> bool:
-    """Check if a room exists.
-
-    Args:
-        room_code (RoomCode): Room to check.
-
-    Returns:
-        bool: True if the room exists, False otherwise.
-    """
-    return room_code in rooms
+async def check_room_exists(room_code: RoomCode) -> bool:
+    """Check if a room exists."""
+    async with room_lock:
+        return room_code in rooms
 
 
 @dataclass
@@ -76,17 +74,13 @@ class RoomNotFoundError(Exception):
     """Raised when a room is not found."""
 
 
-def assign_user_to_room(room_code: RoomCode, user_websocket: WebSocketUser):
-    """Assign the user to be inside a room
-
-    Args:
-        room_code (RoomCode): Room to put the user in.
-        user_websocket (WebSocketUser): The user and his websocket connection.
-    """
-    if room_code in rooms:
-        rooms[room_code].add_user(user_websocket)
-    else:
-        raise RoomNotFoundError(f"Room with code {room_code} not found.")
+async def assign_user_to_room(room_code: RoomCode, user_websocket: WebSocketUser):
+    """Assign the user to be inside a room."""
+    async with room_lock:
+        if room_code in rooms:
+            rooms[room_code].add_user(user_websocket)
+        else:
+            raise RoomNotFoundError(f"Room with code {room_code} not found.")
 
 
 async def broadcast_message(room_code: RoomCode, user_id: int, message: str):
@@ -107,27 +101,21 @@ async def broadcast_message(room_code: RoomCode, user_id: int, message: str):
     await rooms[room_code].message_all(f"User[{user_id}] said: {message}")
 
 
-def disconnect_user(room_code: str, user_id: int):
-    """Disconnect the user from the room
-
-    Args:
-        room_code (RoomCode): Room to remove the user from.
-        user_id (int): User to remove from the room.
-    """
-    room = rooms[room_code]
-    room.remove_user(user_id)
-    delete_room_if_empty(room_code)
+async def disconnect_user(room_code: str, user_id: int):
+    """Disconnect the user from the room."""
+    async with room_lock:
+        room = rooms[room_code]
+        room.remove_user(user_id)
+        if room.is_empty():
+            del rooms[room_code]
 
 
-def create_room(private: bool) -> RoomCode:
-    """Create a new room and give it a unique 6-digit alphanumeric code."
-
-    Returns:
-        RoomCode: The unique 6-digit alphanumeric code of the room.
-    """
+async def create_room(private: bool) -> RoomCode:
+    """Create a new room and give it a unique 6-digit alphanumeric code."""
     room_code = generate_room_code()
 
-    rooms[room_code] = Chatroom(room_code, private)
+    async with room_lock:
+        rooms[room_code] = Chatroom(room_code, private)
     return room_code
 
 
