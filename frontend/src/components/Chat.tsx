@@ -11,6 +11,7 @@ export const Chat = () => {
   const [loggedRoomCode, setLoggedRoomCode] = useState<string | null>(null);
   const [loggedUserId, setLoggedUserId] = useState<number | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [newRoomPrivacy, setNewRoomPrivacy] = useState<string>("public");
 
   const apiBaseUrl = "http://0.0.0.0:8000";
 
@@ -50,7 +51,7 @@ export const Chat = () => {
     try {
       const response = await axios.get(`${apiBaseUrl}/create-new-room`, {
         // eslint-disable-next-line camelcase
-        params: { user_id: userId, private: false }, // TODO: get setting from user
+        params: { user_id: userId, private: (newRoomPrivacy == "private") },
       });
       const newRoomCode = response.data.room_code;
       setRoomCode(newRoomCode);
@@ -94,9 +95,19 @@ export const Chat = () => {
       </div>
       <br />
       <div>
+        <label htmlFor="visibility-dropdown">Visibility of new room: </label>
+        <select
+          id="visibility-dropdown"
+          value={newRoomPrivacy}
+          onChange={(e) => {setNewRoomPrivacy(e.target.value);} }
+        >
+          <option value="public">Public</option>
+          <option value="private">Private</option>
+        </select>
+        <br/>
         <button onClick={handleCreateRoom}>Create Room</button>
       </div>
-      <br />
+      <br/>
       <form onSubmit={handleJoinRoom}>
         <label htmlFor="room_code">Room Code:</label>
         <input
