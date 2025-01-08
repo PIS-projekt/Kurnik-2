@@ -1,6 +1,8 @@
 import { FormEvent, useState } from "react";
 import useWebSocket, { ReadyState } from "react-use-websocket";
 import axios from "axios";
+import {apiBaseUrl} from "../App";
+import {RoomList} from "./RoomList";
 
 export const Chat = () => {
   const [currentMessage, setCurrentMessage] = useState("");
@@ -13,7 +15,6 @@ export const Chat = () => {
   const [error, setError] = useState<string | null>(null);
   const [newRoomPrivacy, setNewRoomPrivacy] = useState<string>("public");
 
-  const apiBaseUrl = "http://0.0.0.0:8000";
 
   const handleOpen = () => {
     console.log("WebSocket connection opened.");
@@ -139,6 +140,7 @@ export const Chat = () => {
           </p>
         ))}
       </div>
+      <RoomList/>
     </div>
   );
 };
