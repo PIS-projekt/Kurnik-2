@@ -36,6 +36,11 @@ def check_room_exists(room_code: RoomCode) -> bool:
     return room_code in rooms
 
 
+def get_all_rooms() -> list[Chatroom]:
+    """Return a list of all rooms."""
+    return list(rooms.values())
+
+
 @dataclass
 class WebSocketUser:
     user_id: UserID

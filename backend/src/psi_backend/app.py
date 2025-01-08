@@ -8,6 +8,7 @@ from src.psi_backend.routes.ws import ws_router
 from src.psi_backend.websocket_chat.room_assignment import (
     check_room_exists,
     create_room,
+    get_all_rooms,
 )
 
 
@@ -39,10 +40,10 @@ async def read_root():
 
 @app.get("/create-new-room")
 async def create_room_endpoint(
-    private: bool,
-    user_id: int,
-    # user_id=Depends(get_current_user_id) -> This should be used when introducing
-    # server-side user authentication. Right now, user_id is passed as a query parameter
+        private: bool,
+        user_id: int,
+        # user_id=Depends(get_current_user_id) -> This should be used when introducing
+        # server-side user authentication. Right now, user_id is passed as a query parameter
 ):
     room_code = create_room(private)
 
@@ -55,10 +56,10 @@ async def create_room_endpoint(
 
 @app.get("/join-room")
 async def join_room(
-    room_code: str,
-    user_id: int,
-    # user_id=Depends(get_current_user_id) -> This should be used when introducing
-    # server-side user authentication. Right now, user_id is passed as a query parameter
+        room_code: str,
+        user_id: int,
+        # user_id=Depends(get_current_user_id) -> This should be used when introducing
+        # server-side user authentication. Right now, user_id is passed as a query parameter
 ):
     """This endpoint has to be called before attempting to connect to the websocket
     endpoint."""
@@ -70,3 +71,11 @@ async def join_room(
         }
     else:
         raise HTTPException(status_code=404, detail="Room not found.")
+
+
+@app.get("/get-public-rooms")
+async def get_public_rooms():
+    rooms = get_all_rooms()
+    return {
+        "rooms": [room.id for room in rooms if not room.private],
+    }
