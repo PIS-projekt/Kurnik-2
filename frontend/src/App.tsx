@@ -11,9 +11,7 @@ function App() {
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<Chat/>}>
-          {/*<Route path={"rooms"} element={<div/>} />*/}
           <Route path={"chat/:roomId/:userId"} element={<Chat/>}/>
-          <Route path={"chat/:roomId?/:userId?"} element={<Chat/>}/>
           <Route path="main" element={
             <div className="App">
               <h1>Projekt PIS 2024Z</h1>
