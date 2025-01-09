@@ -59,10 +59,7 @@ async def create_room_endpoint(
 
 
 @app.get("/join-room")
-async def join_room(
-    room_code: str,
-    user_id: int,  # user_id=Depends(get_current_user_id) -> This should be used when introducing server-side user authentication. Right now, user_id is passed as a query parameter.
-):
+async def join_room(room_code: str, user: User = Depends(get_current_user)):
     """This endpoint has to be called before attempting to connect to the websocket endpoint."""
     if check_room_exists(room_code):
         return {
