@@ -160,15 +160,26 @@ pipeline {
                 stage('Get user confirmation') {
                     steps {
                         script {
-                            def userInput = input(
-                                id: 'userInput',
-                                message: 'Do you want to deploy to production?',
-                                parameters: [
-                                    booleanParam(defaultValue: false, description: 'Deploy to production?', name: 'deployToProduction')
-                                ]
-                            )
-                            if (!userInput.deployToProduction) {
-                                error('Production deployment cancelled by the user')
+                            try {
+                                echo "Assume the Deploy feature/alpha is Success"
+                                try {
+                                    timeout(time: 5, unit: 'MINUTES') {
+                                        env.userChoice = input message: 'Do you want to Deploy?',
+                                            parameters: [choice(name: 'Versioning Service', choices: 'no\nyes', description: 'Choose "yes" if you want to deploy this build')]
+                                    }
+                                    if (userChoice == 'no') {
+                                        echo "User refuse to release"
+                                    }
+                                } catch (Exception err){
+                                    def user = err.getCauses()[0].getUser()
+                                    if ('SYSTEM' == user.toString()) {
+                                        didTimeout = true
+                                    } else {
+                                        echo "Process abort by: ${user}"
+                                    }
+                                }
+                            } catch (Exception err) {
+                                echo "if Fail it will send report"
                             }
                         }
                     }
