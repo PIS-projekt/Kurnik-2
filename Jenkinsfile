@@ -161,7 +161,6 @@ pipeline {
                     steps {
                         script {
                             try {
-                                echo "Assume the Deploy feature/alpha is Success"
                                 try {
                                     timeout(time: 5, unit: 'MINUTES') {
                                         env.userChoice = input message: 'Do you want to Deploy?',
@@ -185,9 +184,20 @@ pipeline {
                     }
                 }
                 stage('Deploy to production') {
+                    when {
+                        environment name: 'userChoice', value: 'yes'
+                    }
                     steps {
                         script {
                             echo 'Deploying to production...'
+                            sh """
+                            tar -czf package.tar.gz
+                            ssh azureuser@51.144.137.71 'mkdir /home/azureuser/kurnik-2'
+                            ssh azureuser@51.144.137.71 'rm -rf /home/azureuser/kurnik-2/*'
+                            scp package.tar.gz azureuser@51.144.137.71:/home/azureuser/kurnik-2/
+                            ssh azureuser@51.144.137.71 'cd /home/azureuser/kurnik-2/ && tar -xzf package.tar.gz'
+                            ssh azureuser@51.144.137.71 'cd /home/azureuser/kurnik-2/ && docker-compose up -d'
+                            """
                             // Add deployment steps here
                         }
                     }
