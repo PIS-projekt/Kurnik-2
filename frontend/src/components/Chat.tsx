@@ -11,7 +11,7 @@ export const Chat = () => {
   const [messageList, setMessageList] = useState<Array<{ data: string }>>([]);
   const [loggedRoomCode, setLoggedRoomCode] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [userId, setUserId] = useState<number | null>(null);
+  const [userName, setUserName] = useState<string | null>(null);
 
   const apiBaseUrl = "http://0.0.0.0:8000";
   const navigate = useNavigate();
@@ -26,7 +26,8 @@ export const Chat = () => {
 
     try {
       const decodedToken: { sub: string; exp: number } = jwtDecode(token);
-      setUserId(parseInt(decodedToken.sub));
+      console.log(decodedToken.sub);
+      setUserName(decodedToken.sub);
 
       // Check if the token is expired
       if (decodedToken.exp * 1000 < Date.now()) {
@@ -38,6 +39,13 @@ export const Chat = () => {
       handleLogout();
     }
   }, [navigate]);
+
+  useEffect(() => {
+    if (userName) {
+      console.log("Here is the username:");
+      console.log(userName);
+    }
+  }, [userName]);
 
   const handleLogout = () => {
     localStorage.removeItem("access_token");
@@ -99,7 +107,7 @@ export const Chat = () => {
       const token = localStorage.getItem("access_token");
       const response = await axios.get(`${apiBaseUrl}/join-room`, {
         // eslint-disable-next-line camelcase
-        params: { room_code: roomCode, user_id: userId },
+        params: { room_code: roomCode },
         headers: { Authorization: `Bearer ${token}` },
       });
       if (response.data.room_exists) {
@@ -131,7 +139,7 @@ export const Chat = () => {
         <button type="submit">Join Room</button>
       </form>
       <br />
-      <div>Logged in as user: {userId} in room: {loggedRoomCode}</div>
+      <div>Logged in as user: {userName} in room: {loggedRoomCode}</div>
       {error && <div style={{ color: "red" }}>{error}</div>}
       <br />
       <div>
