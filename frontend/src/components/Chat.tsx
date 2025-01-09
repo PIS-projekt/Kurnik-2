@@ -1,5 +1,5 @@
 import {FormEvent, useEffect, useState} from "react";
-import useWebSocket, { ReadyState } from "react-use-websocket";
+import useWebSocket, {ReadyState} from "react-use-websocket";
 import axios from "axios";
 import {apiBaseUrl, baseAppUrl} from "../App";
 import {RoomList} from "./RoomList";
@@ -16,14 +16,14 @@ export const Chat = () => {
   const [loggedUserId, setLoggedUserId] = useState<number | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [newRoomPrivacy, setNewRoomPrivacy] = useState<string>("public");
-  const params  = useParams();
+  const params = useParams();
 
 
   useEffect(() => {
     if (params.roomId && params.userId) {
       console.log(params);
-      console .log(params.roomId);
-      console .log(params.userId);
+      console.log(params.roomId);
+      console.log(params.userId);
       setRoomCode(params.roomId);
       const paramUserId = parseInt(params.userId);
       setUserId(paramUserId);
@@ -50,7 +50,7 @@ export const Chat = () => {
     setMessageList((prevMessages) => [...prevMessages, message]);
   };
 
-  const { sendMessage, readyState } = useWebSocket(socketUrl, {
+  const {sendMessage, readyState} = useWebSocket(socketUrl, {
     onOpen: handleOpen,
     onClose: handleClose,
     onMessage: handleMessage,
@@ -68,7 +68,7 @@ export const Chat = () => {
     try {
       const response = await axios.get(`${apiBaseUrl}/create-new-room`, {
         // eslint-disable-next-line camelcase
-        params: { user_id: userId, private: (newRoomPrivacy == "private") },
+        params: {user_id: userId, private: (newRoomPrivacy == "private")},
       });
       const newRoomCode = response.data.room_code;
       setRoomCode(newRoomCode);
@@ -90,7 +90,7 @@ export const Chat = () => {
     try {
       const response = await axios.get(`${apiBaseUrl}/join-room`, {
         // eslint-disable-next-line camelcase
-        params: { room_code: joinRoomCode, user_id: joinRoomUserId },
+        params: {room_code: joinRoomCode, user_id: joinRoomUserId},
       });
       if (response.data.room_exists) {
         setSocketUrl(`${apiBaseUrl}/ws/connect/${joinRoomCode}?user_id=${joinRoomUserId}`);
@@ -144,7 +144,8 @@ export const Chat = () => {
         <button type="submit">Join Room</button>
       </form>
       <br/>
-      {(loggedUserId && <div>Logged in as user: {loggedUserId} in room: {loggedRoomCode}</div>) || <div>Not logged in </div>}
+      {(loggedUserId && <div>Logged in as user: {loggedUserId} in room: {loggedRoomCode}</div>) ||
+          <div>Not logged in </div>}
       {error && <div style={{color: "red"}}>{error}</div>}
       {loggedUserId && <button onClick={() => {
         const url = baseAppUrl + "chat/" + roomCode + "/" + userId;
