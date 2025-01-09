@@ -1,11 +1,10 @@
 from fastapi import APIRouter, HTTPException, Depends, status
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
-from typing import Annotated
+from typing import Annotated, Literal, Any
 from passlib.context import CryptContext
 from pydantic import BaseModel
 
 import jwt
-from jwt.exceptions import InvalidTokenError
 
 from datetime import datetime, timedelta, timezone
 
@@ -45,15 +44,15 @@ pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
 
-def verify_password(plain_password, hashed_password):
+def verify_password(plain_password: str, hashed_password: str) -> bool:
     return pwd_context.verify(plain_password, hashed_password)
 
 
-def get_password_hash(password):
+def get_password_hash(password: str) -> str:
     return pwd_context.hash(password)
 
 
-def authenticate_user(username: str, password: str):
+def authenticate_user(username: str, password: str) -> User | Literal[False]:
     try:
         user = user_repository.get_user_by_username(username)
     except UserNotFoundError:
@@ -65,16 +64,16 @@ def authenticate_user(username: str, password: str):
     return user
 
 
-def create_access_token(data: dict, expires_delta: timedelta | None = None):
+def create_access_token(data: dict[Any, Any], expires_delta: timedelta | None = None):
     to_encode = data.copy()
     if expires_delta:
         expire = datetime.now(timezone.utc) + expires_delta
     else:
         expire = datetime.now(timezone.utc) + timedelta(minutes=15)
     to_encode.update({"exp": expire})
-    encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
+    encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)  # type: ignore
 
-    print(jwt.decode(encoded_jwt, SECRET_KEY, ALGORITHM))
+    print(jwt.decode(encoded_jwt, SECRET_KEY, ALGORITHM))  # type: ignore
 
     return encoded_jwt
 
@@ -91,11 +90,11 @@ async def get_current_user(token: Annotated[str, Depends(oauth2_scheme)]) -> Use
 
     try:
 
-        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])  # type: ignore
         username: str = payload.get("sub")
         print(f"payload {payload}")
 
-        if username is None:
+        if not username:
             raise credentials_exception
 
         token_data = TokenData(username=username)
@@ -105,6 +104,8 @@ async def get_current_user(token: Annotated[str, Depends(oauth2_scheme)]) -> Use
         raise credentials_exception
 
     try:
+        if token_data.username is None:
+            raise credentials_exception
         user = user_repository.get_user_by_username(token_data.username)
     except:
         print("User not found")
