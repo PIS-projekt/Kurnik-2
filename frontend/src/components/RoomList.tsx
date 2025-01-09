@@ -41,8 +41,12 @@ export const RoomList = (props: RoomListProps) => {
               }}> Join room
               </button>
               <button className="button" onClick={() => {
-                navigator.clipboard.writeText(url);
+                navigator.clipboard.writeText(roomId);
               }}> copy join code
+              </button>
+              <button className="button" onClick={() => {
+                navigator.clipboard.writeText(url);
+              }}> copy join url for user {props.userId}
               </button>
             </p>
           );
