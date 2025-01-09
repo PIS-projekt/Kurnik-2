@@ -210,7 +210,7 @@ pipeline {
                                     transfers: [
                                         sshTransfer(
                                             sourceFiles: 'package.tar.gz',  // File to transfer
-                                            remoteDirectory: '/home/azureuser', // Remote directory to copy the file to
+                                            remoteDirectory: '', // Remote directory to copy the file to
                                             removePrefix: '', // Optional prefix to remove from local paths
                                             execCommand: '''
                                                 cd /home/azureuser/kurnik-2
