@@ -1,7 +1,8 @@
 services:
   backend:
     depends_on:
-      - database
+      database:
+        condition: service_healthy
     build:
       context: backend/
       dockerfile: Dockerfile
@@ -29,7 +30,13 @@ services:
       POSTGRES_DB: "pis"
     ports:
       - "5432:5432"
-    restart: unless-stopped
+    restart: always
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U admin -d pis"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
   frontend:
     build:
       context: frontend/
