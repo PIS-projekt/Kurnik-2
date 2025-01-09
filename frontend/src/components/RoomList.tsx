@@ -21,7 +21,7 @@ export const RoomList = () => {
 
   return (
     <div className="RoomLister">
-      <div id="RoomList">
+      <div className="RoomList">
         <h2>Public rooms: </h2>
         {roomList.map((roomId, index) => (
           <p className="roomIdItem" key={index}>
