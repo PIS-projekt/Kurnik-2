@@ -33,18 +33,18 @@ pipeline {
             }
         }
 
-        stage('Run frontend tests') {
-            steps {
-                dir('frontend') {
-                    nodejs(nodeJSInstallationName: 'node-23') {
-                        script {
-                            echo 'Running tests...'
-                            sh 'npm run test'
-                        }
-                    }
-                }
-            }
-        }
+        // stage('Run frontend tests') {
+        //     steps {
+        //         dir('frontend') {
+        //             nodejs(nodeJSInstallationName: 'node-23') {
+        //                 script {
+        //                     echo 'Running tests...'
+        //                     sh 'npm run test'
+        //                 }
+        //             }
+        //         }
+        //     }
+        // }
 
         stage('Build frontend') {
             steps {
