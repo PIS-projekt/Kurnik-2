@@ -3,6 +3,7 @@ import useWebSocket, { ReadyState } from "react-use-websocket";
 import axios from "axios";
 import {apiBaseUrl} from "../App";
 import {RoomList} from "./RoomList";
+import "./Chat.css";
 
 export const Chat = () => {
   const [currentMessage, setCurrentMessage] = useState("");
