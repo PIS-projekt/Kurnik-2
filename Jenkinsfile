@@ -192,14 +192,40 @@ pipeline {
                             echo 'Deploying to production...'
                             sh """
                             tar -czf package.tar.gz *
-                            ssh -o StrictHostKeyChecking=no azureuser@51.144.137.71 'mkdir /home/azureuser/kurnik-2'
-                            ssh -o StrictHostKeyChecking=no azureuser@51.144.137.71 'rm -rf /home/azureuser/kurnik-2/*'
-                            scp package.tar.gz azureuser@51.144.137.71:/home/azureuser/kurnik-2/
-                            ssh -o StrictHostKeyChecking=no azureuser@51.144.137.71 'cd /home/azureuser/kurnik-2/ && tar -xzf package.tar.gz'
-                            ssh -o StrictHostKeyChecking=no azureuser@51.144.137.71 'cd /home/azureuser/kurnik-2/ && docker-compose up -d'
                             """
                             // Add deployment steps here
                         }
+                    }
+                }
+                stage('deploy over ssh') {
+                    when {
+                        environment name: 'userChoice', value: 'yes'
+                    }
+                    steps {
+                        // Use the Publish Over SSH plugin to send the tar file and run commands remotely
+                        sshPublisher(
+                            publishers: [
+                                sshPublisherDesc(
+                                    configName: 'ci-cd', // Name of the SSH server configured in Jenkins
+                                    transfers: [
+                                        sshTransfer(
+                                            sourceFiles: 'package.tar.gz',  // File to transfer
+                                            remoteDirectory: '/home/azureuser', // Remote directory to copy the file to
+                                            removePrefix: '', // Optional prefix to remove from local paths
+                                            execCommand: '''
+                                                cd /home/azureuser/kurnik-2
+                                                rm -rf *
+                                                mv /home/azureuser/package.tar.gz /home/azureuser/kurnik-2
+                                                tar -xzf package.tar.gz
+                                                docker compose up --build -d
+                                            ''' // Command to execute after file transfer
+                                        )
+                                    ],
+                                    usePromotionTimestamp: false,
+                                    verbose: true
+                                )
+                            ]
+                        )
                     }
                 }
             }
