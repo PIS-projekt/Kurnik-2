@@ -26,7 +26,10 @@ export const RoomList = (props: RoomListProps) => {
   return (
     <div className="RoomLister">
       <div className="RoomList">
+
         <h2>Public rooms: </h2>
+        <button onClick={handleRefresh}>Refresh</button>
+
         {roomList.map((roomId, index) => {
           const url = baseAppUrl + "chat/" + roomId + "/" + props.userId;
           return (
@@ -44,7 +47,6 @@ export const RoomList = (props: RoomListProps) => {
             </p>
           );
         })}
-        <button onClick={handleRefresh}>Refresh</button>
       </div>
 
     </div>

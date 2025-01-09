@@ -152,6 +152,7 @@ export const Chat = () => {
       }}> copy join code
       </button>}
       <br/>
+      <br/>
       <div id="chat"></div>
       <input
         type="text"
