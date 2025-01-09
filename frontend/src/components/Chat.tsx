@@ -1,9 +1,10 @@
-import { FormEvent, useState } from "react";
+import {FormEvent, useEffect, useState} from "react";
 import useWebSocket, { ReadyState } from "react-use-websocket";
 import axios from "axios";
-import {apiBaseUrl} from "../App";
+import {apiBaseUrl, baseAppUrl} from "../App";
 import {RoomList} from "./RoomList";
 import "./Chat.css";
+import {useParams} from "react-router-dom";
 
 export const Chat = () => {
   const [currentMessage, setCurrentMessage] = useState("");
@@ -15,8 +16,22 @@ export const Chat = () => {
   const [loggedUserId, setLoggedUserId] = useState<number | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [newRoomPrivacy, setNewRoomPrivacy] = useState<string>("public");
+  const params  = useParams();
 
 
+  useEffect(() => {
+    if (params.roomId && params.userId) {
+      console.log(params);
+      console .log(params.roomId);
+      console .log(params.userId);
+      setRoomCode(params.roomId);
+      const paramUserId = parseInt(params.userId);
+      setUserId(paramUserId);
+      console.log("trying to connect in useEffect");
+      joinRoom(params.roomId, paramUserId).then();
+    }
+
+  }, []);
   const handleOpen = () => {
     console.log("WebSocket connection opened.");
     setLoggedRoomCode(roomCode);
@@ -67,13 +82,18 @@ export const Chat = () => {
 
   const handleJoinRoom = async (event: FormEvent) => {
     event.preventDefault();
+    await joinRoom(roomCode, userId);
+  };
+
+  const joinRoom = async (joinRoomCode: string, joinRoomUserId: number) => {
+
     try {
       const response = await axios.get(`${apiBaseUrl}/join-room`, {
         // eslint-disable-next-line camelcase
-        params: { room_code: roomCode, user_id: userId },
+        params: { room_code: joinRoomCode, user_id: joinRoomUserId },
       });
       if (response.data.room_exists) {
-        setSocketUrl(`${apiBaseUrl}/ws/connect/${roomCode}?user_id=${userId}`);
+        setSocketUrl(`${apiBaseUrl}/ws/connect/${joinRoomCode}?user_id=${joinRoomUserId}`);
         setError("Joined room successfully.");
       }
     } catch (error) {
@@ -95,13 +115,15 @@ export const Chat = () => {
           required
         />
       </div>
-      <br />
+      <br/>
       <div>
         <label htmlFor="visibility-dropdown">Visibility of new room: </label>
         <select
           id="visibility-dropdown"
           value={newRoomPrivacy}
-          onChange={(e) => {setNewRoomPrivacy(e.target.value);} }
+          onChange={(e) => {
+            setNewRoomPrivacy(e.target.value);
+          }}
         >
           <option value="public">Public</option>
           <option value="private">Private</option>
