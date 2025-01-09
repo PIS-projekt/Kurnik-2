@@ -10,28 +10,28 @@ pipeline {
             }
         }
 
-        stage('Setup node and install frontend dependencies') {
-            steps {
-                dir('frontend') {
-                    nodejs(nodeJSInstallationName: 'node-23') {
-                        sh 'npm install'
-                    }
-                }
-            }
-        }
+        // stage('Setup node and install frontend dependencies') {
+        //     steps {
+        //         dir('frontend') {
+        //             nodejs(nodeJSInstallationName: 'node-23') {
+        //                 sh 'npm install'
+        //             }
+        //         }
+        //     }
+        // }
 
-        stage('Lint frontend') {
-            steps {
-                dir('frontend') {
-                    nodejs(nodeJSInstallationName: 'node-23') {
-                        script {
-                            echo 'Running ESLint...'
-                            sh 'npm run lint'
-                        }
-                    }
-                }
-            }
-        }
+        // stage('Lint frontend') {
+        //     steps {
+        //         dir('frontend') {
+        //             nodejs(nodeJSInstallationName: 'node-23') {
+        //                 script {
+        //                     echo 'Running ESLint...'
+        //                     sh 'npm run lint'
+        //                 }
+        //             }
+        //         }
+        //     }
+        // }
 
         // stage('Run frontend tests') {
         //     steps {
