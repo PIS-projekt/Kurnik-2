@@ -121,10 +121,15 @@ export const Chat = () => {
         />
         <button type="submit">Join Room</button>
       </form>
-      <br />
-      <div>Logged in as user: {loggedUserId} in room: {loggedRoomCode}</div>
-      {error && <div style={{ color: "red" }}>{error}</div>}
-      <br />
+      <br/>
+      {(loggedUserId && <div>Logged in as user: {loggedUserId} in room: {loggedRoomCode}</div>) || <div>Not logged in </div>}
+      {error && <div style={{color: "red"}}>{error}</div>}
+      {loggedUserId && <button onClick={() => {
+        const url = baseAppUrl + "chat/" + roomCode + "/" + userId;
+        navigator.clipboard.writeText(url);
+      }}> copy join code
+      </button>}
+      <br/>
       <div id="chat"></div>
       <input
         type="text"
