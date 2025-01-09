@@ -147,10 +147,15 @@ export const Chat = () => {
       {(loggedUserId && <div>Logged in as user: {loggedUserId} in room: {loggedRoomCode}</div>) ||
           <div>Not logged in </div>}
       {error && <div style={{color: "red"}}>{error}</div>}
-      {loggedUserId && <button onClick={() => {
+
+      {loggedUserId && <button className="button" onClick={() => {
+        navigator.clipboard.writeText(roomCode);
+      }}> copy room code
+      </button>}
+      {loggedUserId && <button className="button" onClick={() => {
         const url = baseAppUrl + "chat/" + roomCode + "/" + userId;
         navigator.clipboard.writeText(url);
-      }}> copy join code
+      }}> copy join url for user {userId}
       </button>}
       <br/>
       <br/>
