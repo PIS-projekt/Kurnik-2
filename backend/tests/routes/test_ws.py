@@ -45,15 +45,3 @@ def mock_rooms(monkeypatch):
         "src.psi_backend.websocket_chat.room_assignment.rooms",
         {"VALID123": []},
     )
-
-
-# Test successful WebSocket connection
-# TODO: make this pass by mocking the engine
-# def test_websocket_connect_success():
-#     room_code = "VALID123"
-#     user_id = 1234
-#     with client.websocket_connect(
-#         f"/ws/connect/{room_code}?user_id={user_id}"
-#     ) as websocket:
-#         websocket.send_text("test_connection")
-#         assert True  # If no exceptions are raised, the connection is successful
