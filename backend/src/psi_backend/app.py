@@ -81,3 +81,10 @@ async def get_public_rooms():
     return {
         "rooms": [room.id for room in rooms if not room.private],
     }
+
+
+@app.get("/hello")
+async def hello():
+    return {
+        "message": "hello, world!",
+    }

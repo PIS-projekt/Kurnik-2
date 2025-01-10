@@ -79,3 +79,9 @@ def test_create_rooms():
         "room_code": "ABC124",
         "private": "True",
     }
+
+
+def test_hello_endpoint():
+    response = client.get("/hello")
+    assert response.status_code == 200
+    assert response.json() == {"message": "hello, world!"}
