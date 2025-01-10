@@ -1,6 +1,6 @@
+import pytest
 from fastapi.testclient import TestClient
 from httpx import Response
-import pytest
 
 from src.psi_backend.app import app
 
