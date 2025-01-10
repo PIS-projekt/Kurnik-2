@@ -1,7 +1,8 @@
-import {useEffect, useState} from "react";
+import { useEffect, useState } from "react";
 import axios from "axios";
-import {apiBaseUrl, baseAppUrl} from "../App";
+import { apiBaseUrl, baseAppUrl } from "../App";
 import "./RoomList.css";
+import copyToClipboard from "./util";
 
 interface RoomListProps {
   userId: number;
@@ -35,17 +36,16 @@ export const RoomList = (props: RoomListProps) => {
           return (
             <p className="roomIdItem" key={index}>
               <a>{roomId}</a>
-              {/* FIXME THIS DOES NOT WORK ON LOCALHOST due to "unkown protocol". */}
               <button className="button" onClick={() => {
                 window.location.href = url;
               }}> Join room
               </button>
               <button className="button" onClick={() => {
-                navigator.clipboard.writeText(roomId);
+                copyToClipboard(roomId);
               }}> copy join code
               </button>
               <button className="button" onClick={() => {
-                navigator.clipboard.writeText(url);
+                copyToClipboard(url);
               }}> copy join url for user {props.userId}
               </button>
             </p>

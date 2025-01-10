@@ -1,10 +1,11 @@
-import {FormEvent, useEffect, useState} from "react";
-import useWebSocket, {ReadyState} from "react-use-websocket";
+import { FormEvent, useEffect, useState } from "react";
+import useWebSocket, { ReadyState } from "react-use-websocket";
 import axios from "axios";
-import {apiBaseUrl, baseAppUrl} from "../App";
-import {RoomList} from "./RoomList";
+import { apiBaseUrl, baseAppUrl } from "../App";
+import { RoomList } from "./RoomList";
 import "./Chat.css";
-import {useParams} from "react-router-dom";
+import { useParams } from "react-router-dom";
+import copyToClipboard from "./util";
 
 export const Chat = () => {
   const [currentMessage, setCurrentMessage] = useState("");
@@ -50,7 +51,7 @@ export const Chat = () => {
     setMessageList((prevMessages) => [...prevMessages, message]);
   };
 
-  const {sendMessage, readyState} = useWebSocket(socketUrl, {
+  const { sendMessage, readyState } = useWebSocket(socketUrl, {
     onOpen: handleOpen,
     onClose: handleClose,
     onMessage: handleMessage,
@@ -68,7 +69,7 @@ export const Chat = () => {
     try {
       const response = await axios.get(`${apiBaseUrl}/create-new-room`, {
         // eslint-disable-next-line camelcase
-        params: {user_id: userId, private: (newRoomPrivacy == "private")},
+        params: { user_id: userId, private: (newRoomPrivacy == "private") },
       });
       const newRoomCode = response.data.room_code;
       setRoomCode(newRoomCode);
@@ -90,7 +91,7 @@ export const Chat = () => {
     try {
       const response = await axios.get(`${apiBaseUrl}/join-room`, {
         // eslint-disable-next-line camelcase
-        params: {room_code: joinRoomCode, user_id: joinRoomUserId},
+        params: { room_code: joinRoomCode, user_id: joinRoomUserId },
       });
       if (response.data.room_exists) {
         setSocketUrl(`${apiBaseUrl}/ws/connect/${joinRoomCode}?user_id=${joinRoomUserId}`);
@@ -115,7 +116,7 @@ export const Chat = () => {
           required
         />
       </div>
-      <br/>
+      <br />
       <div>
         <label htmlFor="visibility-dropdown">Visibility of new room: </label>
         <select
@@ -128,10 +129,10 @@ export const Chat = () => {
           <option value="public">Public</option>
           <option value="private">Private</option>
         </select>
-        <br/>
+        <br />
         <button onClick={handleCreateRoom}>Create Room</button>
       </div>
-      <br/>
+      <br />
       <form onSubmit={handleJoinRoom}>
         <label htmlFor="room_code">Room Code:</label>
         <input
@@ -143,33 +144,33 @@ export const Chat = () => {
         />
         <button type="submit">Join Room</button>
       </form>
-      <br/>
+      <br />
       {(loggedUserId &&
-              <div>Logged in as user: {loggedUserId} in room: {loggedRoomCode}</div>)
+        <div>Logged in as user: {loggedUserId} in room: {loggedRoomCode}</div>)
         ||
-          <div>Not logged in </div>
+        <div>Not logged in </div>
       }
       {error &&
-          <div style={{color: "red"}}>{error}</div>
+        <div style={{ color: "red" }}>{error}</div>
       }
 
       {loggedUserId &&
-          <button className="button" onClick={() => {
-            navigator.clipboard.writeText(roomCode);
-          }}>
-              copy room code
-          </button>
+        <button className="button" onClick={() => {
+          copyToClipboard(roomCode);
+        }}>
+          copy room code
+        </button>
       }
       {loggedUserId &&
-          <button className="button" onClick={() => {
-            const url = baseAppUrl + "chat/" + roomCode + "/" + userId;
-            navigator.clipboard.writeText(url);
-          }}>
-              copy join url for user {userId}
-          </button>
+        <button className="button" onClick={() => {
+          const url = baseAppUrl + "chat/" + roomCode + "/" + userId;
+          copyToClipboard(url);
+        }}>
+          copy join url for user {userId}
+        </button>
       }
-      <br/>
-      <br/>
+      <br />
+      <br />
       <div id="chat"></div>
       <input
         type="text"
@@ -187,7 +188,7 @@ export const Chat = () => {
         ))}
       </div>
       <RoomList
-        userId={userId}/>
+        userId={userId} />
     </div>
   );
 };
