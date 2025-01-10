@@ -1,12 +1,14 @@
-from sqlmodel import create_engine
 from copy import deepcopy
+
+from pytest import fixture, raises
+from sqlmodel import create_engine
+
 from src.psi_backend.database.message import (
     Message,
     MessageNotFoundError,
     MessageRepository,
     create_database,
 )
-from pytest import fixture, raises
 
 
 def temporary_db():

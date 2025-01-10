@@ -1,7 +1,8 @@
-from dataclasses import dataclass
-from fastapi import WebSocket
-import string
 import random
+import string
+from dataclasses import dataclass
+
+from fastapi import WebSocket
 
 from src.psi_backend.database.message import Message, message_repository
 
@@ -53,7 +54,7 @@ async def broadcast_message(room_code: RoomCode, user_id: int, message: str):
         )
 
 
-def disconnect_user(room_code: int, user_id: int):
+def disconnect_user(room_code: str, user_id: int):
     """Disconnect the user from the room
 
     Args:

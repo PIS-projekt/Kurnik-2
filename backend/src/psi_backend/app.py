@@ -1,17 +1,13 @@
 from contextlib import asynccontextmanager
+
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 
-from src.psi_backend.database.message import (
-    close_database,
-    create_database,
-    engine,
-)
-
+from src.psi_backend.database.message import close_database, create_database, engine
 from src.psi_backend.routes.ws import ws_router
 from src.psi_backend.websocket_chat.room_assignment import (
-    create_room,
     check_room_exists,
+    create_room,
 )
 
 
@@ -43,7 +39,9 @@ async def read_root():
 
 @app.get("/create-new-room")
 async def create_room_endpoint(
-    user_id: int,  # user_id=Depends(get_current_user_id) -> This should be used when introducing server-side user authentication. Right now, user_id is passed as a query parameter.
+    user_id: int,
+    # user_id=Depends(get_current_user_id) -> This should be used when introducing
+    # server-side user authentication. Right now, user_id is passed as a query parameter
 ):
     room_code = create_room()
 
@@ -53,9 +51,12 @@ async def create_room_endpoint(
 @app.get("/join-room")
 async def join_room(
     room_code: str,
-    user_id: int,  # user_id=Depends(get_current_user_id) -> This should be used when introducing server-side user authentication. Right now, user_id is passed as a query parameter.
+    user_id: int,
+    # user_id=Depends(get_current_user_id) -> This should be used when introducing
+    # server-side user authentication. Right now, user_id is passed as a query parameter
 ):
-    """This endpoint has to be called before attempting to connect to the websocket endpoint."""
+    """This endpoint has to be called before attempting to connect to the websocket
+    endpoint."""
     if check_room_exists(room_code):
         return {
             "message": "Room can be joined.",

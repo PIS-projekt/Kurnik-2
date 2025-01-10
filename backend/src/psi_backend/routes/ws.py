@@ -1,15 +1,13 @@
-from fastapi import APIRouter, Depends, WebSocket, WebSocketDisconnect
-from fastapi.responses import HTMLResponse
+from fastapi import APIRouter, WebSocket, WebSocketDisconnect
 
 from src.psi_backend.websocket_chat.room_assignment import (
+    RoomCode,
     RoomNotFoundError,
+    WebSocketUser,
     assign_user_to_room,
     broadcast_message,
     disconnect_user,
-    WebSocketUser,
-    RoomCode,
 )
-
 
 ws_router = APIRouter()
 
@@ -18,7 +16,9 @@ ws_router = APIRouter()
 async def websocket_endpoint(
     websocket: WebSocket,
     room_code: RoomCode,
-    user_id: int,  # user_id=Depends(get_current_user_id) -> This should be used when introducing server-side user authentication. Right now, user_id is passed as a query parameter.
+    user_id: int,
+    # user_id=Depends(get_current_user_id) -> This should be used when introducing
+    # server-side user authentication. Right now, user_id is passed as a query parameter
 ):
     await websocket.accept()
 
@@ -30,7 +30,7 @@ async def websocket_endpoint(
                 websocket_connection=websocket,
             ),
         )
-    except RoomNotFoundError as e:
+    except RoomNotFoundError:
         websocket.close()
 
     try:
