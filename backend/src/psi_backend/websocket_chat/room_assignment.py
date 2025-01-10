@@ -1,7 +1,8 @@
-from dataclasses import dataclass
-from fastapi import WebSocket
-import string
 import random
+import string
+from dataclasses import dataclass
+
+from fastapi import WebSocket
 
 from src.psi_backend.database.message import Message, message_repository
 

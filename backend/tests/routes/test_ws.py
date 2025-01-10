@@ -1,9 +1,10 @@
-import pytest
-from fastapi.testclient import TestClient
-from src.psi_backend.app import app
-from src.psi_backend.websocket_chat.room_assignment import RoomNotFoundError
 from unittest.mock import AsyncMock, Mock
 
+import pytest
+from fastapi.testclient import TestClient
+
+from src.psi_backend.app import app
+from src.psi_backend.websocket_chat.room_assignment import RoomNotFoundError
 
 client = TestClient(app)
 
