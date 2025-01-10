@@ -1,4 +1,3 @@
-import pytest
 from fastapi.testclient import TestClient
 from src.psi_backend.app import app
 
