@@ -5,11 +5,11 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from src.psi_backend.database.message import close_database, create_database, engine
 from src.psi_backend.routes.ws import ws_router
+from src.psi_backend.tictactoe.game import tictactoe_router
 from src.psi_backend.websocket_chat.room_assignment import (
     check_room_exists,
     create_room,
 )
-from src.psi_backend.tictactoe.game import tictactoe_router
 
 
 @asynccontextmanager

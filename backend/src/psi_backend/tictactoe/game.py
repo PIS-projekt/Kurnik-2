@@ -156,10 +156,18 @@ async def handle_place_mark(session_id: GameSessionId, user_id: UserId, message:
     session = game_sessions[session_id]
     x, y = message["x"], message["y"]
     session.state.board[x][y] = "X" if user_id == session.user1.user_id else "O"
-    session.state.turn = session.user1.user_id if session.state.turn == session.user2.user_id else session.user2.user_id
+    session.state.turn = (
+        session.user1.user_id
+        if session.state.turn == session.user2.user_id
+        else session.user2.user_id
+    )
 
     winner = check_winner(session.state.board)
-    winner_user_id = session.user1.user_id if winner == "X" else session.user2.user_id if winner == "O" else None
+    winner_user_id = (
+        session.user1.user_id
+        if winner == "X"
+        else session.user2.user_id if winner == "O" else None
+    )
     if winner is not None:
         await broadcast_winner_and_finish(session_id, winner_user_id)
     else:
@@ -174,17 +182,16 @@ async def handle_join(websocket: WebSocket, session_id: GameSessionId, user_id: 
 
 @tictactoe_router.websocket("/game/{session_id}")
 async def tictactoe_endpoint(
-        websocket: WebSocket,
-        session_id: GameSessionId,
-        user_id: UserId,
+    websocket: WebSocket,
+    session_id: GameSessionId,
+    user_id: UserId,
 ):
     await websocket.accept()
 
     try:
         print(f"Connecting user {user_id} to session {session_id}")
         connect_user_to_session(
-            session_id=session_id,
-            user=GameUser(user_id, websocket)
+            session_id=session_id, user=GameUser(user_id, websocket)
         )
     except ValueError:
         websocket.close()
@@ -198,9 +205,6 @@ async def tictactoe_endpoint(
                 await handle_place_mark(session_id, user_id, message)
             elif message["action"] == "join":
                 await handle_join(websocket, session_id, user_id)
-
-
-
     except Exception as e:
         print(e)
 
