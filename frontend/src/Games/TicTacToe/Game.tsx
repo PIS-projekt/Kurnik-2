@@ -7,17 +7,18 @@ interface GameState {
   turn: number;
 }
 
-const initialBoard = [["", "", ""], ["", "", ""], ["", "", ""]];
 
 export const Game = () => {
-  const [gameState, setGameState] = useState<GameState>({board: initialBoard, turn: 1});
+  const [gameState, setGameState] = useState<GameState | null>(null);
   const [userId, setUserId] = useState<number>(1);
   const [sessionId, setSessionId] = useState<string>("abc");
   const {sendRequest, response} = useGameBackend(sessionId, userId);
   const [isGameOver, setIsGameOver] = useState<boolean>(false);
   const [gameOverMessage, setGameOverMessage] = useState<string>("");
 
-  const myTurn = gameState.turn === userId && !isGameOver;
+  const myTurn = gameState?.turn === userId && !isGameOver;
+  const turnMessage = myTurn ? "Your turn" : "Opponent's turn";
+  const isGameInProgress = gameState && !isGameOver;
 
 
   const handleJoin = () => {
@@ -53,9 +54,9 @@ export const Game = () => {
       <input type="number" value={userId} onChange={(e) => setUserId(parseInt(e.target.value))}/>
       <input type="text" value={sessionId} onChange={(e) => setSessionId(e.target.value)}/>
       <button onClick={handleJoin}>Join</button>
-      <p>{myTurn ? "Your turn" : "Opponent's turn"}</p>
+      <p>{isGameInProgress && turnMessage}</p>
       <p>{gameOverMessage}</p>
-      <Board board={gameState.board} onClick={handleBoardClick} disabled={!myTurn}/>
+      {gameState && <Board board={gameState.board} onClick={handleBoardClick} disabled={!myTurn}/>}
     </div>
   );
 };
