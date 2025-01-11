@@ -7,6 +7,7 @@ tictactoe_router = APIRouter()
 GameSessionId = str
 UserId = int
 
+
 @dataclass
 class GameUser:
     user_id: UserId
@@ -31,6 +32,57 @@ class GameSession:
     user1: GameUser | None
     user2: GameUser | None
     state: GameState
+
+
+@dataclass
+class UpdateStateMessage:
+    state: GameState
+
+    @classmethod
+    def create(cls, state: GameState):
+        return cls(state=state)
+
+    def json(self):
+        return {
+            "action": "update_state",
+            "state": self.state.json(),
+        }
+
+
+@dataclass
+class GameOverMessage:
+    state: GameState
+    winner: UserId
+
+    @classmethod
+    def create(cls, state: GameState, winner: UserId):
+        return cls(state=state, winner=winner)
+
+    def json(self):
+        return {
+            "action": "game_over",
+            "state": self.state.json(),
+            "winner": self.winner,
+        }
+
+
+@dataclass
+class AcceptJoinMessage:
+    session_id: GameSessionId
+    user_id: UserId
+    state: GameState
+
+    @classmethod
+    def create(cls, session_id: GameSessionId, user_id: UserId, state: GameState):
+        return cls(session_id=session_id, user_id=user_id, state=state)
+
+    def json(self):
+        return {
+            "action": "accept_join",
+            "session_id": self.session_id,
+            "user_id": self.user_id,
+            "state": self.state.json(),
+        }
 
 
 game_sessions: dict[GameSessionId, GameSession] = dict()
@@ -68,31 +120,25 @@ def connect_user_to_session(session_id: GameSessionId, user: GameUser):
         )
 
 
-async def broadcast_game_state(session_id: GameSessionId):
+async def broadcast_message(session_id: GameSessionId, message_json: dict):
     session = game_sessions[session_id]
-
-    message = {
-        "action": "update_state",
-        "state": session.state.json(),
-    }
 
     for user in [session.user1, session.user2]:
         if user is not None:
-            await user.websocket_connection.send_json(message)
+            await user.websocket_connection.send_json(message_json)
+
+
+async def broadcast_game_state(session_id: GameSessionId):
+    session = game_sessions[session_id]
+    message = UpdateStateMessage.create(session.state).json()
+    await broadcast_message(session_id, message)
 
 
 async def broadcast_winner(session_id: GameSessionId, winner: UserId):
     session = game_sessions[session_id]
+    message = GameOverMessage.create(session.state, winner).json()
+    await broadcast_message(session_id, message)
 
-    message = {
-        "action": "game_over",
-        "state": session.state.json(),
-        "winner": winner,
-    }
-
-    for user in [session.user1, session.user2]:
-        if user is not None:
-            await user.websocket_connection.send_json(message)
 
 async def handle_place_mark(websocket: WebSocket, session_id: GameSessionId, user_id: UserId, message: dict):
     session = game_sessions[session_id]
@@ -110,8 +156,8 @@ async def handle_place_mark(websocket: WebSocket, session_id: GameSessionId, use
 
 async def handle_join(websocket: WebSocket, session_id: GameSessionId, user_id: UserId):
     session = game_sessions[session_id]
-    await websocket.send_json(
-        {"action": "accept_join", "session_id": session_id, "user_id": user_id, "state": session.state.json()})
+    message = AcceptJoinMessage.create(session_id, user_id, session.state).json()
+    await websocket.send_json(message)
 
 
 @tictactoe_router.websocket("/game/{session_id}")
