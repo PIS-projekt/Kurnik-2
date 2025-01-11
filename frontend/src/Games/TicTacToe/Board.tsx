@@ -6,16 +6,35 @@ interface BoardProps {
 }
 
 export const Board = (props: BoardProps) => (
-  <div>
+  <BoardContainer>
     {props.board.map((row, i) => (
-      <div key={i}>
+      <RowContainer key={i}>
         {row.map((cell, j) => (
           <Cell key={j} onClick={() => props.onClick(i, j)}>{cell}</Cell>
         ))}
-      </div>
+      </RowContainer>
     ))}
-  </div>
+  </BoardContainer>
 );
+
+const BoardContainer = styled.div({
+  display: "flex",
+  flexDirection: "column",
+  alignItems: "center",
+  justifyContent: "center",
+  width: "100%",
+  height: "100%",
+  margin: "20px",
+});
+
+const RowContainer = styled.div({
+  display: "flex",
+  flexDirection: "row",
+  alignItems: "center",
+  justifyContent: "center",
+  width: "100%",
+  height: "100%",
+});
 
 const Cell = styled.button({
   width: "50px",
