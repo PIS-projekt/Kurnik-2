@@ -14,7 +14,8 @@ export const Board = (props: BoardProps) => (
           <Cell
             key={j}
             onClick={() => props.onClick(i, j)}
-            disabled={props.disabled}
+            disabled={props.disabled || cell !== ""}
+            selectable={!props.disabled && cell === ""}
           >
             {cell}
           </Cell>
@@ -43,7 +44,7 @@ const RowContainer = styled.div({
   height: "100%",
 });
 
-const Cell = styled.button({
+const Cell = styled.button<{selectable: boolean}>((props) => ({
   width: "50px",
   height: "50px",
   fontSize: "24px",
@@ -51,6 +52,6 @@ const Cell = styled.button({
   cursor: "pointer",
   backgroundColor: "white",
   "&:hover": {
-    backgroundColor: "lightgray",
+    backgroundColor: props.selectable ? "lightgray" : "white",
   },
-});
+}));
