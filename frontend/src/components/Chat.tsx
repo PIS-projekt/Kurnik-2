@@ -1,10 +1,11 @@
 import { FormEvent, useState } from "react";
 import useWebSocket, { ReadyState } from "react-use-websocket";
 import axios from "axios";
+import {useRoom} from "../hooks/useRoom";
 
 export const Chat = () => {
   const [currentMessage, setCurrentMessage] = useState("");
-  const [roomCode, setRoomCode] = useState<string>("");
+  const {roomCode, setRoomCode} = useRoom();
   const [userId, setUserId] = useState<number>(1);
   const [socketUrl, setSocketUrl] = useState<string | null>(null);
   const [messageList, setMessageList] = useState<Array<{ data: string }>>([]);

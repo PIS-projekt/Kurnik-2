@@ -5,6 +5,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from src.psi_backend.database.message import close_database, create_database, engine
 from src.psi_backend.routes.ws import ws_router
+from src.psi_backend.tictactoe.game import tictactoe_router
 from src.psi_backend.websocket_chat.room_assignment import (
     check_room_exists,
     create_room,
@@ -22,6 +23,7 @@ async def lifespan(_: FastAPI):
 
 app = FastAPI(lifespan=lifespan)
 app.include_router(ws_router, prefix="/ws")
+app.include_router(tictactoe_router, prefix="/tictactoe")
 
 app.add_middleware(
     CORSMiddleware,
