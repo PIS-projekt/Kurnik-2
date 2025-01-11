@@ -3,6 +3,7 @@ import styled from "@emotion/styled";
 interface BoardProps {
   board: string[][];
   onClick: (x: number, y: number) => void;
+  disabled: boolean;
 }
 
 export const Board = (props: BoardProps) => (
@@ -10,7 +11,13 @@ export const Board = (props: BoardProps) => (
     {props.board.map((row, i) => (
       <RowContainer key={i}>
         {row.map((cell, j) => (
-          <Cell key={j} onClick={() => props.onClick(i, j)}>{cell}</Cell>
+          <Cell
+            key={j}
+            onClick={() => props.onClick(i, j)}
+            disabled={props.disabled}
+          >
+            {cell}
+          </Cell>
         ))}
       </RowContainer>
     ))}

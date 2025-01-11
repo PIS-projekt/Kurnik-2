@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+
 from fastapi import APIRouter, WebSocket
 
 tictactoe_router = APIRouter()
@@ -16,6 +17,12 @@ class GameUser:
 class GameState:
     board: list[list[str]]
     turn: int
+
+    def json(self):
+        return {
+            "board": self.board,
+            "turn": self.turn,
+        }
 
 
 @dataclass
@@ -51,10 +58,7 @@ async def broadcast_game_state(session_id: GameSessionId):
 
     message = {
         "action": "update_state",
-        "state": {
-            "board": session.state.board,
-            "turn": session.state.turn,
-        },
+        "state": session.state.json(),
     }
 
     for user in [session.user1, session.user2]:
@@ -70,8 +74,12 @@ async def handle_place_mark(websocket: WebSocket, room_code: str, user_id: int, 
 
     await broadcast_game_state(room_code)
 
+
 async def handle_join(websocket: WebSocket, room_code: str, user_id: int):
-    await websocket.send_json({"action": "accept_join", "room_code": room_code, "user_id": user_id})
+    session = game_sessions[room_code]
+    await websocket.send_json(
+        {"action": "accept_join", "room_code": room_code, "user_id": user_id, "state": session.state.json()})
+
 
 @tictactoe_router.websocket("/game/{room_code}")
 async def tictactoe_endpoint(
@@ -80,7 +88,6 @@ async def tictactoe_endpoint(
         user_id: int,
 ):
     await websocket.accept()
-
 
     try:
         print(f"Connecting user {user_id} to session {room_code}")

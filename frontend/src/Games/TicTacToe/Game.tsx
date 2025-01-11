@@ -10,18 +10,16 @@ interface GameState {
 const initialBoard = [["", "", ""], ["", "", ""], ["", "", ""]];
 
 export const Game = () => {
-  const [gameState, setGameState] = useState<GameState>({ board: initialBoard, turn: 1 });
+  const [gameState, setGameState] = useState<GameState>({board: initialBoard, turn: 1});
   const [userId, setUserId] = useState<number>(1);
   const [sessionId, setSessionId] = useState<string>("abc");
-  const { sendRequest, response } = useGameBackend(sessionId, userId);
+  const {sendRequest, response} = useGameBackend(sessionId, userId);
 
-  const handleClick = () => {
-    const request = JSON.stringify({ action: "press_button" });
-    sendRequest(request);
-  };
+  const myTurn = gameState.turn === userId;
+
 
   const handleJoin = () => {
-    const request = JSON.stringify({ action: "join" });
+    const request = JSON.stringify({action: "join"});
     sendRequest(request);
   };
 
@@ -30,14 +28,14 @@ export const Game = () => {
       const parsedResponse = JSON.parse(response);
       console.info("Received response:", parsedResponse);
 
-      if (parsedResponse.action === "update_state") {
+      if (parsedResponse.action === "update_state" || parsedResponse.action === "accept_join") {
         setGameState(parsedResponse.state);
       }
     }
   }, [response]);
 
   const handleBoardClick = (x: number, y: number) => {
-    const request = JSON.stringify({ action: "place_mark", x: x, y: y });
+    const request = JSON.stringify({action: "place_mark", x: x, y: y});
     sendRequest(request);
   };
 
@@ -47,9 +45,8 @@ export const Game = () => {
       <input type="number" value={userId} onChange={(e) => setUserId(parseInt(e.target.value))}/>
       <input type="text" value={sessionId} onChange={(e) => setSessionId(e.target.value)}/>
       <button onClick={handleJoin}>Join</button>
-      <button onClick={handleClick} disabled={gameState.turn !== userId}>Press</button>
       <p>Turn: {gameState.turn}</p>
-      <Board board={gameState.board} onClick={handleBoardClick} />
+      <Board board={gameState.board} onClick={handleBoardClick} disabled={!myTurn}/>
     </div>
   );
 };
