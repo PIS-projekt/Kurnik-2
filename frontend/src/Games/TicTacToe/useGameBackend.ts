@@ -15,7 +15,6 @@ export const useGameBackend = (sessionId: string, userId: number) => {
   const handleMessage = (message: { data: string }) => {
     const msg = message.data as string;
     setResponse(msg);
-    // setSocketUrl(null);
   };
 
   const {sendMessage} = useWebSocket(socketUrl, {
