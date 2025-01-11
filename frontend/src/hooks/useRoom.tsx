@@ -16,4 +16,5 @@ export const RoomContextProvider = ({children}: { children: ReactNode }) => {
 };
 
 
+// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
 export const useRoom = (): RoomContextData => useContext(RoomContext)!;
