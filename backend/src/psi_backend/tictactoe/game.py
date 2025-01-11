@@ -91,6 +91,7 @@ game_sessions: dict[GameSessionId, GameSession] = dict()
 def empty_board():
     return [["", "", ""], ["", "", ""], ["", "", ""]]
 
+
 def check_winner(board: list[list[str]]) -> str | None:
     for i in range(3):
         if board[i][0] == board[i][1] == board[i][2] != "":
@@ -123,6 +124,13 @@ def connect_user_to_session(session_id: GameSessionId, user: GameUser):
         )
 
 
+async def end_session(session_id: GameSessionId):
+    session = game_sessions[session_id]
+    await session.user1.websocket_connection.close()
+    await session.user2.websocket_connection.close()
+    game_sessions.pop(session_id)
+
+
 async def broadcast_message(session_id: GameSessionId, message_json: dict):
     session = game_sessions[session_id]
 
@@ -137,10 +145,11 @@ async def broadcast_game_state(session_id: GameSessionId):
     await broadcast_message(session_id, message)
 
 
-async def broadcast_winner(session_id: GameSessionId, winner: UserId):
+async def broadcast_winner_and_finish(session_id: GameSessionId, winner: UserId):
     session = game_sessions[session_id]
     message = GameOverMessage.create(session.state, winner).json()
     await broadcast_message(session_id, message)
+    await end_session(session_id)
 
 
 async def handle_place_mark(session_id: GameSessionId, user_id: UserId, message: dict):
@@ -152,7 +161,7 @@ async def handle_place_mark(session_id: GameSessionId, user_id: UserId, message:
     winner = check_winner(session.state.board)
     winner_user_id = session.user1.user_id if winner == "X" else session.user2.user_id if winner == "O" else None
     if winner is not None:
-        await broadcast_winner(session_id, winner_user_id)
+        await broadcast_winner_and_finish(session_id, winner_user_id)
     else:
         await broadcast_game_state(session_id)
 
@@ -194,3 +203,8 @@ async def tictactoe_endpoint(
 
     except Exception as e:
         print(e)
+
+
+@tictactoe_router.get("/number-of-sessions")
+async def number_of_sessions():
+    return {"number_of_sessions": len(game_sessions)}
