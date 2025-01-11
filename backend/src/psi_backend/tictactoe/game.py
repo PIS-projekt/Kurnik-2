@@ -5,18 +5,18 @@ from fastapi import APIRouter, WebSocket
 tictactoe_router = APIRouter()
 
 GameSessionId = str
-
+UserId = int
 
 @dataclass
 class GameUser:
-    user_id: int
+    user_id: UserId
     websocket_connection: WebSocket
 
 
 @dataclass
 class GameState:
     board: list[list[str]]
-    turn: int
+    turn: UserId
 
     def json(self):
         return {
@@ -81,7 +81,7 @@ async def broadcast_game_state(session_id: GameSessionId):
             await user.websocket_connection.send_json(message)
 
 
-async def broadcast_winner(session_id: GameSessionId, winner: int):
+async def broadcast_winner(session_id: GameSessionId, winner: UserId):
     session = game_sessions[session_id]
 
     message = {
@@ -94,7 +94,7 @@ async def broadcast_winner(session_id: GameSessionId, winner: int):
         if user is not None:
             await user.websocket_connection.send_json(message)
 
-async def handle_place_mark(websocket: WebSocket, room_code: str, user_id: int, message: dict):
+async def handle_place_mark(websocket: WebSocket, room_code: str, user_id: UserId, message: dict):
     session = game_sessions[room_code]
     x, y = message["x"], message["y"]
     session.state.board[x][y] = "X" if user_id == session.user1.user_id else "O"
@@ -108,7 +108,7 @@ async def handle_place_mark(websocket: WebSocket, room_code: str, user_id: int, 
         await broadcast_game_state(room_code)
 
 
-async def handle_join(websocket: WebSocket, room_code: str, user_id: int):
+async def handle_join(websocket: WebSocket, room_code: str, user_id: UserId):
     session = game_sessions[room_code]
     await websocket.send_json(
         {"action": "accept_join", "room_code": room_code, "user_id": user_id, "state": session.state.json()})
@@ -118,7 +118,7 @@ async def handle_join(websocket: WebSocket, room_code: str, user_id: int):
 async def tictactoe_endpoint(
         websocket: WebSocket,
         room_code: str,
-        user_id: int,
+        user_id: UserId,
 ):
     await websocket.accept()
 
