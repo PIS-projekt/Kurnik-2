@@ -94,8 +94,8 @@ async def broadcast_winner(session_id: GameSessionId, winner: UserId):
         if user is not None:
             await user.websocket_connection.send_json(message)
 
-async def handle_place_mark(websocket: WebSocket, room_code: str, user_id: UserId, message: dict):
-    session = game_sessions[room_code]
+async def handle_place_mark(websocket: WebSocket, session_id: GameSessionId, user_id: UserId, message: dict):
+    session = game_sessions[session_id]
     x, y = message["x"], message["y"]
     session.state.board[x][y] = "X" if user_id == session.user1.user_id else "O"
     session.state.turn = session.user1.user_id if session.state.turn == session.user2.user_id else session.user2.user_id
@@ -103,29 +103,29 @@ async def handle_place_mark(websocket: WebSocket, room_code: str, user_id: UserI
     winner = check_winner(session.state.board)
     winner_user_id = session.user1.user_id if winner == "X" else session.user2.user_id if winner == "O" else None
     if winner is not None:
-        await broadcast_winner(room_code, winner_user_id)
+        await broadcast_winner(session_id, winner_user_id)
     else:
-        await broadcast_game_state(room_code)
+        await broadcast_game_state(session_id)
 
 
-async def handle_join(websocket: WebSocket, room_code: str, user_id: UserId):
-    session = game_sessions[room_code]
+async def handle_join(websocket: WebSocket, session_id: GameSessionId, user_id: UserId):
+    session = game_sessions[session_id]
     await websocket.send_json(
-        {"action": "accept_join", "room_code": room_code, "user_id": user_id, "state": session.state.json()})
+        {"action": "accept_join", "session_id": session_id, "user_id": user_id, "state": session.state.json()})
 
 
-@tictactoe_router.websocket("/game/{room_code}")
+@tictactoe_router.websocket("/game/{session_id}")
 async def tictactoe_endpoint(
         websocket: WebSocket,
-        room_code: str,
+        session_id: GameSessionId,
         user_id: UserId,
 ):
     await websocket.accept()
 
     try:
-        print(f"Connecting user {user_id} to session {room_code}")
+        print(f"Connecting user {user_id} to session {session_id}")
         connect_user_to_session(
-            session_id=room_code,
+            session_id=session_id,
             user=GameUser(user_id, websocket)
         )
     except ValueError:
@@ -137,9 +137,9 @@ async def tictactoe_endpoint(
             print("Received message", message)
 
             if message["action"] == "place_mark":
-                await handle_place_mark(websocket, room_code, user_id, message)
+                await handle_place_mark(websocket, session_id, user_id, message)
             elif message["action"] == "join":
-                await handle_join(websocket, room_code, user_id)
+                await handle_join(websocket, session_id, user_id)
 
 
 
