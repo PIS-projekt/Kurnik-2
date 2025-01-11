@@ -1,13 +1,16 @@
 import {useEffect, useState} from "react";
 import {useGameBackend} from "./useGameBackend";
+import {Board} from "./Board";
 
 interface GameState {
-  counter: number;
+  board: string[][];
   turn: number;
 }
 
+const initialBoard = [["", "", ""], ["", "", ""], ["", "", ""]];
+
 export const Game = () => {
-  const [gameState, setGameState] = useState<GameState>({ counter: 0, turn: 1 });
+  const [gameState, setGameState] = useState<GameState>({ board: initialBoard, turn: 1 });
   const [userId, setUserId] = useState<number>(1);
   const [sessionId, setSessionId] = useState<string>("abc");
   const { sendRequest, response } = useGameBackend(sessionId, userId);
@@ -33,6 +36,11 @@ export const Game = () => {
     }
   }, [response]);
 
+  const handleBoardClick = (x: number, y: number) => {
+    const request = JSON.stringify({ action: "place_mark", x: x, y: y });
+    sendRequest(request);
+  };
+
   return (
     <div>
       <h1>Game</h1>
@@ -40,8 +48,8 @@ export const Game = () => {
       <input type="text" value={sessionId} onChange={(e) => setSessionId(e.target.value)}/>
       <button onClick={handleJoin}>Join</button>
       <button onClick={handleClick} disabled={gameState.turn !== userId}>Press</button>
-      <p>Counter: {gameState.counter}</p>
       <p>Turn: {gameState.turn}</p>
+      <Board board={gameState.board} onClick={handleBoardClick} />
     </div>
   );
 };

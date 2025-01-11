@@ -14,7 +14,7 @@ class GameUser:
 
 @dataclass
 class GameState:
-    counter: int
+    board: list[list[str]]
     turn: int
 
 
@@ -42,7 +42,7 @@ def connect_user_to_session(session_id: GameSessionId, user: GameUser):
             id=session_id,
             user1=user,
             user2=None,
-            state=GameState(counter=0, turn=1),
+            state=GameState(board=[["", "", ""], ["", "", ""], ["", "", ""]], turn=user.user_id),
         )
 
 
@@ -52,7 +52,7 @@ async def broadcast_game_state(session_id: GameSessionId):
     message = {
         "action": "update_state",
         "state": {
-            "counter": session.state.counter,
+            "board": session.state.board,
             "turn": session.state.turn,
         },
     }
@@ -62,10 +62,10 @@ async def broadcast_game_state(session_id: GameSessionId):
             await user.websocket_connection.send_json(message)
 
 
-async def handle_press_button(websocket: WebSocket, room_code: str, user_id: int):
+async def handle_place_mark(websocket: WebSocket, room_code: str, user_id: int, message: dict):
     session = game_sessions[room_code]
-
-    session.state.counter += 1
+    x, y = message["x"], message["y"]
+    session.state.board[x][y] = "X" if user_id == session.user1.user_id else "O"
     session.state.turn = session.user1.user_id if session.state.turn == session.user2.user_id else session.user2.user_id
 
     await broadcast_game_state(room_code)
@@ -96,8 +96,8 @@ async def tictactoe_endpoint(
             message = await websocket.receive_json()
             print("Received message", message)
 
-            if message["action"] == "press_button":
-                await handle_press_button(websocket, room_code, user_id)
+            if message["action"] == "place_mark":
+                await handle_place_mark(websocket, room_code, user_id, message)
             elif message["action"] == "join":
                 await handle_join(websocket, room_code, user_id)
 
