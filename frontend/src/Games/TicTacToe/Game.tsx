@@ -39,8 +39,9 @@ export const Game = () => {
       <input type="number" value={userId} onChange={(e) => setUserId(parseInt(e.target.value))}/>
       <input type="text" value={sessionId} onChange={(e) => setSessionId(e.target.value)}/>
       <button onClick={handleJoin}>Join</button>
-      <button onClick={handleClick}>Press</button>
+      <button onClick={handleClick} disabled={gameState.turn !== userId}>Press</button>
       <p>Counter: {gameState.counter}</p>
+      <p>Turn: {gameState.turn}</p>
     </div>
   );
 };

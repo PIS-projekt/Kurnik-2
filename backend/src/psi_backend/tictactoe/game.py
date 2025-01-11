@@ -62,6 +62,17 @@ async def broadcast_game_state(session_id: GameSessionId):
             await user.websocket_connection.send_json(message)
 
 
+async def handle_press_button(websocket: WebSocket, room_code: str, user_id: int):
+    session = game_sessions[room_code]
+
+    session.state.counter += 1
+    session.state.turn = session.user1.user_id if session.state.turn == session.user2.user_id else session.user2.user_id
+
+    await broadcast_game_state(room_code)
+
+async def handle_join(websocket: WebSocket, room_code: str, user_id: int):
+    await websocket.send_json({"action": "accept_join", "room_code": room_code, "user_id": user_id})
+
 @tictactoe_router.websocket("/game/{room_code}")
 async def tictactoe_endpoint(
         websocket: WebSocket,
@@ -83,13 +94,14 @@ async def tictactoe_endpoint(
     try:
         while True:
             message = await websocket.receive_json()
-            print("Receiver message", message)
-            session = game_sessions[room_code]
+            print("Received message", message)
 
-            session.state.counter += 1
-            session.state.turn = 1 if session.state.turn == 2 else 2
+            if message["action"] == "press_button":
+                await handle_press_button(websocket, room_code, user_id)
+            elif message["action"] == "join":
+                await handle_join(websocket, room_code, user_id)
 
-            await broadcast_game_state(room_code)
+
 
     except Exception as e:
         print(e)
