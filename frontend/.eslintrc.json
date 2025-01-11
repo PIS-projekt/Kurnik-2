@@ -39,6 +39,7 @@
       "error",
       "as-needed"
     ],
-    "camelcase": "error"
+    "camelcase": "error",
+    "no-non-null-assertion": "off"
   }
 }
