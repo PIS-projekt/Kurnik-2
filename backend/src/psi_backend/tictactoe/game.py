@@ -88,6 +88,9 @@ class AcceptJoinMessage:
 game_sessions: dict[GameSessionId, GameSession] = dict()
 
 
+def empty_board():
+    return [["", "", ""], ["", "", ""], ["", "", ""]]
+
 def check_winner(board: list[list[str]]) -> str | None:
     for i in range(3):
         if board[i][0] == board[i][1] == board[i][2] != "":
@@ -116,7 +119,7 @@ def connect_user_to_session(session_id: GameSessionId, user: GameUser):
             id=session_id,
             user1=user,
             user2=None,
-            state=GameState(board=[["", "", ""], ["", "", ""], ["", "", ""]], turn=user.user_id),
+            state=GameState(board=empty_board(), turn=user.user_id),
         )
 
 
@@ -140,7 +143,7 @@ async def broadcast_winner(session_id: GameSessionId, winner: UserId):
     await broadcast_message(session_id, message)
 
 
-async def handle_place_mark(websocket: WebSocket, session_id: GameSessionId, user_id: UserId, message: dict):
+async def handle_place_mark(session_id: GameSessionId, user_id: UserId, message: dict):
     session = game_sessions[session_id]
     x, y = message["x"], message["y"]
     session.state.board[x][y] = "X" if user_id == session.user1.user_id else "O"
@@ -183,7 +186,7 @@ async def tictactoe_endpoint(
             print("Received message", message)
 
             if message["action"] == "place_mark":
-                await handle_place_mark(websocket, session_id, user_id, message)
+                await handle_place_mark(session_id, user_id, message)
             elif message["action"] == "join":
                 await handle_join(websocket, session_id, user_id)
 
