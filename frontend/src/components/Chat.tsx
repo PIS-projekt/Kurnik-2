@@ -14,7 +14,7 @@ export const Chat = () => {
   const [error, setError] = useState<string | null>(null);
 
   const apiBaseUrl = "http://0.0.0.0:8000";
-  
+
   const handleOpen = () => {
     console.log("WebSocket connection opened.");
     setLoggedRoomCode(roomCode);
@@ -51,7 +51,7 @@ export const Chat = () => {
     try {
       const response = await axios.get(`${apiBaseUrl}/create-new-room`, {
         // eslint-disable-next-line camelcase
-        params: { user_id: userId },
+        params: { user_id: userId, private: false }, // TODO: get setting from user
       });
       const newRoomCode = response.data.room_code;
       setRoomCode(newRoomCode);

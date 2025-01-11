@@ -41,13 +41,18 @@ async def read_root():
 
 @app.get("/create-new-room")
 async def create_room_endpoint(
+    private: bool,
     user_id: int,
     # user_id=Depends(get_current_user_id) -> This should be used when introducing
     # server-side user authentication. Right now, user_id is passed as a query parameter
 ):
-    room_code = create_room()
+    room_code = create_room(private)
 
-    return {"message": "Room created successfully", "room_code": room_code}
+    return {
+        "message": "Room created successfully",
+        "room_code": room_code,
+        "private": str(private),
+    }
 
 
 @app.get("/join-room")
