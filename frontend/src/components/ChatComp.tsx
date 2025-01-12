@@ -33,15 +33,7 @@ interface ChatCompProps {
 }
 const ChatComp: FC<ChatCompProps> = ({ className }) => {
     const [closed, setClosed] = useState(false);
-    // const { messageList } = useChat()
-    const messageList = [
-        {
-            data: "xd"
-        },
-        {
-            data: "xd"
-        },
-    ]
+    const { messageList } = useChat()
 
     return (
         <div className={cn('flex flex-col max-w-md mx-auto w-full', className)}>
