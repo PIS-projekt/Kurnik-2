@@ -9,6 +9,7 @@ import { api } from '../lib/api';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from './ui/tooltip';
+import toast from 'react-hot-toast';
 
 interface RoomCreateJoinProps {
 
@@ -32,7 +33,10 @@ const RoomCreateJoin: FC<RoomCreateJoinProps> = ({ }) => {
                             <TooltipProvider>
                                 <Tooltip delayDuration={0}>
                                     <TooltipTrigger asChild>
-                                        <Button variant='ghost' className='p-0 aspect-square' >
+                                        <Button variant='ghost' className='p-0 aspect-square' onClick={() => {
+                                            navigator.clipboard.writeText(roomId)
+                                            toast.success('Room ID copied to clipboard')
+                                        }}>
                                             <IoCopy />
                                         </Button>
                                     </TooltipTrigger>
@@ -44,7 +48,9 @@ const RoomCreateJoin: FC<RoomCreateJoinProps> = ({ }) => {
                             <TooltipProvider>
                                 <Tooltip delayDuration={0}>
                                     <TooltipTrigger asChild>
-                                        <Button variant='ghost' className='p-0 aspect-square' >
+                                        <Button variant='ghost' className='p-0 aspect-square' onClick={() => {
+                                            toast.success('Room URL copied to clipboard')
+                                        }}>
                                             <FaLink />
                                         </Button>
                                     </TooltipTrigger>
