@@ -12,7 +12,7 @@ function App() {
         <p>Profile: {process.env.NODE_ENV}</p>
         <Chat />
         <Game />
-        <ChatComp />
+        <ChatComp className="bottom-0 fixed right-0 max-w-[25vw]" />
       </div>
     </RoomContextProvider>
 

@@ -29,14 +29,22 @@ const MessageComp: FC<MessageCompProps> = ({ message, username }) => {
 }
 
 interface ChatCompProps {
-
+    className?: string;
 }
-const ChatComp: FC<ChatCompProps> = ({ }) => {
+const ChatComp: FC<ChatCompProps> = ({ className }) => {
     const [closed, setClosed] = useState(false);
-    const { messageList } = useChat()
+    // const { messageList } = useChat()
+    const messageList = [
+        {
+            data: "xd"
+        },
+        {
+            data: "xd"
+        },
+    ]
 
     return (
-        <div className='max-w-md mx-auto'>
+        <div className={cn('flex flex-col max-w-md mx-auto w-full', className)}>
             {/* <Button onClick={() => {
                 api.createRoom(1).then((roomCode) => {
                     console.log(roomCode)
@@ -69,7 +77,7 @@ const ChatComp: FC<ChatCompProps> = ({ }) => {
             }}>
                 msg
             </Button> */}
-            <div className='bg-slate-900 rounded-t-md flex items-center relative p-2'>
+            <div className=' bg-slate-900 rounded-t-md flex items-center relative p-2'>
                 <p className='text-center font-semibold text-slate-50 flex-1'>Chat</p>
                 <Button
                     onClick={() => setClosed(!closed)}
@@ -78,8 +86,8 @@ const ChatComp: FC<ChatCompProps> = ({ }) => {
                     <PiCaretDownBold className={cn("transition-all", { 'rotate-180': closed })} />
                 </Button>
             </div>
-            <div className={cn('border border-gray-200 rounded-b-md border-t-0 p-2', { 'hidden': closed })}>
-                <div className={``}>
+            <div className={cn('flex flex-col border border-gray-200 rounded-b-md border-t-0 p-2 max-h-[80vh]', { 'hidden': closed })}>
+                <div className={`overflow-y-scroll`}>
                     {messageList.map((message, index) => {
                         return (
                             <MessageComp key={index} message={message.data} username={'user FIX'} />
@@ -95,7 +103,7 @@ const ChatComp: FC<ChatCompProps> = ({ }) => {
                     <MessageComp message='some message' username='user 1' />
                     <MessageComp message='some message' username='user 1' /> */}
                 </div>
-                <div className='flex'>
+                <div className='flex '>
                     <Input className='border-r-0 rounded-r-none' type="text" placeholder="Send message..." />
                     <Button className='rounded-l-none'>
                         <IoSend />
