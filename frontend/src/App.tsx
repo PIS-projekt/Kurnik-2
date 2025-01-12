@@ -1,7 +1,8 @@
 import "./App.css";
-import {Chat} from "./components/Chat";
-import {Game} from "./Games/TicTacToe/Game";
-import {RoomContextProvider} from "./hooks/useRoom";
+import { Chat } from "./components/Chat";
+import ChatComp from "./components/ChatComp";
+import { Game } from "./Games/TicTacToe/Game";
+import { RoomContextProvider } from "./hooks/useRoom";
 
 function App() {
   return (
@@ -9,8 +10,9 @@ function App() {
       <div className="App">
         <h1>Projekt PIS 2024Z</h1>
         <p>Profile: {process.env.NODE_ENV}</p>
-        <Chat/>
-        <Game/>
+        <Chat />
+        <Game />
+        <ChatComp />
       </div>
     </RoomContextProvider>
 
