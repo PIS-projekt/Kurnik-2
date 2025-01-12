@@ -1,11 +1,12 @@
 import { FormEvent, useState } from "react";
 import useWebSocket, { ReadyState } from "react-use-websocket";
 import axios from "axios";
-import {useRoom} from "../hooks/useRoom";
+import { useRoom } from "../hooks/useRoom";
+import { Button } from "./ui/button";
 
 export const Chat = () => {
   const [currentMessage, setCurrentMessage] = useState("");
-  const {roomCode, setRoomCode} = useRoom();
+  const { roomCode, setRoomCode } = useRoom();
   const [userId, setUserId] = useState<number>(1);
   const [socketUrl, setSocketUrl] = useState<string | null>(null);
   const [messageList, setMessageList] = useState<Array<{ data: string }>>([]);
@@ -95,7 +96,8 @@ export const Chat = () => {
       </div>
       <br />
       <div>
-        <button onClick={handleCreateRoom}>Create Room</button>
+        <Button onClick={handleCreateRoom}>Create Room</Button>
+        {/* <button onClick={handleCreateRoom}>Create Room</button> */}
       </div>
       <br />
       <form onSubmit={handleJoinRoom}>
