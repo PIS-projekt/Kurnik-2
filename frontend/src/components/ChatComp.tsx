@@ -1,11 +1,15 @@
 /* eslint-disable */
-import { FC, useState } from 'react';
+import { FC, useEffect, useState } from 'react';
 import { Input } from './ui/input';
 import { IoSend } from "react-icons/io5";
 import { Button } from './ui/button';
 import { FaUser } from "react-icons/fa";
 import { PiCaretDownBold } from "react-icons/pi";
 import { cn } from '../lib/utils';
+import axios from 'axios';
+import { useChat } from '../hooks/useChat';
+import { api } from '../lib/api';
+import { GrKeyboard } from "react-icons/gr";
 
 
 interface MessageCompProps {
@@ -24,15 +28,47 @@ const MessageComp: FC<MessageCompProps> = ({ message, username }) => {
     )
 }
 
-
 interface ChatCompProps {
 
 }
 const ChatComp: FC<ChatCompProps> = ({ }) => {
     const [closed, setClosed] = useState(false);
+    const { messageList } = useChat()
 
     return (
         <div className='max-w-md mx-auto'>
+            {/* <Button onClick={() => {
+                api.createRoom(1).then((roomCode) => {
+                    console.log(roomCode)
+                    // @ts-ignore
+                    window.roomCode = roomCode
+                })
+            }}>
+                create
+            </Button>
+            <Button onClick={() => {
+                // @ts-ignore
+                api.joinRoom(window.roomCode, 2).then((roomCode) => {
+                    console.log(roomCode)
+                    // eslint-disable-next-line no-undef
+                    // @ts-ignore
+                    console.log(window.roomCode)
+                })
+            }}>
+                join
+            </Button>
+            <Button onClick={() => {
+                // @ts-ignore
+                joinRoomChat(window.roomCode, 1)
+            }
+            }>
+                join chat
+            </Button>
+            <Button onClick={() => {
+                sendMessageF('some message')
+            }}>
+                msg
+            </Button> */}
             <div className='bg-slate-900 rounded-t-md flex items-center relative p-2'>
                 <p className='text-center font-semibold text-slate-50 flex-1'>Chat</p>
                 <Button
@@ -44,9 +80,20 @@ const ChatComp: FC<ChatCompProps> = ({ }) => {
             </div>
             <div className={cn('border border-gray-200 rounded-b-md border-t-0 p-2', { 'hidden': closed })}>
                 <div className={``}>
+                    {messageList.map((message, index) => {
+                        return (
+                            <MessageComp key={index} message={message.data} username={'user FIX'} />
+                        )
+                    })}
+                    {messageList.length === 0 && (
+                        <div className='flex justify-center items-center flex-col my-16 opacity-15 max-w-[75%] mx-auto'>
+                            <GrKeyboard className='text-7xl' />
+                            <p className='text-xl'>Join chat, and messages you write will appear here.</p>
+                        </div>
+                    )}
+                    {/* <MessageComp message='some message' username='user 1' />
                     <MessageComp message='some message' username='user 1' />
-                    <MessageComp message='some message' username='user 1' />
-                    <MessageComp message='some message' username='user 1' />
+                    <MessageComp message='some message' username='user 1' /> */}
                 </div>
                 <div className='flex'>
                     <Input className='border-r-0 rounded-r-none' type="text" placeholder="Send message..." />
