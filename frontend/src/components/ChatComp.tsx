@@ -1,15 +1,13 @@
 /* eslint-disable */
-import { FC, useEffect, useState } from 'react';
-import { Input } from './ui/input';
-import { IoSend } from "react-icons/io5";
-import { Button } from './ui/button';
+import { FC, useState } from 'react';
 import { FaUser } from "react-icons/fa";
-import { PiCaretDownBold } from "react-icons/pi";
-import { cn } from '../lib/utils';
-import axios from 'axios';
-import { useChat } from '../hooks/useChat';
-import { api } from '../lib/api';
 import { GrKeyboard } from "react-icons/gr";
+import { IoSend } from "react-icons/io5";
+import { PiCaretDownBold } from "react-icons/pi";
+import { useChat } from '../hooks/useChat';
+import { cn } from '../lib/utils';
+import { Button } from './ui/button';
+import { Input } from './ui/input';
 
 
 interface MessageCompProps {
@@ -33,42 +31,11 @@ interface ChatCompProps {
 }
 const ChatComp: FC<ChatCompProps> = ({ className }) => {
     const [closed, setClosed] = useState(false);
-    const { messageList } = useChat()
+    const [typedMessage, setTypedMessage] = useState<string>('')
+    const { messageList, sendMessageF } = useChat()
 
     return (
         <div className={cn('flex flex-col max-w-md mx-auto w-full', className)}>
-            {/* <Button onClick={() => {
-                api.createRoom(1).then((roomCode) => {
-                    console.log(roomCode)
-                    // @ts-ignore
-                    window.roomCode = roomCode
-                })
-            }}>
-                create
-            </Button>
-            <Button onClick={() => {
-                // @ts-ignore
-                api.joinRoom(window.roomCode, 2).then((roomCode) => {
-                    console.log(roomCode)
-                    // eslint-disable-next-line no-undef
-                    // @ts-ignore
-                    console.log(window.roomCode)
-                })
-            }}>
-                join
-            </Button>
-            <Button onClick={() => {
-                // @ts-ignore
-                joinRoomChat(window.roomCode, 1)
-            }
-            }>
-                join chat
-            </Button>
-            <Button onClick={() => {
-                sendMessageF('some message')
-            }}>
-                msg
-            </Button> */}
             <div className=' bg-slate-900 rounded-t-md flex items-center relative p-2'>
                 <p className='text-center font-semibold text-slate-50 flex-1'>Chat</p>
                 <Button
@@ -91,13 +58,13 @@ const ChatComp: FC<ChatCompProps> = ({ className }) => {
                             <p className='text-xl'>Join chat, and messages you write will appear here.</p>
                         </div>
                     )}
-                    {/* <MessageComp message='some message' username='user 1' />
-                    <MessageComp message='some message' username='user 1' />
-                    <MessageComp message='some message' username='user 1' /> */}
                 </div>
                 <div className='flex '>
-                    <Input className='border-r-0 rounded-r-none' type="text" placeholder="Send message..." />
-                    <Button className='rounded-l-none'>
+                    <Input value={typedMessage} onChange={(e) => setTypedMessage(e.currentTarget.value)} className='border-r-0 rounded-r-none' type="text" placeholder="Send message..." />
+                    <Button className='rounded-l-none' onClick={() => {
+                        sendMessageF(typedMessage)
+                        setTypedMessage('')
+                    }}>
                         <IoSend />
                     </Button>
                 </div>
@@ -106,4 +73,4 @@ const ChatComp: FC<ChatCompProps> = ({ className }) => {
     )
 }
 
-export { ChatComp, MessageComp }
+export { ChatComp, MessageComp };
