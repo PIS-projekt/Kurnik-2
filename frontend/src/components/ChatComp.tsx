@@ -8,10 +8,26 @@ import { PiCaretDownBold } from "react-icons/pi";
 import { cn } from '../lib/utils';
 
 
+interface MessageCompProps {
+    username: string;
+    message: string;
+}
+const MessageComp: FC<MessageCompProps> = ({ message, username }) => {
+    return (
+        <div className='flex items-start flex-col gap-1 mb-5'>
+            <div className='flex justify-center items-center gap-1 text-muted-foreground'>
+                <FaUser className='text-xs' />
+                <p className='text-xs font-semibold'>{username}</p>
+            </div>
+            <p className='border bg-slate-100 p-2 rounded-md w-full text-start text-sm'>{message}</p>
+        </div>
+    )
+}
+
+
 interface ChatCompProps {
 
 }
-
 const ChatComp: FC<ChatCompProps> = ({ }) => {
     const [closed, setClosed] = useState(false);
 
@@ -28,27 +44,9 @@ const ChatComp: FC<ChatCompProps> = ({ }) => {
             </div>
             <div className={cn('border border-gray-200 rounded-b-md border-t-0 p-2', { 'hidden': closed })}>
                 <div className={``}>
-                    <div className='flex items-start flex-col gap-1 mb-5'>
-                        <div className='flex justify-center items-center gap-1 text-muted-foreground'>
-                            <FaUser className='text-xs' />
-                            <p className='text-xs font-semibold'>User 1</p>
-                        </div>
-                        <p className='border bg-slate-100 p-2 rounded-md w-full text-start text-sm'>some mesage sne by user</p>
-                    </div>
-                    <div className='flex items-start flex-col gap-1 mb-5'>
-                        <div className='flex justify-center items-center gap-1 text-muted-foreground'>
-                            <FaUser className='text-xs' />
-                            <p className='text-xs font-semibold'>User 1</p>
-                        </div>
-                        <p className='border bg-slate-100 p-2 rounded-md w-full text-start text-sm'>some mesage sne by user</p>
-                    </div>
-                    <div className='flex items-start flex-col gap-1 mb-5'>
-                        <div className='flex justify-center items-center gap-1 text-muted-foreground'>
-                            <FaUser className='text-xs' />
-                            <p className='text-xs font-semibold'>User 1</p>
-                        </div>
-                        <p className='border bg-slate-100 p-2 rounded-md w-full text-start text-sm'>some mesage sne by user</p>
-                    </div>
+                    <MessageComp message='some message' username='user 1' />
+                    <MessageComp message='some message' username='user 1' />
+                    <MessageComp message='some message' username='user 1' />
                 </div>
                 <div className='flex'>
                     <Input className='border-r-0 rounded-r-none' type="text" placeholder="Send message..." />
@@ -61,4 +59,4 @@ const ChatComp: FC<ChatCompProps> = ({ }) => {
     )
 }
 
-export default ChatComp
+export { ChatComp, MessageComp }

@@ -1,6 +1,6 @@
 import "./App.css";
 import { Chat } from "./components/Chat";
-import ChatComp from "./components/ChatComp";
+import { ChatComp } from "./components/ChatComp";
 import { Game } from "./Games/TicTacToe/Game";
 import { RoomContextProvider } from "./hooks/useRoom";
 
