@@ -4,6 +4,8 @@ import { useState, useEffect } from "react";
 import { Chat } from "./components/Chat";
 import { Login } from "./components/Login";
 import { Register } from "./components/Register";
+import {Game} from "./Games/TicTacToe/Game";
+import {RoomContextProvider} from "./hooks/useRoom";
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -30,7 +32,7 @@ function App() {
           />
           <Route
             path="/chat"
-            element={isAuthenticated ? <Chat /> : <Navigate to="/login" />}
+            element={isAuthenticated ?   <RoomContextProvider><Chat/><Game/></RoomContextProvider> : <Navigate to="/login" />}
           />
           <Route
             path="/login"

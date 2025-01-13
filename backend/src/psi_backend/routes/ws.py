@@ -2,6 +2,7 @@ from fastapi import APIRouter, HTTPException, WebSocket, WebSocketDisconnect
 
 from src.psi_backend.routes.auth import get_current_user
 from src.psi_backend.websocket_chat.room_assignment import (
+    RoomCode,
     RoomNotFoundError,
     WebSocketUser,
     assign_user_to_room,
