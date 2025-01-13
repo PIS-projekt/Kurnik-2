@@ -1,58 +1,98 @@
-import pytest
 from fastapi.testclient import TestClient
-from fastapi.websockets import WebSocketDisconnect
-from src.psi_backend.app import app
-from src.psi_backend.websocket_chat.room_assignment import RoomNotFoundError, rooms
-from src.psi_backend.websocket_chat.room_assignment import WebSocketUser
-from unittest.mock import AsyncMock, Mock
+from fastapi import HTTPException, WebSocketDisconnect
+import pytest
 
-client = TestClient(app)
-
-
-@pytest.fixture
-def mock_assign_user_to_room(monkeypatch):
-    async def mock(room_code, user):
-        if room_code != "VALID123":
-            raise RoomNotFoundError("Room not found")
-
-    monkeypatch.setattr(
-        "src.psi_backend.websocket_chat.room_assignment.assign_user_to_room", mock
-    )
-    return mock
+from src.psi_backend.database.user import User
+from src.psi_backend.websocket_chat.room_assignment import (
+    create_room,
+    rooms,
+)
 
 
 @pytest.fixture
-def mock_broadcast_message(monkeypatch):
-    mock = AsyncMock()
-    monkeypatch.setattr(
-        "src.psi_backend.websocket_chat.room_assignment.broadcast_message", mock
-    )
-    return mock
+def test_client() -> TestClient:
+    from src.psi_backend.app import app
+
+    return TestClient(app)
 
 
 @pytest.fixture
-def mock_disconnect_user(monkeypatch):
-    mock = Mock()
-    monkeypatch.setattr(
-        "src.psi_backend.websocket_chat.room_assignment.disconnect_user", mock
-    )
-    return mock
-
-
-@pytest.fixture
-def mock_rooms(monkeypatch):
-    monkeypatch.setattr(
-        "src.psi_backend.websocket_chat.room_assignment.rooms",
-        {"VALID123": []},
+def test_user() -> User:
+    """Fixture to create a test user."""
+    return User(
+        id=1, username="testuser", email="test@example.com", hashed_pwd="hashedpwd123"
     )
 
 
-# Test successful WebSocket connection
-def test_websocket_connect_success(mock_assign_user_to_room, mock_rooms):
-    room_code = "VALID123"
-    user_id = 1234
-    with client.websocket_connect(
-        f"/ws/connect/{room_code}?user_id={user_id}"
+def test_connect_to_websocket_valid_user(
+    test_client: TestClient, test_user: User, monkeypatch: pytest.MonkeyPatch
+):
+
+    new_room_code = create_room()
+
+    def mock_get_current_user(_: str) -> User:
+        return test_user
+
+    monkeypatch.setattr(
+        "src.psi_backend.routes.ws.get_current_user", mock_get_current_user
+    )
+
+    with test_client.websocket_connect(f"/ws/connect/{new_room_code}?token=123") as _:
+        assert rooms[new_room_code][0].user_id == test_user.id
+
+
+def test_connect_to_websocket_invalid_token(
+    test_client: TestClient, test_user: User, monkeypatch: pytest.MonkeyPatch
+):
+
+    new_room_code = create_room()
+
+    def mock_get_current_user_return_invalid(_: str):
+        raise HTTPException(status_code=403, detail="Invalid token")
+
+    monkeypatch.setattr(
+        "src.psi_backend.routes.ws.get_current_user",
+        mock_get_current_user_return_invalid,
+    )
+
+    with test_client.websocket_connect(
+        f"/ws/connect/{new_room_code}?token=123"
     ) as websocket:
-        websocket.send_text("test_connection")
-        assert True  # If no exceptions are raised, the connection is successful
+        with pytest.raises(WebSocketDisconnect) as exc:
+            websocket.receive_text()
+
+        assert exc.value.code == 1008
+        assert exc.value.reason == "Invalid token"
+
+
+def test_connect_to_websocket_missing_token(
+    test_client: TestClient, test_user: User, monkeypatch: pytest.MonkeyPatch
+):
+
+    new_room_code = create_room()
+
+    with test_client.websocket_connect(f"/ws/connect/{new_room_code}") as websocket:
+        with pytest.raises(WebSocketDisconnect) as exc:
+            websocket.receive_text()
+
+        assert exc.value.code == 1008
+        assert exc.value.reason == "Missing token"
+
+
+def test_connect_to_non_existent_room(
+    test_client: TestClient, test_user: User, monkeypatch: pytest.MonkeyPatch
+):
+
+    def mock_get_current_user(_: str) -> User:
+        return test_user
+
+    monkeypatch.setattr(
+        "src.psi_backend.routes.ws.get_current_user", mock_get_current_user
+    )
+    with test_client.websocket_connect("/ws/connect/NOROOM?token=123") as websocket:
+
+        with pytest.raises(WebSocketDisconnect) as exc:
+            websocket.receive_text()
+
+        # assert exc.value.code == 1003
+        assert exc.value.reason == "Room not found"
