@@ -1,9 +1,6 @@
 from __future__ import annotations
-from datetime import datetime
 from sqlalchemy import Engine
-from sqlmodel import Field, SQLModel, Session, create_engine, select
-from attrs import define
-from typing import Optional
+from sqlmodel import SQLModel, create_engine
 import os
 
 DB_PROVIDER = "postgresql"

@@ -1,5 +1,4 @@
-from fastapi import APIRouter, Depends, WebSocket, WebSocketDisconnect
-from fastapi.responses import HTMLResponse
+from fastapi import APIRouter, WebSocket, WebSocketDisconnect, HTTPException
 
 from src.psi_backend.websocket_chat.room_assignment import (
     RoomNotFoundError,
@@ -7,24 +6,16 @@ from src.psi_backend.websocket_chat.room_assignment import (
     broadcast_message,
     disconnect_user,
     WebSocketUser,
-    RoomCode,
 )
 
-from src.psi_backend.routes.auth import get_current_user, OAuth2PasswordBearer
-
-from src.psi_backend.database.user import User
+from src.psi_backend.routes.auth import get_current_user
 
 
 ws_router = APIRouter()
 
 
-from fastapi import WebSocket, WebSocketDisconnect, Depends, HTTPException
-from fastapi.security import OAuth2PasswordBearer
-from typing import Annotated
-
-
 @ws_router.websocket("/connect/{room_code}")
-async def websocket_endpoint(websocket: WebSocket, room_code: str):
+async def websocket_endpoint(websocket: WebSocket, room_code: str) -> None:
     await websocket.accept()
 
     # Extract the token from the query parameters
@@ -36,13 +27,17 @@ async def websocket_endpoint(websocket: WebSocket, room_code: str):
 
     # Validate the token and get the current user
     try:
-        user = await get_current_user(token)
-        print(user)
-    except HTTPException as e:
+        user = get_current_user(token)
+    except HTTPException:
         await websocket.close(code=1008, reason="Invalid token")
         return
 
     try:
+
+        if user.id is None:
+            await websocket.close(code=1008, reason="Invalid user ID")
+            return
+
         assign_user_to_room(
             room_code,
             WebSocketUser(
@@ -50,7 +45,7 @@ async def websocket_endpoint(websocket: WebSocket, room_code: str):
                 websocket_connection=websocket,
             ),
         )
-    except RoomNotFoundError as e:
+    except RoomNotFoundError:
         await websocket.close(code=1003, reason="Room not found")
         return
 

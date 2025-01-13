@@ -5,17 +5,18 @@ from passlib.context import CryptContext
 from pydantic import BaseModel
 
 import jwt
+from jwt.exceptions import InvalidTokenError
 
 from datetime import datetime, timedelta, timezone
 
 from src.psi_backend.database.user import User, UserNotFoundError, user_repository
 
-# TODO Replace with env variable
+# TODO Replace with env variable from secrets
 # Generate with:
 # openssl rand -hex 32
 SECRET_KEY = "secret"
 ALGORITHM = "HS256"
-ACCESS_TOKEN_EXPIRE_MINUTES = 30
+ACCESS_TOKEN_EXPIRE_MINUTES = 10
 
 
 class Token(BaseModel):
@@ -78,9 +79,7 @@ def create_access_token(data: dict[Any, Any], expires_delta: timedelta | None = 
     return encoded_jwt
 
 
-async def get_current_user(token: Annotated[str, Depends(oauth2_scheme)]) -> User:
-
-    print(token)
+def get_current_user(token: Annotated[str, Depends(oauth2_scheme)]) -> User:
 
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
@@ -92,22 +91,20 @@ async def get_current_user(token: Annotated[str, Depends(oauth2_scheme)]) -> Use
 
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])  # type: ignore
         username: str = payload.get("sub")
-        print(f"payload {payload}")
 
         if not username:
             raise credentials_exception
 
         token_data = TokenData(username=username)
 
-    except:
-        print("Invalid token")
+    except InvalidTokenError:
         raise credentials_exception
 
     try:
         if token_data.username is None:
             raise credentials_exception
         user = user_repository.get_user_by_username(token_data.username)
-    except:
+    except UserNotFoundError:
         print("User not found")
         raise credentials_exception
 
@@ -115,7 +112,7 @@ async def get_current_user(token: Annotated[str, Depends(oauth2_scheme)]) -> Use
 
 
 @auth_router.post("/token")
-async def login_for_access_token(
+def login_for_access_token(
     form_data: Annotated[OAuth2PasswordRequestForm, Depends()],
 ) -> Token:
 
@@ -140,13 +137,11 @@ async def login_for_access_token(
 
 
 @auth_router.post("/register")
-async def register_new_user(request: RegisterRequest):
+def register_new_user(request: RegisterRequest):
 
     hashed_pwd = get_password_hash(request.password)
 
     user = User(username=request.username, email=request.email, hashed_pwd=hashed_pwd)
     user_repository.add_user(user)
-
-    print(user_repository.get_users())
 
     return {"message": "User registered successfully"}

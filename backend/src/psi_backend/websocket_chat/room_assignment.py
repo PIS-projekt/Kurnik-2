@@ -36,7 +36,7 @@ def assign_user_to_room(room_code: RoomCode, user_websocket: WebSocketUser):
         raise RoomNotFoundError(f"Room with code {room_code} not found.")
 
 
-async def broadcast_message(room_code: RoomCode, user: User, message: str):
+async def broadcast_message(room_code: RoomCode, user: User, message: str) -> None:
     """Broadcast a message to all users in the room.
 
     Args:
@@ -44,6 +44,9 @@ async def broadcast_message(room_code: RoomCode, user: User, message: str):
         user_id (str): User that sent the message.
         message (str): Message to broadcast.
     """
+    if user.id is None:
+        raise ValueError("User ID cannot be None")
+
     message_repository.add_message(
         Message(user_id=user.id, chatroom_code=room_code, contents=message)
     )
@@ -54,18 +57,19 @@ async def broadcast_message(room_code: RoomCode, user: User, message: str):
         )
 
 
-def disconnect_user(room_code: int, user_id: int):
+def disconnect_user(room_code: RoomCode, user_id: int) -> None:
     """Disconnect the user from the room
 
     Args:
         room_code (RoomCode): Room to remove the user from.
         user_id (int): User to remove from the room.
     """
+
     for websocket_user in rooms[room_code]:
         if websocket_user.user_id == user_id:
             rooms[room_code].remove(websocket_user)
             break
-    if not rooms[room_code]:
+    if check_room_exists(room_code) and len(rooms[room_code]) == 0:
         del rooms[room_code]
 
 

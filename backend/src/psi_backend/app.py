@@ -2,6 +2,7 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI, HTTPException, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from typing import Annotated
+from pydantic import BaseModel
 
 from src.psi_backend.database.db import (
     close_database,
@@ -35,37 +36,40 @@ app.include_router(auth_router, prefix="/auth")
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Replace with the actual URL of your frontend
+    allow_origins=["*"],  # Replace with the frontend
     allow_credentials=True,
     allow_methods=["*"],  # Allow all HTTP methods
     allow_headers=["*"],  # Allow all headers
 )
 
 
-@app.get("/")
-async def read_root():
-    return {"Hello": "World"}
+class CreateRoomResponse(BaseModel):
+    message: str
+    room_code: str
 
 
-@app.get("/create-new-room")
-async def create_room_endpoint(
-    current_user: Annotated[User, Depends(get_current_user)]
-):
-    print(current_user.username)
+@app.post("/create-new-room", response_model=CreateRoomResponse)
+def create_room_endpoint(
+    _: Annotated[User, Depends(get_current_user)]
+) -> CreateRoomResponse:
 
     room_code = create_room()
 
-    return {"message": "Room created successfully", "room_code": room_code}
+    return CreateRoomResponse(message="Room created successfully", room_code=room_code)
+
+
+class JoinRoomResponse(BaseModel):
+    message: str
+    room_code: str
+    room_exists: bool
 
 
 @app.get("/join-room")
-async def join_room(room_code: str, user: User = Depends(get_current_user)):
+def join_room(room_code: str, _: User = Depends(get_current_user)) -> JoinRoomResponse:
     """This endpoint has to be called before attempting to connect to the websocket endpoint."""
     if check_room_exists(room_code):
-        return {
-            "message": "Room can be joined.",
-            "room_code": room_code,
-            "room_exists": True,
-        }
+        return JoinRoomResponse(
+            message="Room can be joined.", room_code=room_code, room_exists=True
+        )
     else:
         raise HTTPException(status_code=404, detail="Room not found.")

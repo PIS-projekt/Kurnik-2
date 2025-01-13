@@ -1,10 +1,10 @@
 from __future__ import annotations
-from datetime import datetime
 from sqlalchemy import Engine
-from sqlmodel import Field, SQLModel, Session, create_engine, select
+from sqlalchemy.exc import IntegrityError
+from sqlmodel import SQLModel, Session, select
+from sqlmodel import Field  # type: ignore
 from attrs import define
-from typing import Optional
-import os
+from typing import Optional, Sequence
 
 from src.psi_backend.database.db import engine
 
@@ -13,8 +13,8 @@ class User(SQLModel, table=True):
     """User on the platform."""
 
     id: Optional[int] = Field(default=None, primary_key=True)
-    username: str = Field(nullable=False)
-    email: str = Field(nullable=False)
+    username: str = Field(nullable=False, unique=True)
+    email: str = Field(nullable=False, unique=True)
     hashed_pwd: str = Field(nullable=False)
 
 
@@ -32,13 +32,23 @@ class UserRepository:
 
     engine: Engine
 
-    def add_user(self, user: User) -> None:
+    def add_user(self, user: User) -> int:
         """Add user to database."""
         with Session(self.engine) as session:
-            session.add(user)
-            session.commit()
+            try:
+                session.add(user)
+                session.commit()
+                if user.id is None:
+                    raise ValueError("User ID cannot be None")
+            except IntegrityError as e:
+                session.rollback()
+                if "UNIQUE constraint failed" in str(e.orig):
+                    raise ValueError("User with this email or username already exists")
+                else:
+                    raise
+            return user.id
 
-    def delete_user(self: int, user_id: int) -> None:
+    def delete_user(self, user_id: int) -> None:
         """Deletes a message from the database."""
         with Session(self.engine) as session:
             msg = session.get(User, user_id)
@@ -48,7 +58,7 @@ class UserRepository:
             session.delete(msg)
             session.commit()
 
-    def get_users(self) -> list[User]:
+    def get_users(self) -> Sequence[User]:
         """Get all users from the database."""
         with Session(self.engine) as session:
             users = session.exec(select(User)).all()
