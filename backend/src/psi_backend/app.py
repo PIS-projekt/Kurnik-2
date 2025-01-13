@@ -48,7 +48,7 @@ class CreateRoomResponse(BaseModel):
     room_code: str
 
 
-@app.post("/create-new-room", response_model=CreateRoomResponse)
+@app.get("/create-new-room", response_model=CreateRoomResponse)
 def create_room_endpoint(
     _: Annotated[User, Depends(get_current_user)]
 ) -> CreateRoomResponse:

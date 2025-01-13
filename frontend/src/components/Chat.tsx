@@ -88,7 +88,6 @@ export const Chat = () => {
       const token = localStorage.getItem("access_token");
       console.log(token);
       const response = await axios.get(`${apiBaseUrl}/create-new-room`, {
-        // eslint-disable-next-line camelcase
         headers: { Authorization: `Bearer ${token}` },
       });
       const newRoomCode = response.data.room_code;
