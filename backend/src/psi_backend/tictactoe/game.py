@@ -118,6 +118,7 @@ def connect_user_to_session(session_id: GameSessionId, user: GameUser):
         else:
             raise ValueError("Session is full")
     else:
+        print(f"Creating new session {session_id}")
         game_sessions[session_id] = GameSession(
             id=session_id,
             user1=user,
@@ -202,13 +203,13 @@ async def tictactoe_endpoint(
             session_id=session_id, user=GameUser(user.id, websocket)
         )
     except ValueError:
-        websocket.close()
+        await websocket.close()
 
     try:
         while True:
             message = await websocket.receive_json()
             print("Received message", message)
-
+            print("Turn of ", game_sessions[session_id].state.turn)
             if message["action"] == "place_mark":
                 await handle_place_mark(session_id, user.id, message)
             elif message["action"] == "join":

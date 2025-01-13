@@ -93,5 +93,4 @@ def test_connect_to_non_existent_room(
         with pytest.raises(WebSocketDisconnect) as exc:
             websocket.receive_text()
 
-        # assert exc.value.code == 1003
         assert exc.value.reason == "Room not found"

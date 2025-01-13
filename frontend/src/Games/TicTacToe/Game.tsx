@@ -15,8 +15,8 @@ export const Game = () => {
   const {sendRequest, response} = useGameBackend(sessionId, userId);
   const [isGameOver, setIsGameOver] = useState<boolean>(false);
   const [gameOverMessage, setGameOverMessage] = useState<string>("");
+  const [myTurn, setMyTurn] = useState<boolean>(false);
 
-  const myTurn = gameState?.turn === userId && !isGameOver;
   const turnMessage = myTurn ? "Your turn" : "Opponent's turn";
   const isGameInProgress = gameState && !isGameOver;
 
@@ -27,12 +27,24 @@ export const Game = () => {
   };
 
   useEffect(() => {
+    console.log("My turn updated:", myTurn);
+  }, [myTurn]);
+
+  useEffect(() => {
     if (response) {
       const parsedResponse = JSON.parse(response);
       console.info("Received response:", parsedResponse);
 
-      if (parsedResponse.action === "update_state" || parsedResponse.action === "accept_join") {
+      if (parsedResponse.action === "accept_join") {
         setGameState(parsedResponse.state);
+        setUserId(parsedResponse.user_id);
+        setMyTurn(parsedResponse.state.turn === parsedResponse.user_id);
+        console.log("My turn:", parsedResponse.state.turn === parsedResponse.user_id);
+
+      } else if (parsedResponse.action === "update_state") {
+        setGameState(parsedResponse.state);
+        setMyTurn(parsedResponse.state.turn === userId);
+
       } else if (parsedResponse.action === "game_over") {
         setGameState(parsedResponse.state);
         setIsGameOver(true);
