@@ -3,7 +3,6 @@ from fastapi import WebSocket
 from unittest.mock import AsyncMock
 from src.psi_backend.websocket_chat.room_assignment import (
     assign_user_to_room,
-    broadcast_message,
     disconnect_user,
     create_room,
     generate_room_code,
@@ -12,7 +11,6 @@ from src.psi_backend.websocket_chat.room_assignment import (
     WebSocketUser,
     rooms,
 )
-from src.psi_backend.database.user import User
 
 
 @pytest.fixture
