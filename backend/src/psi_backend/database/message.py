@@ -1,10 +1,12 @@
 from __future__ import annotations
+
 from datetime import datetime
-from sqlalchemy import Engine
-from sqlmodel import SQLModel, Session, select
-from sqlmodel import Field  # type: ignore
-from attrs import define
 from typing import Optional, Sequence
+
+from attrs import define
+from sqlalchemy import Engine
+from sqlmodel import Field  # type: ignore
+from sqlmodel import Session, SQLModel, select
 
 from src.psi_backend.database.db import engine
 

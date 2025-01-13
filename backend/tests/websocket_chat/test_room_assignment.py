@@ -1,14 +1,16 @@
+from unittest.mock import AsyncMock
+
 import pytest
 from fastapi import WebSocket
-from unittest.mock import AsyncMock
+
 from src.psi_backend.websocket_chat.room_assignment import (
-    assign_user_to_room,
-    disconnect_user,
-    create_room,
-    generate_room_code,
-    check_room_exists,
     RoomNotFoundError,
     WebSocketUser,
+    assign_user_to_room,
+    check_room_exists,
+    create_room,
+    disconnect_user,
+    generate_room_code,
     rooms,
 )
 

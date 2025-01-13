@@ -1,7 +1,9 @@
 from __future__ import annotations
+
+import os
+
 from sqlalchemy import Engine
 from sqlmodel import SQLModel, create_engine
-import os
 
 DB_PROVIDER = "postgresql"
 DB_DRIVER = "psycopg2"

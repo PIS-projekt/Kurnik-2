@@ -1,15 +1,13 @@
-from fastapi import APIRouter, WebSocket, WebSocketDisconnect, HTTPException
+from fastapi import APIRouter, HTTPException, WebSocket, WebSocketDisconnect
 
+from src.psi_backend.routes.auth import get_current_user
 from src.psi_backend.websocket_chat.room_assignment import (
     RoomNotFoundError,
+    WebSocketUser,
     assign_user_to_room,
     broadcast_message,
     disconnect_user,
-    WebSocketUser,
 )
-
-from src.psi_backend.routes.auth import get_current_user
-
 
 ws_router = APIRouter()
 

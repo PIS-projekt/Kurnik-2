@@ -1,13 +1,12 @@
-from fastapi import APIRouter, HTTPException, Depends, status
-from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
-from typing import Annotated, Literal, Any
-from passlib.context import CryptContext
-from pydantic import BaseModel
+from datetime import datetime, timedelta, timezone
+from typing import Annotated, Any, Literal
 
 import jwt
+from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from jwt.exceptions import InvalidTokenError
-
-from datetime import datetime, timedelta, timezone
+from passlib.context import CryptContext
+from pydantic import BaseModel
 
 from src.psi_backend.database.user import User, UserNotFoundError, user_repository
 

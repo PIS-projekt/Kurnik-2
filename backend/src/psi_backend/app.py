@@ -1,23 +1,17 @@
 from contextlib import asynccontextmanager
-from fastapi import FastAPI, HTTPException, Depends
-from fastapi.middleware.cors import CORSMiddleware
 from typing import Annotated
+
+from fastapi import Depends, FastAPI, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 
-from src.psi_backend.database.db import (
-    close_database,
-    create_database,
-    engine,
-)
-
+from src.psi_backend.database.db import close_database, create_database, engine
 from src.psi_backend.database.user import User
-
 from src.psi_backend.routes.auth import auth_router, get_current_user
-
 from src.psi_backend.routes.ws import ws_router
 from src.psi_backend.websocket_chat.room_assignment import (
-    create_room,
     check_room_exists,
+    create_room,
 )
 
 
@@ -66,7 +60,8 @@ class JoinRoomResponse(BaseModel):
 
 @app.get("/join-room")
 def join_room(room_code: str, _: User = Depends(get_current_user)) -> JoinRoomResponse:
-    """This endpoint has to be called before attempting to connect to the websocket endpoint."""
+    """This endpoint has to be called before attempting to connect to the
+    websocket endpoint."""
     if check_room_exists(room_code):
         return JoinRoomResponse(
             message="Room can be joined.", room_code=room_code, room_exists=True

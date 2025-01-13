@@ -1,9 +1,11 @@
+from unittest.mock import patch
+
 import pytest
 from fastapi.testclient import TestClient
-from unittest.mock import patch
-from src.psi_backend.routes.auth import get_current_user
-from src.psi_backend.database.user import User
+
 from src.psi_backend.app import app
+from src.psi_backend.database.user import User
+from src.psi_backend.routes.auth import get_current_user
 
 
 @pytest.fixture

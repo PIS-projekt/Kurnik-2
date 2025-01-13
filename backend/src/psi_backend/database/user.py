@@ -1,10 +1,12 @@
 from __future__ import annotations
+
+from typing import Optional, Sequence
+
+from attrs import define
 from sqlalchemy import Engine
 from sqlalchemy.exc import IntegrityError
-from sqlmodel import SQLModel, Session, select
 from sqlmodel import Field  # type: ignore
-from attrs import define
-from typing import Optional, Sequence
+from sqlmodel import Session, SQLModel, select
 
 from src.psi_backend.database.db import engine
 

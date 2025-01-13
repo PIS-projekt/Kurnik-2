@@ -1,12 +1,9 @@
-from fastapi.testclient import TestClient
-from fastapi import HTTPException, WebSocketDisconnect
 import pytest
+from fastapi import HTTPException, WebSocketDisconnect
+from fastapi.testclient import TestClient
 
 from src.psi_backend.database.user import User
-from src.psi_backend.websocket_chat.room_assignment import (
-    create_room,
-    rooms,
-)
+from src.psi_backend.websocket_chat.room_assignment import create_room, rooms
 
 
 @pytest.fixture

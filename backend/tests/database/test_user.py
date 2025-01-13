@@ -1,13 +1,10 @@
 from __future__ import annotations
-import pytest
-from sqlmodel import create_engine, SQLModel
-from sqlalchemy import Engine
 
-from src.psi_backend.database.user import (
-    User,
-    UserRepository,
-    UserNotFoundError,
-)
+import pytest
+from sqlalchemy import Engine
+from sqlmodel import SQLModel, create_engine
+
+from src.psi_backend.database.user import User, UserNotFoundError, UserRepository
 
 
 # In-memory SQLite database for testing
