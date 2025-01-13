@@ -2,7 +2,7 @@ from datetime import datetime, timedelta, timezone
 from typing import Annotated, Any, Literal
 
 import jwt
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, WebSocket, status
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from jwt.exceptions import InvalidTokenError
 from passlib.context import CryptContext
@@ -104,6 +104,26 @@ def get_current_user(token: Annotated[str, Depends(oauth2_scheme)]) -> User:
         user = user_repository.get_user_by_username(token_data.username)
     except UserNotFoundError:
         raise credentials_exception
+
+    return user
+
+
+async def validate_websocket(token: str, websocket: WebSocket) -> User:
+
+    if not token:
+        await websocket.close(code=1008, reason="Missing token")
+        raise HTTPException(status_code=400, detail="Missing token")
+
+    # Validate the token and get the current user
+    try:
+        user = get_current_user(token)
+    except HTTPException as e:
+        await websocket.close(code=1008, reason="Invalid token")
+        raise e
+
+    if user.id is None:
+        await websocket.close(code=1008, reason="Invalid user ID")
+        raise HTTPException(status_code=400, detail="Invalid user ID")
 
     return user
 

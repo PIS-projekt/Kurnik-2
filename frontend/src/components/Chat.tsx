@@ -43,6 +43,9 @@ export const Chat = () => {
   }, [navigate]);
 
   useEffect(() => {
+    if(userName) {
+      console.log("User name:", userName);
+    }
   }, [userName]);
 
   const handleLogout = () => {
@@ -84,6 +87,7 @@ export const Chat = () => {
     try {
       const token = localStorage.getItem("access_token");
       const response = await axios.get(`${apiBaseUrl}/create-new-room`, {
+        params: { private: false },
         headers: { Authorization: `Bearer ${token}` },
       });
       const newRoomCode = response.data.room_code;

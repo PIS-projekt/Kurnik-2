@@ -28,12 +28,13 @@ def test_create_new_room(authorized_client: TestClient) -> None:
     with patch(
         "src.psi_backend.app.create_room", return_value="ABC123"
     ) as mock_create_room:
-        response = authorized_client.get("/create-new-room")
+        response = authorized_client.get("/create-new-room", params={"private": False})
 
     assert response.status_code == 200
     assert response.json() == {
         "message": "Room created successfully",
         "room_code": "ABC123",
+        "private": "False",
     }
     mock_create_room.assert_called_once()
 

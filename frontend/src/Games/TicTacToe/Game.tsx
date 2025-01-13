@@ -51,7 +51,6 @@ export const Game = () => {
   return (
     <div>
       <h1>Game</h1>
-      <input type="number" value={userId} onChange={(e) => setUserId(parseInt(e.target.value))}/>
       <input type="text" value={sessionId} onChange={(e) => setSessionId(e.target.value)}/>
       <button onClick={handleJoin}>Join</button>
       <p>{isGameInProgress && turnMessage}</p>

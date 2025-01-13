@@ -1,8 +1,8 @@
 from fastapi import APIRouter, HTTPException, WebSocket, WebSocketDisconnect
 
-from src.psi_backend.routes.auth import get_current_user
+from src.psi_backend.database.user import User
+from src.psi_backend.routes.auth import validate_websocket
 from src.psi_backend.websocket_chat.room_assignment import (
-    RoomCode,
     RoomNotFoundError,
     WebSocketUser,
     assign_user_to_room,
@@ -17,21 +17,10 @@ ws_router = APIRouter()
 async def websocket_endpoint(websocket: WebSocket, room_code: str) -> None:
     await websocket.accept()
 
-    # Extract the token from the query parameters
-    token = websocket.query_params.get("token")
-    if not token:
-        await websocket.close(code=1008, reason="Missing token")
-        return
-
-    # Validate the token and get the current user
-    try:
-        user = get_current_user(token)
-    except HTTPException:
-        await websocket.close(code=1008, reason="Invalid token")
-        return
+    token = websocket.query_params.get("token") or ""
+    user = await validate_websocket(token, websocket)
 
     if user.id is None:
-        await websocket.close(code=1008, reason="Invalid user ID")
         return
 
     try:

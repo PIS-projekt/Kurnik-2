@@ -27,30 +27,30 @@ def test_connect_to_websocket_valid_user(
     test_client: TestClient, test_user: User, monkeypatch: pytest.MonkeyPatch
 ):
 
-    new_room_code = create_room()
+    new_room_code = create_room(private=False)
 
     def mock_get_current_user(_: str) -> User:
         return test_user
 
     monkeypatch.setattr(
-        "src.psi_backend.routes.ws.get_current_user", mock_get_current_user
+        "src.psi_backend.routes.auth.get_current_user", mock_get_current_user
     )
 
     with test_client.websocket_connect(f"/ws/connect/{new_room_code}?token=123") as _:
-        assert rooms[new_room_code][0].user_id == test_user.id
+        assert rooms[new_room_code].users[0].user_id == test_user.id
 
 
 def test_connect_to_websocket_invalid_token(
     test_client: TestClient, test_user: User, monkeypatch: pytest.MonkeyPatch
 ):
 
-    new_room_code = create_room()
+    new_room_code = create_room(private=False)
 
     def mock_get_current_user_return_invalid(_: str):
         raise HTTPException(status_code=403, detail="Invalid token")
 
     monkeypatch.setattr(
-        "src.psi_backend.routes.ws.get_current_user",
+        "src.psi_backend.routes.auth.get_current_user",
         mock_get_current_user_return_invalid,
     )
 
@@ -68,7 +68,7 @@ def test_connect_to_websocket_missing_token(
     test_client: TestClient, test_user: User, monkeypatch: pytest.MonkeyPatch
 ):
 
-    new_room_code = create_room()
+    new_room_code = create_room(private=False)
 
     with test_client.websocket_connect(f"/ws/connect/{new_room_code}") as websocket:
         with pytest.raises(WebSocketDisconnect) as exc:
@@ -86,7 +86,7 @@ def test_connect_to_non_existent_room(
         return test_user
 
     monkeypatch.setattr(
-        "src.psi_backend.routes.ws.get_current_user", mock_get_current_user
+        "src.psi_backend.routes.auth.get_current_user", mock_get_current_user
     )
     with test_client.websocket_connect("/ws/connect/NOROOM?token=123") as websocket:
 
