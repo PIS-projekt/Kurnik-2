@@ -20,7 +20,6 @@ async def websocket_endpoint(websocket: WebSocket, room_code: str) -> None:
     token = websocket.query_params.get("token")
     if not token:
         await websocket.close(code=1008, reason="Missing token")
-        print("Missing token")
         return
 
     # Validate the token and get the current user
@@ -30,12 +29,11 @@ async def websocket_endpoint(websocket: WebSocket, room_code: str) -> None:
         await websocket.close(code=1008, reason="Invalid token")
         return
 
+    if user.id is None:
+        await websocket.close(code=1008, reason="Invalid user ID")
+        return
+
     try:
-
-        if user.id is None:
-            await websocket.close(code=1008, reason="Invalid user ID")
-            return
-
         assign_user_to_room(
             room_code,
             WebSocketUser(

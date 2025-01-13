@@ -42,12 +42,11 @@ class UserRepository:
                 session.commit()
                 if user.id is None:
                     raise ValueError("User ID cannot be None")
+
             except IntegrityError as e:
                 session.rollback()
-                if "UNIQUE constraint failed" in str(e.orig):
-                    raise ValueError("User with this email or username already exists")
-                else:
-                    raise
+                raise e
+
             return user.id
 
     def delete_user(self, user_id: int) -> None:

@@ -27,7 +27,6 @@ export function Login({ setIsAuthenticated }: { setIsAuthenticated: (auth: boole
       if (response.ok) {
         const data = await response.json();
         localStorage.setItem("access_token", data.access_token);
-        console.log(data.access_token);
         setIsAuthenticated(true);
         navigate("/chat");
       } else {

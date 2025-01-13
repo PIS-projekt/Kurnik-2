@@ -26,7 +26,6 @@ export const Chat = () => {
 
     try {
       const decodedToken: { sub: string; exp: number } = jwtDecode(token);
-      console.log(decodedToken.sub);
       setUserName(decodedToken.sub);
 
       // Check if the token is expired
@@ -41,10 +40,6 @@ export const Chat = () => {
   }, [navigate]);
 
   useEffect(() => {
-    if (userName) {
-      console.log("Here is the username:");
-      console.log(userName);
-    }
   }, [userName]);
 
   const handleLogout = () => {
@@ -84,9 +79,7 @@ export const Chat = () => {
 
   const handleCreateRoom = async () => {
     try {
-      console.log("Creating room...");
       const token = localStorage.getItem("access_token");
-      console.log(token);
       const response = await axios.get(`${apiBaseUrl}/create-new-room`, {
         headers: { Authorization: `Bearer ${token}` },
       });

@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import pytest
 from sqlalchemy import Engine
+from sqlalchemy.exc import IntegrityError
 from sqlmodel import SQLModel, create_engine
 
 from src.psi_backend.database.user import User, UserNotFoundError, UserRepository
@@ -102,7 +103,5 @@ def test_add_user_duplicate_username(user_repo: UserRepository) -> None:
     )
     user_repo.add_user(user1)
 
-    with pytest.raises(
-        ValueError, match="User with this email or username already exists"
-    ):
+    with pytest.raises(IntegrityError):
         user_repo.add_user(user2)

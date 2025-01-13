@@ -7,6 +7,7 @@ from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from jwt.exceptions import InvalidTokenError
 from passlib.context import CryptContext
 from pydantic import BaseModel
+from sqlalchemy.exc import IntegrityError
 
 from src.psi_backend.database.user import User, UserNotFoundError, user_repository
 
@@ -73,8 +74,6 @@ def create_access_token(data: dict[Any, Any], expires_delta: timedelta | None = 
     to_encode.update({"exp": expire})
     encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)  # type: ignore
 
-    print(jwt.decode(encoded_jwt, SECRET_KEY, ALGORITHM))  # type: ignore
-
     return encoded_jwt
 
 
@@ -104,7 +103,6 @@ def get_current_user(token: Annotated[str, Depends(oauth2_scheme)]) -> User:
             raise credentials_exception
         user = user_repository.get_user_by_username(token_data.username)
     except UserNotFoundError:
-        print("User not found")
         raise credentials_exception
 
     return user
@@ -141,6 +139,12 @@ def register_new_user(request: RegisterRequest):
     hashed_pwd = get_password_hash(request.password)
 
     user = User(username=request.username, email=request.email, hashed_pwd=hashed_pwd)
-    user_repository.add_user(user)
+    try:
+        user_repository.add_user(user)
+    except IntegrityError:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Username or user email already exists.",
+        )
 
     return {"message": "User registered successfully"}
