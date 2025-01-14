@@ -18,6 +18,7 @@ export const Game = () => {
   const [isGameOver, setIsGameOver] = useState<boolean>(false);
   const [gameOverMessage, setGameOverMessage] = useState<string>("");
   const [myTurn, setMyTurn] = useState<boolean>(false);
+  const [error, setError] = useState<string | null>(null);
 
   const turnMessage = myTurn ? "Your turn" : "Opponent's turn";
   const isGameInProgress = gameState && !isGameOver;
@@ -50,6 +51,7 @@ export const Game = () => {
 
   useEffect(() => {
     if (response) {
+      setError(null);
       const parsedResponse = JSON.parse(response);
       console.info("Received response:", parsedResponse);
 
@@ -70,8 +72,11 @@ export const Game = () => {
         console.log("winner: ", winner);
         const msg = parsedResponse.winner === userId ? "You win!" : (winner == null ? "It's a draw" : "You lose!");
         setGameOverMessage(msg);
-      }
 
+      } else if (parsedResponse.action === "error") {
+        console.error("Error:", parsedResponse.message);
+        setError(parsedResponse.message);
+      }
     }
   }, [response]);
 
@@ -86,6 +91,7 @@ export const Game = () => {
       <button onClick={handleJoin}>Join</button>
       <p>{isGameInProgress && turnMessage}</p>
       <p>{gameOverMessage}</p>
+      {error && <p>{error}</p>}
       {gameState && <Board board={gameState.board} onClick={handleBoardClick} disabled={!myTurn} />}
     </div>
   );

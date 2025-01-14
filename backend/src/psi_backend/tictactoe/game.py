@@ -29,6 +29,17 @@ class GameSession:
     user2: Optional[WebSocketUser]
     state: GameState
 
+    def players_present(self):
+        """Check if both players are present and the game can start."""
+        return self.user1 is not None and self.user2 is not None
+
+    def get_player_by_id(self, user_id: UserId) -> Optional[WebSocketUser]:
+        if self.user1 is not None and self.user1.user_id == user_id:
+            return self.user1
+        elif self.user2 is not None and self.user2.user_id == user_id:
+            return self.user2
+        return None
+
 
 class UpdateStateMessage(BaseModel):
     action: str = "update_state"
@@ -46,6 +57,11 @@ class AcceptJoinMessage(BaseModel):
     session_id: GameSessionId
     user_id: UserId
     state: GameState
+
+
+class ErrorMessage(BaseModel):
+    action: str = "error"
+    message: str
 
 
 game_sessions: dict[GameSessionId, GameSession] = dict()
@@ -122,8 +138,24 @@ async def broadcast_winner_and_finish(
     await end_session(session_id)
 
 
+async def handle_premature_move(session_id: GameSessionId, user_id: UserId):
+    """Handle a move from a player who is not supposed to move since the
+    game has not been started yet."""
+    player = cast(WebSocketUser, game_sessions[session_id].get_player_by_id(user_id))
+    await player.websocket_connection.send_json(
+        ErrorMessage(
+            message="Unable to make a move before opponent joins."
+        ).model_dump()
+    )
+
+
 async def handle_place_mark(session_id: GameSessionId, user_id: UserId, message: dict):
     session = game_sessions[session_id]
+
+    if not session.players_present():
+        await handle_premature_move(session_id, user_id)
+        return
+
     user1, user2 = cast(WebSocketUser, session.user1), cast(
         WebSocketUser, session.user2
     )
