@@ -1,12 +1,12 @@
 from dataclasses import dataclass
-from loguru import logger
 from typing import Optional, cast
 
 from fastapi import APIRouter, WebSocket
+from loguru import logger
 from pydantic import BaseModel
 
-from src.psi_backend.websocket_chat.room_assignment import WebSocketUser
 from src.psi_backend.routes.auth import validate_websocket
+from src.psi_backend.websocket_chat.room_assignment import WebSocketUser
 
 tictactoe_router = APIRouter()
 
@@ -18,12 +18,8 @@ class SessionFullError(Exception):
     """Thrown when a user tries to join a full session."""
 
 
-from typing import List, Optional
-from pydantic import BaseModel
-
-
 class GameState(BaseModel):
-    board: List[List[str]]
+    board: list[list[str]]
     turn: UserId
 
 
