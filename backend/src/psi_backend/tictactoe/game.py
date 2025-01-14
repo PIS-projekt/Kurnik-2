@@ -41,10 +41,6 @@ class GameSession:
 class UpdateStateMessage:
     state: GameState
 
-    @classmethod
-    def create(cls, state: GameState):
-        return cls(state=state)
-
     def json(self):
         return {
             "action": "update_state",
@@ -70,10 +66,6 @@ class AcceptJoinMessage:
     session_id: GameSessionId
     user_id: UserId
     state: GameState
-
-    @classmethod
-    def create(cls, session_id: GameSessionId, user_id: UserId, state: GameState):
-        return cls(session_id=session_id, user_id=user_id, state=state)
 
     def json(self):
         return {
@@ -144,7 +136,7 @@ async def broadcast_message(session_id: GameSessionId, message_json: dict):
 
 async def broadcast_game_state(session_id: GameSessionId):
     session = game_sessions[session_id]
-    message = UpdateStateMessage.create(session.state).json()
+    message = UpdateStateMessage(session.state).json()
     await broadcast_message(session_id, message)
 
 
@@ -178,7 +170,7 @@ async def handle_place_mark(session_id: GameSessionId, user_id: UserId, message:
 
 async def handle_join(websocket: WebSocket, session_id: GameSessionId, user_id: UserId):
     session = game_sessions[session_id]
-    message = AcceptJoinMessage.create(session_id, user_id, session.state).json()
+    message = AcceptJoinMessage(session_id, user_id, session.state).json()
     await websocket.send_json(message)
 
 
