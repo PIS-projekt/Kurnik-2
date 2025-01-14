@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from typing import Optional, cast
 
 from fastapi import APIRouter, WebSocket
 
@@ -31,8 +32,8 @@ class GameState:
 @dataclass
 class GameSession:
     id: GameSessionId
-    user1: GameUser | None
-    user2: GameUser | None
+    user1: Optional[GameUser]
+    user2: Optional[GameUser]
     state: GameState
 
 
@@ -54,11 +55,7 @@ class UpdateStateMessage:
 @dataclass
 class GameOverMessage:
     state: GameState
-    winner: UserId
-
-    @classmethod
-    def create(cls, state: GameState, winner: UserId):
-        return cls(state=state, winner=winner)
+    winner: Optional[UserId]
 
     def json(self):
         return {
@@ -94,19 +91,22 @@ def empty_board():
     return [["", "", ""], ["", "", ""], ["", "", ""]]
 
 
-def check_winner(board: list[list[str]]) -> str | None:
+def check_winner(board: list[list[str]]) -> tuple[bool, Optional[str]]:
     for i in range(3):
         if board[i][0] == board[i][1] == board[i][2] != "":
-            return board[i][0]
+            return True, board[i][0]
         if board[0][i] == board[1][i] == board[2][i] != "":
-            return board[0][i]
+            return True, board[0][i]
 
     if board[0][0] == board[1][1] == board[2][2] != "":
-        return board[0][0]
+        return True, board[0][0]
     if board[0][2] == board[1][1] == board[2][0] != "":
-        return board[0][2]
+        return True, board[0][2]
 
-    return None
+    if all(board[i][j] != "" for i in range(3) for j in range(3)):
+        return True, None  # draw
+
+    return False, None
 
 
 def connect_user_to_session(session_id: GameSessionId, user: GameUser):
@@ -148,31 +148,30 @@ async def broadcast_game_state(session_id: GameSessionId):
     await broadcast_message(session_id, message)
 
 
-async def broadcast_winner_and_finish(session_id: GameSessionId, winner: UserId):
+async def broadcast_winner_and_finish(
+    session_id: GameSessionId, winner: Optional[UserId]
+):
     session = game_sessions[session_id]
-    message = GameOverMessage.create(session.state, winner).json()
+    message = GameOverMessage(session.state, winner).json()
     await broadcast_message(session_id, message)
     await end_session(session_id)
 
 
 async def handle_place_mark(session_id: GameSessionId, user_id: UserId, message: dict):
     session = game_sessions[session_id]
+    user1, user2 = cast(GameUser, session.user1), cast(GameUser, session.user2)
     x, y = message["x"], message["y"]
-    session.state.board[x][y] = "X" if user_id == session.user1.user_id else "O"
+    session.state.board[x][y] = "X" if user_id == user1.user_id else "O"
     session.state.turn = (
-        session.user1.user_id
-        if session.state.turn == session.user2.user_id
-        else session.user2.user_id
+        user1.user_id if session.state.turn == user2.user_id else user2.user_id
     )
 
-    winner = check_winner(session.state.board)
-    winner_user_id = (
-        session.user1.user_id
-        if winner == "X"
-        else session.user2.user_id if winner == "O" else None
-    )
-    if winner is not None:
-        await broadcast_winner_and_finish(session_id, winner_user_id)
+    game_over, winner = check_winner(session.state.board)
+    if game_over:
+        winner_user_id = (
+            user1.user_id if winner == "X" else user2.user_id if winner == "O" else None
+        )
+        await broadcast_winner_and_finish(session_id, cast(int, winner_user_id))
     else:
         await broadcast_game_state(session_id)
 

@@ -66,7 +66,9 @@ export const Game = () => {
       } else if (parsedResponse.action === "game_over") {
         setGameState(parsedResponse.state);
         setIsGameOver(true);
-        const msg = parsedResponse.winner === userId ? "You win!" : "You lose!";
+        const winner = parsedResponse.winner;
+        console.log("winner: ", winner);
+        const msg = parsedResponse.winner === userId ? "You win!" : (winner == null ? "It's a draw" : "You lose!");
         setGameOverMessage(msg);
       }
 
