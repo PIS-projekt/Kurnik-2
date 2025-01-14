@@ -1,5 +1,5 @@
 from datetime import datetime, timedelta, timezone
-from typing import Annotated, Any, Literal
+from typing import Annotated, Any, Literal, Optional
 
 import jwt
 from fastapi import APIRouter, Depends, HTTPException, WebSocket, status
@@ -25,7 +25,7 @@ class Token(BaseModel):
 
 
 class TokenData(BaseModel):
-    username: str | None = None
+    username: Optional[str] = None
 
 
 class RegisterRequest(BaseModel):
@@ -65,7 +65,9 @@ def authenticate_user(username: str, password: str) -> User | Literal[False]:
     return user
 
 
-def create_access_token(data: dict[Any, Any], expires_delta: timedelta | None = None):
+def create_access_token(
+    data: dict[Any, Any], expires_delta: Optional[timedelta] = None
+):
     to_encode = data.copy()
     if expires_delta:
         expire = datetime.now(timezone.utc) + expires_delta
