@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Optional, Sequence
+from typing import cast, Optional, Sequence
 
 from attrs import define
 from sqlalchemy import Engine
@@ -40,14 +40,12 @@ class UserRepository:
             try:
                 session.add(user)
                 session.commit()
-                if user.id is None:
-                    raise ValueError("User ID cannot be None")
 
             except IntegrityError as e:
                 session.rollback()
                 raise e
 
-            return user.id
+            return cast(int, user.id)
 
     def delete_user(self, user_id: int) -> None:
         """Deletes a message from the database."""

@@ -111,7 +111,7 @@ async def broadcast_message(room_code: RoomCode, user: User, message: str) -> No
     if room_code not in rooms:
         raise RoomNotFoundError(f"Room with code {room_code} not found.")
 
-    await rooms[room_code].message_all(f"User[{user_id}] said: {message}")
+    await rooms[room_code].message_all(f"{user.username} said: {message}")
 
 
 def disconnect_user(room_code: RoomCode, user_id: int) -> None:
