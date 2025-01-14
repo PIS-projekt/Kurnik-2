@@ -5,8 +5,10 @@ export const useGameBackend = (sessionId: string, userId: number) => {
   const [response, setResponse] = useState<string | null>(null);
   const [socketUrl, setSocketUrl] = useState<string | null>(null);
 
+
+
   const apiBaseUrl = "ws://localhost:8000";
-  const apiUrl = `${apiBaseUrl}/tictactoe/game/${sessionId}?user_id=${userId}`;
+  const apiUrl = `${apiBaseUrl}/tictactoe/game/${sessionId}`;
 
   const handleOpen = () => console.log("WebSocket connection opened.");
 
@@ -25,7 +27,8 @@ export const useGameBackend = (sessionId: string, userId: number) => {
   });
 
   const sendRequest = (message: string) => {
-    setSocketUrl(apiUrl);
+    const token = localStorage.getItem("access_token");
+    setSocketUrl(`${apiUrl}?token=${token}`);
     sendMessage(message);
   };
 

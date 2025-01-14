@@ -2,6 +2,8 @@ from dataclasses import dataclass
 
 from fastapi import APIRouter, WebSocket
 
+from src.psi_backend.routes.auth import validate_websocket
+
 tictactoe_router = APIRouter()
 
 GameSessionId = str
@@ -116,6 +118,7 @@ def connect_user_to_session(session_id: GameSessionId, user: GameUser):
         else:
             raise ValueError("Session is full")
     else:
+        print(f"Creating new session {session_id}")
         game_sessions[session_id] = GameSession(
             id=session_id,
             user1=user,
@@ -184,27 +187,33 @@ async def handle_join(websocket: WebSocket, session_id: GameSessionId, user_id: 
 async def tictactoe_endpoint(
     websocket: WebSocket,
     session_id: GameSessionId,
-    user_id: UserId,
+    token: str,
 ):
     await websocket.accept()
 
+    token = websocket.query_params.get("token") or ""
+    user = await validate_websocket(token, websocket)
+
+    if user.id is None:
+        return
+
     try:
-        print(f"Connecting user {user_id} to session {session_id}")
+        print(f"Connecting user {user.id} to session {session_id}")
         connect_user_to_session(
-            session_id=session_id, user=GameUser(user_id, websocket)
+            session_id=session_id, user=GameUser(user.id, websocket)
         )
     except ValueError:
-        websocket.close()
+        await websocket.close()
 
     try:
         while True:
             message = await websocket.receive_json()
             print("Received message", message)
-
+            print("Turn of ", game_sessions[session_id].state.turn)
             if message["action"] == "place_mark":
-                await handle_place_mark(session_id, user_id, message)
+                await handle_place_mark(session_id, user.id, message)
             elif message["action"] == "join":
-                await handle_join(websocket, session_id, user_id)
+                await handle_join(websocket, session_id, user.id)
     except Exception as e:
         print(e)
 

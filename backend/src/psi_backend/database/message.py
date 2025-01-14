@@ -1,35 +1,14 @@
 from __future__ import annotations
 
-import os
 from datetime import datetime
-from typing import Optional
+from typing import Optional, Sequence
 
 from attrs import define
 from sqlalchemy import Engine
-from sqlmodel import Field, Session, SQLModel, create_engine, select
+from sqlmodel import Field  # type: ignore
+from sqlmodel import Session, SQLModel, select
 
-DB_PROVIDER = "postgresql"
-DB_DRIVER = "psycopg2"
-# TODO: load using env vars depending on environment
-DB_NAME = "pis"
-DB_USER = "admin"
-DB_PASSWORD = "admin"
-DB_HOST = os.getenv("DB_HOST") or "0.0.0.0"
-
-
-engine = create_engine(
-    f"{DB_PROVIDER}+{DB_DRIVER}://{DB_USER}:{DB_PASSWORD}@{DB_HOST}/{DB_NAME}",
-)
-
-
-def create_database(engine: Engine):
-    """Creates the database schema using a given engine."""
-    SQLModel.metadata.create_all(engine)
-
-
-def close_database(engine: Engine):
-    """Closes the database connection."""
-    engine.dispose()
+from src.psi_backend.database.db import engine
 
 
 class Message(SQLModel, table=True):
@@ -55,25 +34,25 @@ class MessageRepository:
 
     engine: Engine
 
-    def add_message(self, message: Message):
+    def add_message(self, message: Message) -> None:
         """Adds a message to the database."""
         with Session(self.engine) as session:
             session.add(message)
             session.commit()
 
-    def add_messages(self, messages: list[Message]):
+    def add_messages(self, messages: list[Message]) -> None:
         """Adds multiple messages to the database."""
         with Session(self.engine) as session:
             session.add_all(messages)
             session.commit()
 
-    def get_messages(self):
+    def get_messages(self) -> Sequence[Message]:
         """Gets all messages from the database."""
         with Session(self.engine) as session:
             messages = session.exec(select(Message)).all()
             return messages
 
-    def get_message(self, message_id: int):
+    def get_message(self, message_id: int) -> Message:
         """Gets a message from the database."""
         with Session(self.engine) as session:
             msg = session.get(Message, message_id)
@@ -81,7 +60,7 @@ class MessageRepository:
                 raise MessageNotFoundError(f"Message with id {message_id} not found")
             return msg
 
-    def delete_message(self, message_id: int):
+    def delete_message(self, message_id: int) -> None:
         """Deletes a message from the database."""
         with Session(self.engine) as session:
             msg = session.get(Message, message_id)
@@ -91,7 +70,7 @@ class MessageRepository:
             session.delete(msg)
             session.commit()
 
-    def delete_messages(self, messages: list[Message]):
+    def delete_messages(self, messages: Sequence[Message]) -> None:
         """Deletes all messages from the database."""
         with Session(self.engine) as session:
             for msg in messages:
