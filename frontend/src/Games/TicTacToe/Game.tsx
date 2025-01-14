@@ -1,6 +1,7 @@
-import {useEffect, useState} from "react";
-import {useGameBackend} from "./useGameBackend";
-import {Board} from "./Board";
+import { useEffect, useState } from "react";
+import { useGameBackend } from "./useGameBackend";
+import { Board } from "./Board";
+import { useRoom } from "../../hooks/useRoom";
 
 interface GameState {
   board: string[][];
@@ -11,8 +12,9 @@ interface GameState {
 export const Game = () => {
   const [gameState, setGameState] = useState<GameState | null>(null);
   const [userId, setUserId] = useState<number>(1);
-  const [sessionId, setSessionId] = useState<string>("abc");
-  const {sendRequest, response} = useGameBackend(sessionId, userId);
+  const { roomCode } = useRoom();
+  const [sessionId, setSessionId] = useState<string>(roomCode);
+  const { sendRequest, response } = useGameBackend(sessionId, userId);
   const [isGameOver, setIsGameOver] = useState<boolean>(false);
   const [gameOverMessage, setGameOverMessage] = useState<string>("");
   const [myTurn, setMyTurn] = useState<boolean>(false);
@@ -22,13 +24,19 @@ export const Game = () => {
 
 
   const handleJoin = () => {
-    const request = JSON.stringify({action: "join"});
+    const request = JSON.stringify({ action: "join" });
+    console.log("Requesting to join game with id: ", sessionId);
     sendRequest(request);
   };
 
   useEffect(() => {
     console.log("My turn updated:", myTurn);
   }, [myTurn]);
+
+  useEffect(() => {
+    console.log("room code changed to ", roomCode);
+    setSessionId(roomCode);
+  }, [roomCode]);
 
   useEffect(() => {
     if (response) {
@@ -56,18 +64,17 @@ export const Game = () => {
   }, [response]);
 
   const handleBoardClick = (x: number, y: number) => {
-    const request = JSON.stringify({action: "place_mark", x: x, y: y});
+    const request = JSON.stringify({ action: "place_mark", x: x, y: y });
     sendRequest(request);
   };
 
   return (
     <div>
       <h1>Game</h1>
-      <input type="text" value={sessionId} onChange={(e) => setSessionId(e.target.value)}/>
       <button onClick={handleJoin}>Join</button>
       <p>{isGameInProgress && turnMessage}</p>
       <p>{gameOverMessage}</p>
-      {gameState && <Board board={gameState.board} onClick={handleBoardClick} disabled={!myTurn}/>}
+      {gameState && <Board board={gameState.board} onClick={handleBoardClick} disabled={!myTurn} />}
     </div>
   );
 };

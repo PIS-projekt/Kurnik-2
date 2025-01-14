@@ -4,12 +4,11 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { jwtDecode } from "jwt-decode";
 
-import {useRoom} from "../hooks/useRoom";
+import { useRoom } from "../hooks/useRoom";
 
 export const Chat = () => {
   const [currentMessage, setCurrentMessage] = useState("");
-  const {roomCode, setRoomCode} = useRoom();
-  const [userId, setUserId] = useState<number>(1);
+  const { roomCode, setRoomCode } = useRoom();
   const [socketUrl, setSocketUrl] = useState<string | null>(null);
   const [messageList, setMessageList] = useState<Array<{ data: string }>>([]);
   const [loggedRoomCode, setLoggedRoomCode] = useState<string | null>(null);
@@ -43,7 +42,7 @@ export const Chat = () => {
   }, [navigate]);
 
   useEffect(() => {
-    if(userName) {
+    if (userName) {
       console.log("User name:", userName);
     }
   }, [userName]);
