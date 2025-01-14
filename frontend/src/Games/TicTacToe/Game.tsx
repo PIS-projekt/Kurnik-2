@@ -13,8 +13,7 @@ export const Game = () => {
   const [gameState, setGameState] = useState<GameState | null>(null);
   const [userId, setUserId] = useState<number | null>(null);
   const { roomCode } = useRoom();
-  const [sessionId, setSessionId] = useState<string>(roomCode);
-  const { sendRequest, response } = useGameBackend(sessionId);
+  const { sendRequest, response } = useGameBackend(roomCode);
   const [isGameOver, setIsGameOver] = useState<boolean>(false);
   const [gameOverMessage, setGameOverMessage] = useState<string>("");
   const [myTurn, setMyTurn] = useState<boolean>(false);
@@ -26,14 +25,13 @@ export const Game = () => {
 
   const handleJoin = () => {
     const request = JSON.stringify({ action: "join" });
-    console.log("Requesting to join game with id: ", sessionId);
+    console.log("Requesting to join game with id: ", roomCode);
     sendRequest(request);
   };
 
   const resetGame = () => {
     setGameState(null);
     setUserId(null);
-    setSessionId("");
     setIsGameOver(false);
     setGameOverMessage("");
     setMyTurn(false);
@@ -46,7 +44,6 @@ export const Game = () => {
   useEffect(() => {
     console.log("room code changed to ", roomCode);
     resetGame();
-    setSessionId(roomCode);
   }, [roomCode]);
 
   useEffect(() => {
@@ -93,6 +90,8 @@ export const Game = () => {
       <p>{gameOverMessage}</p>
       {error && <p>{error}</p>}
       {gameState && <Board board={gameState.board} onClick={handleBoardClick} disabled={!myTurn} />}
-    </div>
+      {!isGameInProgress && gameState &&
+        <button onClick={resetGame}>Quit game</button>}
+    </div >
   );
 };
