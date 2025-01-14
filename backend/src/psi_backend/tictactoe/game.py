@@ -2,6 +2,7 @@ from dataclasses import dataclass
 from typing import Optional, cast
 
 from fastapi import APIRouter, WebSocket
+from pydantic import BaseModel
 
 from src.psi_backend.websocket_chat.room_assignment import WebSocketUser
 from src.psi_backend.routes.auth import validate_websocket
@@ -12,16 +13,13 @@ GameSessionId = str
 UserId = int
 
 
-@dataclass
-class GameState:
-    board: list[list[str]]
-    turn: UserId
+from typing import List, Optional
+from pydantic import BaseModel
 
-    def json(self):
-        return {
-            "board": self.board,
-            "turn": self.turn,
-        }
+
+class GameState(BaseModel):
+    board: List[List[str]]
+    turn: UserId
 
 
 @dataclass
@@ -32,43 +30,22 @@ class GameSession:
     state: GameState
 
 
-@dataclass
-class UpdateStateMessage:
+class UpdateStateMessage(BaseModel):
+    action: str = "update_state"
     state: GameState
 
-    def json(self):
-        return {
-            "action": "update_state",
-            "state": self.state.json(),
-        }
 
-
-@dataclass
-class GameOverMessage:
+class GameOverMessage(BaseModel):
+    action: str = "game_over"
     state: GameState
     winner: Optional[UserId]
 
-    def json(self):
-        return {
-            "action": "game_over",
-            "state": self.state.json(),
-            "winner": self.winner,
-        }
 
-
-@dataclass
-class AcceptJoinMessage:
+class AcceptJoinMessage(BaseModel):
+    action: str = "accept_join"
     session_id: GameSessionId
     user_id: UserId
     state: GameState
-
-    def json(self):
-        return {
-            "action": "accept_join",
-            "session_id": self.session_id,
-            "user_id": self.user_id,
-            "state": self.state.json(),
-        }
 
 
 game_sessions: dict[GameSessionId, GameSession] = dict()
@@ -116,8 +93,9 @@ def connect_user_to_session(session_id: GameSessionId, user: WebSocketUser):
 
 async def end_session(session_id: GameSessionId):
     session = game_sessions[session_id]
-    await session.user1.websocket_connection.close()
-    await session.user2.websocket_connection.close()
+    u1, u2 = cast(WebSocketUser, session.user1), cast(WebSocketUser, session.user2)
+    await u1.websocket_connection.close()
+    await u2.websocket_connection.close()
     game_sessions.pop(session_id)
 
 
@@ -131,7 +109,7 @@ async def broadcast_message(session_id: GameSessionId, message_json: dict):
 
 async def broadcast_game_state(session_id: GameSessionId):
     session = game_sessions[session_id]
-    message = UpdateStateMessage(session.state).json()
+    message = UpdateStateMessage(state=session.state).model_dump()
     await broadcast_message(session_id, message)
 
 
@@ -139,7 +117,7 @@ async def broadcast_winner_and_finish(
     session_id: GameSessionId, winner: Optional[UserId]
 ):
     session = game_sessions[session_id]
-    message = GameOverMessage(session.state, winner).json()
+    message = GameOverMessage(state=session.state, winner=winner).model_dump()
     await broadcast_message(session_id, message)
     await end_session(session_id)
 
@@ -167,7 +145,9 @@ async def handle_place_mark(session_id: GameSessionId, user_id: UserId, message:
 
 async def handle_join(websocket: WebSocket, session_id: GameSessionId, user_id: UserId):
     session = game_sessions[session_id]
-    message = AcceptJoinMessage(session_id, user_id, session.state).json()
+    message = AcceptJoinMessage(
+        session_id=session_id, user_id=user_id, state=session.state
+    ).model_dump()
     await websocket.send_json(message)
 
 
