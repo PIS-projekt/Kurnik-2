@@ -3,18 +3,13 @@ from typing import Optional, cast
 
 from fastapi import APIRouter, WebSocket
 
+from src.psi_backend.websocket_chat.room_assignment import WebSocketUser
 from src.psi_backend.routes.auth import validate_websocket
 
 tictactoe_router = APIRouter()
 
 GameSessionId = str
 UserId = int
-
-
-@dataclass
-class GameUser:
-    user_id: UserId
-    websocket_connection: WebSocket
 
 
 @dataclass
@@ -32,8 +27,8 @@ class GameState:
 @dataclass
 class GameSession:
     id: GameSessionId
-    user1: Optional[GameUser]
-    user2: Optional[GameUser]
+    user1: Optional[WebSocketUser]
+    user2: Optional[WebSocketUser]
     state: GameState
 
 
@@ -101,7 +96,7 @@ def check_winner(board: list[list[str]]) -> tuple[bool, Optional[str]]:
     return False, None
 
 
-def connect_user_to_session(session_id: GameSessionId, user: GameUser):
+def connect_user_to_session(session_id: GameSessionId, user: WebSocketUser):
     if session_id in game_sessions:
         if game_sessions[session_id].user1 is None:
             game_sessions[session_id].user1 = user
@@ -151,7 +146,9 @@ async def broadcast_winner_and_finish(
 
 async def handle_place_mark(session_id: GameSessionId, user_id: UserId, message: dict):
     session = game_sessions[session_id]
-    user1, user2 = cast(GameUser, session.user1), cast(GameUser, session.user2)
+    user1, user2 = cast(WebSocketUser, session.user1), cast(
+        WebSocketUser, session.user2
+    )
     x, y = message["x"], message["y"]
     session.state.board[x][y] = "X" if user_id == user1.user_id else "O"
     session.state.turn = (
@@ -191,7 +188,7 @@ async def tictactoe_endpoint(
     try:
         print(f"Connecting user {user.id} to session {session_id}")
         connect_user_to_session(
-            session_id=session_id, user=GameUser(user.id, websocket)
+            session_id=session_id, user=WebSocketUser(user.id, websocket)
         )
     except ValueError:
         await websocket.close()
