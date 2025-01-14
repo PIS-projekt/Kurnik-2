@@ -11,10 +11,10 @@ interface GameState {
 
 export const Game = () => {
   const [gameState, setGameState] = useState<GameState | null>(null);
-  const [userId, setUserId] = useState<number>(1);
+  const [userId, setUserId] = useState<number | null>(null);
   const { roomCode } = useRoom();
   const [sessionId, setSessionId] = useState<string>(roomCode);
-  const { sendRequest, response } = useGameBackend(sessionId, userId);
+  const { sendRequest, response } = useGameBackend(sessionId);
   const [isGameOver, setIsGameOver] = useState<boolean>(false);
   const [gameOverMessage, setGameOverMessage] = useState<string>("");
   const [myTurn, setMyTurn] = useState<boolean>(false);
@@ -31,7 +31,7 @@ export const Game = () => {
 
   const resetGame = () => {
     setGameState(null);
-    setUserId(1);
+    setUserId(null);
     setSessionId("");
     setIsGameOver(false);
     setGameOverMessage("");
