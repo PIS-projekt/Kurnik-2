@@ -13,7 +13,7 @@ export const Game = () => {
   const [gameState, setGameState] = useState<GameState | null>(null);
   const [userId, setUserId] = useState<number | null>(null);
   const { roomCode } = useRoom();
-  const { sendRequest, response } = useGameBackend(roomCode);
+  const { sendRequest, response, resetGameBackend } = useGameBackend(roomCode);
   const [isGameOver, setIsGameOver] = useState<boolean>(false);
   const [gameOverMessage, setGameOverMessage] = useState<string>("");
   const [myTurn, setMyTurn] = useState<boolean>(false);
@@ -35,6 +35,7 @@ export const Game = () => {
     setIsGameOver(false);
     setGameOverMessage("");
     setMyTurn(false);
+    resetGameBackend();
   };
 
   useEffect(() => {

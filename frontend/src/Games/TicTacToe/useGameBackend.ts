@@ -25,11 +25,20 @@ export const useGameBackend = (sessionId: string) => {
   });
 
   const sendRequest = (message: string) => {
+    console.log("Setting socketUrl to:", apiUrl);
     const token = localStorage.getItem("access_token");
     setSocketUrl(`${apiUrl}?token=${token}`);
     sendMessage(message);
   };
 
-  return { sendRequest: sendRequest, response: response };
-};
+  const resetGameBackend = () => {
+    setSocketUrl(null);
+    setResponse(null);
+  };
 
+  return {
+    sendRequest: sendRequest,
+    response: response,
+    resetGameBackend: resetGameBackend,
+  };
+};
