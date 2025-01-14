@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import cast, Optional, Sequence
+from typing import Optional, Sequence, cast
 
 from attrs import define
 from sqlalchemy import Engine
