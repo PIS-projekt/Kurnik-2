@@ -29,12 +29,22 @@ export const Game = () => {
     sendRequest(request);
   };
 
+  const resetGame = () => {
+    setGameState(null);
+    setUserId(1);
+    setSessionId("");
+    setIsGameOver(false);
+    setGameOverMessage("");
+    setMyTurn(false);
+  };
+
   useEffect(() => {
     console.log("My turn updated:", myTurn);
   }, [myTurn]);
 
   useEffect(() => {
     console.log("room code changed to ", roomCode);
+    resetGame();
     setSessionId(roomCode);
   }, [roomCode]);
 
