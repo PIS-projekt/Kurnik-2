@@ -1,6 +1,5 @@
-from fastapi import APIRouter, HTTPException, WebSocket, WebSocketDisconnect
+from fastapi import APIRouter, WebSocket, WebSocketDisconnect
 
-from src.psi_backend.database.user import User
 from src.psi_backend.routes.auth import validate_websocket
 from src.psi_backend.websocket_chat.room_assignment import (
     RoomNotFoundError,

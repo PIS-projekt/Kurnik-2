@@ -1,5 +1,3 @@
-from unittest.mock import AsyncMock, Mock
-
 import pytest
 from fastapi import HTTPException, WebSocketDisconnect
 from fastapi.testclient import TestClient

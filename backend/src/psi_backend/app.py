@@ -1,5 +1,4 @@
 from contextlib import asynccontextmanager
-
 from typing import Annotated
 
 from fastapi import Depends, FastAPI, HTTPException
