@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from loguru import logger
 from typing import Optional, cast
 
 from fastapi import APIRouter, WebSocket
@@ -11,6 +12,10 @@ tictactoe_router = APIRouter()
 
 GameSessionId = str
 UserId = int
+
+
+class SessionFullError(Exception):
+    """Thrown when a user tries to join a full session."""
 
 
 from typing import List, Optional
@@ -89,16 +94,20 @@ def check_winner(board: list[list[str]]) -> tuple[bool, Optional[str]]:
     return False, None
 
 
-def connect_user_to_session(session_id: GameSessionId, user: WebSocketUser):
+async def connect_user_to_session(session_id: GameSessionId, user: WebSocketUser):
     if session_id in game_sessions:
         if game_sessions[session_id].user1 is None:
             game_sessions[session_id].user1 = user
         elif game_sessions[session_id].user2 is None:
             game_sessions[session_id].user2 = user
         else:
-            raise ValueError("Session is full")
+            logger.info(f"Session {session_id} is full")
+            await user.websocket_connection.send_json(
+                ErrorMessage(message="Game is full").model_dump()
+            )
+            raise SessionFullError()
     else:
-        print(f"Creating new session {session_id}")
+        logger.info(f"Creating new session {session_id}")
         game_sessions[session_id] = GameSession(
             id=session_id,
             user1=user,
@@ -199,10 +208,10 @@ async def tictactoe_endpoint(
 
     try:
         print(f"Connecting user {user.id} to session {session_id}")
-        connect_user_to_session(
+        await connect_user_to_session(
             session_id=session_id, user=WebSocketUser(user.id, websocket)
         )
-    except ValueError:
+    except (ValueError, SessionFullError):
         await websocket.close()
 
     try:
