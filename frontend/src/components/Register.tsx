@@ -51,7 +51,6 @@ export function Register() {
                 <h2 className="bg-gradient-to-r from-blue-600 to-blue-900 font-extrabold text-clip inline-block bg-clip-text text-4xl text-transparent">Register</h2>
                 <form onSubmit={handleRegister} className="mt-12">
                     <div className="flex items-center justify-center flex-col gap-4">
-                        {/* <label>Username:</label> */}
                         <div className="bg-slate-100 rounded-full border flex items-center justify-start py-2 px-4 gap-2 font-semibold">
                             <FaUser className="text-slate-400" />
                             <input
@@ -86,7 +85,7 @@ export function Register() {
                             />
                         </div>
                     </div>
-                    <div className="mt-12 flex items-center justify-center gap-4">
+                    <div className="w-fit mt-12 grid grid-cols-2 gap-4 mx-auto">
                         <button
                             className="font-semibold hover:bg-slate-100 p-2 px-4 rounded-full text-muted-foreground "
                             onClick={() => navigate("/login")}>
