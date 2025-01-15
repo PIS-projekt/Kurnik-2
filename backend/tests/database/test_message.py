@@ -1,17 +1,18 @@
 from copy import deepcopy
 
 from pytest import fixture, raises
+from sqlalchemy import Engine
 from sqlmodel import create_engine
 
+from src.psi_backend.database.db import create_database
 from src.psi_backend.database.message import (
     Message,
     MessageNotFoundError,
     MessageRepository,
-    create_database,
 )
 
 
-def temporary_db():
+def temporary_db() -> Engine:
     """An in-memory sqlite database."""
     engine = create_engine("sqlite://")
     create_database(engine)
@@ -26,7 +27,7 @@ def temporary_repo(contents: list[Message] = []):
     return repo
 
 
-def weak_message_eq(msg1, msg2):
+def weak_message_eq(msg1: Message, msg2: Message) -> bool:
     """Weak equality for messages, used only for
     performing insertion tests, so added here not to clutter the message class."""
     return (
@@ -77,37 +78,39 @@ def test_add_messages():
         assert weak_message_eq(m1, m2)
 
 
-def test_get_messages(prepopulated_repo):
+def test_get_messages(prepopulated_repo: MessageRepository):
     """Retrieves all messages from the repository."""
     messages = prepopulated_repo.get_messages()
     assert len(messages) == 4
 
 
-def test_get_existing_message(prepopulated_repo):
+def test_get_existing_message(prepopulated_repo: MessageRepository):
     """Retrieves a message from the repository."""
     repo = prepopulated_repo
     message = repo.get_messages()[0]
-    assert repo.get_message(message.id) == message
+    assert message.id is not None and repo.get_message(message.id) == message
 
 
-def test_get_nonexisting_message(prepopulated_repo):
+def test_get_nonexisting_message(prepopulated_repo: MessageRepository):
     """Raises an error when a message is not found."""
     repo = prepopulated_repo
     with raises(MessageNotFoundError):
         repo.get_message(999)
 
 
-def test_delete_message(prepopulated_repo):
+def test_delete_message(prepopulated_repo: MessageRepository):
     """Deletes a message from the repository."""
     repo = prepopulated_repo
     message = repo.get_messages()[0]
-    repo.delete_message(message.id)
+    if message.id is not None:
+        repo.delete_message(message.id)
 
-    with raises(MessageNotFoundError):
-        repo.get_message(message.id)
+    if message.id is not None:
+        with raises(MessageNotFoundError):
+            repo.get_message(message.id)
 
 
-def test_delete_messages(prepopulated_repo):
+def test_delete_messages(prepopulated_repo: MessageRepository):
     """Deletes multiple messages from the repository."""
     repo = prepopulated_repo
     messages = repo.get_messages()

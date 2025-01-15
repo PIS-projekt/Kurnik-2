@@ -1,5 +1,4 @@
 services:
-
   backend:
     depends_on:
       - database
@@ -12,8 +11,7 @@ services:
     environment:
       - PYTHONUNBUFFERED=1
       - DB_HOST=pis-db
-    restart: always
-  
+    restart: unless-stopped
   backend-tests:
     build:
       context: backend/
@@ -22,7 +20,6 @@ services:
     environment:
       - PYTHONUNBUFFERED=1
       - DB_HOST=pis-db
-  
   database:
     image: "postgres:16"
     container_name: pis-db
@@ -32,8 +29,7 @@ services:
       POSTGRES_DB: "pis"
     ports:
       - "5432:5432"
-    restart: always
-
+    restart: unless-stopped
   frontend:
     build:
       context: frontend/
@@ -42,5 +38,4 @@ services:
       - "80:80"
     environment:
       - NODE_ENV=production
-    restart: always
-
+    restart: unless-stopped

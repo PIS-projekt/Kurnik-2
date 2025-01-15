@@ -1,25 +1,60 @@
-import { FormEvent, useState } from "react";
+import { FormEvent, useState, useEffect } from "react";
 import useWebSocket, { ReadyState } from "react-use-websocket";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
+import { jwtDecode } from "jwt-decode";
+
 import { useRoom } from "../hooks/useRoom";
-import { Button } from "./ui/button";
 
 export const Chat = () => {
   const [currentMessage, setCurrentMessage] = useState("");
   const { roomCode, setRoomCode } = useRoom();
-  const [userId, setUserId] = useState<number>(1);
   const [socketUrl, setSocketUrl] = useState<string | null>(null);
   const [messageList, setMessageList] = useState<Array<{ data: string }>>([]);
   const [loggedRoomCode, setLoggedRoomCode] = useState<string | null>(null);
-  const [loggedUserId, setLoggedUserId] = useState<number | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [userName, setUserName] = useState<string | null>(null);
 
   const apiBaseUrl = "http://0.0.0.0:8000";
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const token = localStorage.getItem("access_token");
+
+    if (!token) {
+      navigate("/login");
+      return;
+    }
+
+    try {
+      const decodedToken: { sub: string; exp: number } = jwtDecode(token);
+      setUserName(decodedToken.sub);
+
+      // Check if the token is expired
+      if (decodedToken.exp * 1000 < Date.now()) {
+        handleLogout();
+        return;
+      }
+    } catch (error) {
+      console.error("Invalid token:", error);
+      handleLogout();
+    }
+  }, [navigate]);
+
+  useEffect(() => {
+    if (userName) {
+      console.log("User name:", userName);
+    }
+  }, [userName]);
+
+  const handleLogout = () => {
+    localStorage.removeItem("access_token");
+    navigate("/login");
+  };
 
   const handleOpen = () => {
     console.log("WebSocket connection opened.");
     setLoggedRoomCode(roomCode);
-    setLoggedUserId(userId);
     setError(null);
   };
 
@@ -27,7 +62,6 @@ export const Chat = () => {
     console.log("WebSocket connection closed.");
     setMessageList([]);
     setLoggedRoomCode(null);
-    setLoggedUserId(null);
   };
 
   const handleMessage = (message: { data: string }) => {
@@ -50,13 +84,14 @@ export const Chat = () => {
 
   const handleCreateRoom = async () => {
     try {
+      const token = localStorage.getItem("access_token");
       const response = await axios.get(`${apiBaseUrl}/create-new-room`, {
-        // eslint-disable-next-line camelcase
-        params: { user_id: userId, private: false }, // TODO: get setting from user
+        params: { private: false },
+        headers: { Authorization: `Bearer ${token}` },
       });
       const newRoomCode = response.data.room_code;
       setRoomCode(newRoomCode);
-      setSocketUrl(`${apiBaseUrl}/ws/connect/${newRoomCode}?user_id=${userId}`);
+      setSocketUrl(`${apiBaseUrl}/ws/connect/${newRoomCode}?token=${token}`);
       setError("Room created and joined successfully.");
     } catch (error) {
       console.error("Failed to create room:", error);
@@ -67,12 +102,14 @@ export const Chat = () => {
   const handleJoinRoom = async (event: FormEvent) => {
     event.preventDefault();
     try {
+      const token = localStorage.getItem("access_token");
       const response = await axios.get(`${apiBaseUrl}/join-room`, {
         // eslint-disable-next-line camelcase
-        params: { room_code: roomCode, user_id: userId },
+        params: { room_code: roomCode },
+        headers: { Authorization: `Bearer ${token}` },
       });
       if (response.data.room_exists) {
-        setSocketUrl(`${apiBaseUrl}/ws/connect/${roomCode}?user_id=${userId}`);
+        setSocketUrl(`${apiBaseUrl}/ws/connect/${roomCode}?token=${token}`);
         setError("Joined room successfully.");
       }
     } catch (error) {
@@ -85,19 +122,7 @@ export const Chat = () => {
     <div className="Chatroom">
       <h1>Chatroom</h1>
       <div>
-        <label htmlFor="user_id">User ID:</label>
-        <input
-          type="number"
-          id="user_id"
-          value={userId}
-          onChange={(e) => setUserId(parseInt(e.target.value))}
-          required
-        />
-      </div>
-      <br />
-      <div>
-        <Button onClick={handleCreateRoom}>Create Room</Button>
-        {/* <button onClick={handleCreateRoom}>Create Room</button> */}
+        <button onClick={handleCreateRoom}>Create Room</button>
       </div>
       <br />
       <form onSubmit={handleJoinRoom}>
@@ -112,9 +137,12 @@ export const Chat = () => {
         <button type="submit">Join Room</button>
       </form>
       <br />
-      <div>Logged in as user: {loggedUserId} in room: {loggedRoomCode}</div>
+      <div>Logged in as user: {userName} in room: {loggedRoomCode}</div>
       {error && <div style={{ color: "red" }}>{error}</div>}
       <br />
+      <div>
+        <button onClick={handleLogout}>Logout</button>
+      </div>
       <div id="chat"></div>
       <input
         type="text"
