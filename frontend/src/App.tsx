@@ -34,7 +34,7 @@ function App() {
           />
           <Route
             path="/chat"
-            element={isAuthenticated ? <RoomContextProvider><Chat /><Game /></RoomContextProvider> : <Navigate to="/login" />}
+            element={isAuthenticated ? <RoomContextProvider><><RoomCreateJoin /><ChatComp /></><Game /></RoomContextProvider> : <Navigate to="/login" />}
           />
           <Route
             path="/login"
