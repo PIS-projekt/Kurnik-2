@@ -45,7 +45,7 @@ const ChatComp: FC<ChatCompProps> = ({ className }) => {
                     <PiCaretDownBold className={cn("transition-all", { 'rotate-180': closed })} />
                 </Button>
             </div>
-            <div className={cn('flex flex-col border border-gray-200 rounded-b-md border-t-0 p-2 max-h-[80vh]', { 'hidden': closed })}>
+            <div className={cn('flex flex-col border border-gray-200 bg-white rounded-b-md border-t-0 p-2 max-h-[80vh]', { 'hidden': closed })}>
                 <div className={`overflow-y-scroll`}>
                     {messageList.map((message, index) => {
                         return (

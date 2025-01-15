@@ -23,26 +23,29 @@ function App() {
 
   return (
     <Router>
-      <Navbar />
-      {/* <h1>Projekt PIS 2024Z</h1>
+      <div id="reg-bg" className="min-h-screen" >
+
+        <Navbar />
+        {/* <h1>Projekt PIS 2024Z</h1>
         <p>Profile: {process.env.NODE_ENV}</p> */}
 
-      <Routes>
-        {/* Redirect to chat if authenticated, otherwise go to login */}
-        <Route
-          path="/"
-          element={isAuthenticated ? <Navigate to="/chat" /> : <Navigate to="/login" />}
-        />
-        <Route
-          path="/chat"
-          element={isAuthenticated ? <RoomContextProvider><Chat /><Game /></RoomContextProvider> : <Navigate to="/login" />}
-        />
-        <Route
-          path="/login"
-          element={<Login setIsAuthenticated={setIsAuthenticated} />}
-        />
-        <Route path="/register" element={<Register />} />
-      </Routes>
+        <Routes>
+          {/* Redirect to chat if authenticated, otherwise go to login */}
+          <Route
+            path="/"
+            element={isAuthenticated ? <Navigate to="/chat" /> : <Navigate to="/login" />}
+          />
+          <Route
+            path="/chat"
+            element={isAuthenticated ? <RoomContextProvider><> <RoomCreateJoin /> <ChatComp /></><Game /></RoomContextProvider> : <Navigate to="/login" />}
+          />
+          <Route
+            path="/login"
+            element={<Login setIsAuthenticated={setIsAuthenticated} />}
+          />
+          <Route path="/register" element={<Register />} />
+        </Routes>
+      </div>
     </Router>
   );
 }
