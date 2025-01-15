@@ -23,8 +23,8 @@ function App() {
   return (
     <Router>
       <div className="App">
-        <h1>Projekt PIS 2024Z</h1>
-        <p>Profile: {process.env.NODE_ENV}</p>
+        {/* <h1>Projekt PIS 2024Z</h1>
+        <p>Profile: {process.env.NODE_ENV}</p> */}
 
         <Routes>
           {/* Redirect to chat if authenticated, otherwise go to login */}
@@ -34,7 +34,7 @@ function App() {
           />
           <Route
             path="/chat"
-            element={isAuthenticated ? <RoomContextProvider><><RoomCreateJoin /><ChatComp /></><Game /></RoomContextProvider> : <Navigate to="/login" />}
+            element={isAuthenticated ? <RoomContextProvider><Chat /><Game /></RoomContextProvider> : <Navigate to="/login" />}
           />
           <Route
             path="/login"
