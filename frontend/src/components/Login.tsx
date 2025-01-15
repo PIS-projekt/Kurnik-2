@@ -40,8 +40,8 @@ export function Login({ setIsAuthenticated }: { setIsAuthenticated: (auth: boole
 
   return (
     <div id="reg-bg" className="min-h-screen flex items-center justify-center">
-      <div className="max-w-lg bg-white w-full rounded-lg shadow-lg p-6">
-        <h2 className="bg-gradient-to-r from-blue-600 to-blue-900 font-extrabold text-clip inline-block bg-clip-text text-4xl text-transparent">Login</h2>
+      <div className="max-w-lg bg-white w-full rounded-lg shadow-lg p-6 flex flex-col justify-center">
+        <h2 className="mx-auto bg-gradient-to-r from-blue-600 to-blue-900 font-extrabold text-clip inline-block bg-clip-text text-4xl text-transparent">Login</h2>
         <form onSubmit={handleLogin} className="mt-12">
           <div className="flex items-center justify-center flex-col gap-4">
             <div className="bg-slate-100 rounded-full border flex items-center justify-start py-2 px-4 gap-2 font-semibold">
