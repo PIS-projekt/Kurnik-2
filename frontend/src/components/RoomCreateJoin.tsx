@@ -10,6 +10,7 @@ import { Button } from './ui/button';
 import { Input } from './ui/input';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from './ui/tooltip';
 import toast from 'react-hot-toast';
+import { useUser } from '../hooks/useUser';
 
 interface RoomCreateJoinProps {
 
@@ -17,13 +18,13 @@ interface RoomCreateJoinProps {
 
 const RoomCreateJoin: FC<RoomCreateJoinProps> = ({ }) => {
     const { joinRoomChat } = useChat()
+    const { getToken } = useUser()
 
     const [roomId, setRoomId] = useState<string>('')
     const [joinRoomId, setJoinRoomId] = useState<string>('')
-    const USER_ID = 1
 
     return (
-        <div className='border shadow-sm rounded-sm p-4 mx-auto mt-12 bg-white w-full shadow-md shadow-zinc-800'>
+        <div className='border rounded-sm p-4 mx-auto mt-12 bg-white w-full shadow-md shadow-zinc-800'>
             <div className='flex items-center justify-center gap-2'>
                 <p className='text-3xl font-semibold'>Room:</p>
                 {roomId ?
@@ -64,9 +65,9 @@ const RoomCreateJoin: FC<RoomCreateJoinProps> = ({ }) => {
                     :
                     (
                         <Button className='' onClick={async () => {
-                            const roomId = await api.createRoom(USER_ID)
+                            const roomId = await api.createRoom(getToken()!)
                             setRoomId(roomId)
-                            joinRoomChat(roomId, USER_ID)
+                            joinRoomChat(roomId, getToken()!)
                         }}>
                             <p>create</p>
                             <FaPlus />
@@ -82,8 +83,8 @@ const RoomCreateJoin: FC<RoomCreateJoinProps> = ({ }) => {
                 <Input value={joinRoomId} placeholder='Room ID' onChange={(e) => setJoinRoomId(e.currentTarget.value)} className='max-w-36 rounded-r-none border-r-0' />
                 <Button className='rounded-l-none' onClick={async () => {
                     setRoomId(joinRoomId)
-                    await api.joinRoom(joinRoomId, USER_ID)
-                    joinRoomChat(joinRoomId, USER_ID)
+                    await api.joinRoom(joinRoomId, getToken()!)
+                    joinRoomChat(joinRoomId, getToken()!)
                 }}>
                     <p>join</p>
                     <FaArrowRightToBracket />

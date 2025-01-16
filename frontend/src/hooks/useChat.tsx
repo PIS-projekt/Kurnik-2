@@ -5,7 +5,7 @@ import useWebSocket, { ReadyState } from "react-use-websocket";
 
 interface ChatContextType {
     messageList: Array<{ data: string }>;
-    joinRoomChat: (roomCode: string, userId: number) => void;
+    joinRoomChat: (roomCode: string, token: string) => void;
     sendMessageF: (message: string) => void;
 }
 const ChatContext = createContext<ChatContextType | undefined>(undefined);
@@ -36,8 +36,8 @@ export const ChatProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         shouldReconnect: () => true,
     });
 
-    async function joinRoomChat(roomCode: string, userId: number) {
-        setSocketUrl(`${apiBaseUrl}/ws/connect/${roomCode}?user_id=${userId}`);
+    async function joinRoomChat(roomCode: string, token: string) {
+        setSocketUrl(`${apiBaseUrl}/ws/connect/${roomCode}?token=${token}`);
     }
 
     async function sendMessageF(message: string) {

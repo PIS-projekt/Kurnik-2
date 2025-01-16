@@ -10,27 +10,16 @@ import { Game } from "./Games/TicTacToe/Game";
 import { RoomContextProvider } from "./hooks/useRoom";
 import Navbar from "./components/Navbar";
 import GamePage from "./components/GamePage";
+import { useUser } from "./hooks/useUser";
 
 function App() {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-
-  useEffect(() => {
-    // Check for token in localStorage to determine authentication status
-    const token = localStorage.getItem("access_token");
-    if (token) {
-      setIsAuthenticated(true);
-    }
-  }, []);
+  const { isAuthenticated } = useUser();
 
   return (
     <Router>
 
       <Navbar />
-      {/* <h1>Projekt PIS 2024Z</h1>
-        <p>Profile: {process.env.NODE_ENV}</p> */}
-
       <Routes>
-        {/* Redirect to chat if authenticated, otherwise go to login */}
         <Route
           path="/"
           element={isAuthenticated ? <Navigate to="/chat" /> : <Navigate to="/login" />}
@@ -41,7 +30,7 @@ function App() {
         />
         <Route
           path="/login"
-          element={<Login setIsAuthenticated={setIsAuthenticated} />}
+          element={<Login />}
         />
         <Route path="/register" element={<Register />} />
       </Routes>

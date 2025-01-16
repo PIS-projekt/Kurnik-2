@@ -1,34 +1,25 @@
+import { useUser } from "../hooks/useUser";
 import { useState } from "react";
 import { FaUser } from "react-icons/fa";
 import { RiLockPasswordFill } from "react-icons/ri";
 import { useNavigate } from "react-router-dom";
 
-export function Login({ setIsAuthenticated }: { setIsAuthenticated: (auth: boolean) => void }) {
+export function Login() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const navigate = useNavigate();
+
+  const { login } = useUser();
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
 
     try {
-      const response = await fetch("http://0.0.0.0:8000/auth/token", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/x-www-form-urlencoded",
-        },
-        body: new URLSearchParams({
-          username: username,
-          password: password,
-        }),
-      });
+      const response = await login(username, password);
 
-      if (response.ok) {
-        const data = await response.json();
-        localStorage.setItem("access_token", data.access_token);
-        setIsAuthenticated(true);
+      if (response.success) {
         navigate("/chat");
       } else {
         setError("Invalid username or password");

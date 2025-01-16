@@ -6,6 +6,8 @@ import { FaUser } from "react-icons/fa";
 import { Separator } from "./ui/separator";
 import { MdEmail } from "react-icons/md";
 import { RiLockPasswordFill } from "react-icons/ri";
+import { api } from "../lib/api";
+import { useUser } from "../hooks/useUser";
 
 export function Register() {
     const [username, setUsername] = useState("");
@@ -14,34 +16,18 @@ export function Register() {
     const [error, setError] = useState("");
     const [success, setSuccess] = useState("");
     const navigate = useNavigate();
+    const { register } = useUser()
 
     const handleRegister = async (e: React.FormEvent) => {
         e.preventDefault();
         setError("");
         setSuccess("");
-
-        try {
-            const response = await fetch("http://0.0.0.0:8000/auth/register", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({
-                    username: username,
-                    email: email,
-                    password: password,
-                }),
-            });
-
-            if (response.ok) {
-                setSuccess("Registration successful! Please log in.");
-                setTimeout(() => navigate("/login"), 2000);
-            } else {
-                const data = await response.json();
-                setError(data.detail || "Registration failed");
-            }
-        } catch (error) {
-            setError("Something went wrong. Please try again.");
+        const res = await register(username, email, password)
+        if (res.success) {
+            setSuccess("Registration successful! Please log in.");
+            setTimeout(() => navigate("/login"), 1000);
+        } else {
+            setError("Registration failed");
         }
     };
 
