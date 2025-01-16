@@ -23,7 +23,7 @@ const RoomCreateJoin: FC<RoomCreateJoinProps> = ({ }) => {
     const USER_ID = 1
 
     return (
-        <div className='border shadow-sm rounded-sm p-4 max-w-[25vw] mx-auto mt-12 bg-white'>
+        <div className='border shadow-sm rounded-sm p-4 mx-auto mt-12 bg-white w-full shadow-md shadow-zinc-800'>
             <div className='flex items-center justify-center gap-2'>
                 <p className='text-3xl font-semibold'>Room:</p>
                 {roomId ?

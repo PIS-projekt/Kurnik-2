@@ -35,7 +35,7 @@ const ChatComp: FC<ChatCompProps> = ({ className }) => {
     const { messageList, sendMessageF } = useChat()
 
     return (
-        <div className={cn('flex flex-col max-w-md mx-auto w-full', className)}>
+        <div className={cn('flex flex-col mx-auto w-full shadow-md shadow-zinc-800', className, { 'h-full': !closed })}>
             <div className=' bg-slate-900 rounded-t-md flex items-center relative p-2'>
                 <p className='text-center font-semibold text-slate-50 flex-1'>Chat</p>
                 <Button
@@ -45,15 +45,15 @@ const ChatComp: FC<ChatCompProps> = ({ className }) => {
                     <PiCaretDownBold className={cn("transition-all", { 'rotate-180': closed })} />
                 </Button>
             </div>
-            <div className={cn('flex flex-col border border-gray-200 bg-white rounded-b-md border-t-0 p-2 max-h-[80vh]', { 'hidden': closed })}>
-                <div className={`overflow-y-scroll`}>
+            <div className={cn('h-full flex flex-col border border-gray-200 bg-white rounded-b-md border-t-0 p-2 max-h-[80vh]', { 'hidden': closed })}>
+                <div className={cn(`h-full overflow-y-scroll`, messageList.length === 0 ? `flex ` : '')}>
                     {messageList.map((message, index) => {
                         return (
                             <MessageComp key={index} message={message.data} username={'user FIX'} />
                         )
                     })}
                     {messageList.length === 0 && (
-                        <div className='flex justify-center items-center flex-col my-16 opacity-15 max-w-[75%] mx-auto'>
+                        <div className=' flex justify-center items-center flex-col my-16 opacity-15 max-w-[75%] mx-auto'>
                             <GrKeyboard className='text-7xl' />
                             <p className='text-xl'>Join chat, and messages you write will appear here.</p>
                         </div>

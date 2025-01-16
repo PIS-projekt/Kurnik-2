@@ -10,7 +10,7 @@ interface NavbarProps {
 
 const Navbar: FC<NavbarProps> = ({ }) => {
     return (
-        <nav className='border-b-4 shadow-lg z-20 border-b-blue-600 sticky top-0 bg-white'>
+        <nav className='border-b-4 shadow-lg z-20 border-b-blue-600 fixed top-0 bg-white w-full'>
             <div className="flex justify-between items-center p-4 max-w-screen-xl mx-auto">
                 <div className="text-2xl font-bold">Kurnik-2</div>
                 <div className="flex items-center justify-center gap-4">
