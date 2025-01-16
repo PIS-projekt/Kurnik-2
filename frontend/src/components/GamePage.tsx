@@ -18,8 +18,10 @@ const GamePage: FC<GamePageProps> = ({ }) => {
                         <RoomCreateJoin />
                         <ChatComp className='' />
                     </div>
-                    <div className='bg-white shadow-lg shadow-black min-w-[100vw]'>
-                        <Game />
+                    <div className='bg-white shadow-lg shadow-black min-w-[50vw] flex items-center justify-center'>
+                        <div>
+                            <Game />
+                        </div>
                     </div>
                 </div>
             </div>
