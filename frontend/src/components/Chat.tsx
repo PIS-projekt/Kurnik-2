@@ -2,22 +2,63 @@ import {FormEvent, useEffect, useState} from "react";
 import useWebSocket, {ReadyState} from "react-use-websocket";
 import axios from "axios";
 import {apiBaseUrl, baseAppUrl} from "../App";
+import { useNavigate } from "react-router-dom";
 import {RoomList} from "./RoomList";
 import "./Chat.css";
 import {useParams} from "react-router-dom";
 
+import { jwtDecode } from "jwt-decode";
+
+import { useRoom } from "../hooks/useRoom";
+
 export const Chat = () => {
   const [currentMessage, setCurrentMessage] = useState("");
-  const [roomCode, setRoomCode] = useState<string>("");
-  const [userId, setUserId] = useState<number>(1);
+  const { roomCode, setRoomCode } = useRoom();
   const [socketUrl, setSocketUrl] = useState<string | null>(null);
   const [messageList, setMessageList] = useState<Array<{ data: string }>>([]);
   const [loggedRoomCode, setLoggedRoomCode] = useState<string | null>(null);
-  const [loggedUserId, setLoggedUserId] = useState<number | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [newRoomPrivacy, setNewRoomPrivacy] = useState<string>("public");
   const params = useParams();
 
+  const [userName, setUserName] = useState<string | null>(null);
+
+  const apiBaseUrl = "http://0.0.0.0:8000";
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const token = localStorage.getItem("access_token");
+
+    if (!token) {
+      navigate("/login");
+      return;
+    }
+
+    try {
+      const decodedToken: { sub: string; exp: number } = jwtDecode(token);
+      setUserName(decodedToken.sub);
+
+      // Check if the token is expired
+      if (decodedToken.exp * 1000 < Date.now()) {
+        handleLogout();
+        return;
+      }
+    } catch (error) {
+      console.error("Invalid token:", error);
+      handleLogout();
+    }
+  }, [navigate]);
+
+  useEffect(() => {
+    if (userName) {
+      console.log("User name:", userName);
+    }
+  }, [userName]);
+
+  const handleLogout = () => {
+    localStorage.removeItem("access_token");
+    navigate("/login");
+  };
 
   useEffect(() => {
     if (params.roomId && params.userId) {
@@ -35,7 +76,6 @@ export const Chat = () => {
   const handleOpen = () => {
     console.log("WebSocket connection opened.");
     setLoggedRoomCode(roomCode);
-    setLoggedUserId(userId);
     setError(null);
   };
 
@@ -43,7 +83,6 @@ export const Chat = () => {
     console.log("WebSocket connection closed.");
     setMessageList([]);
     setLoggedRoomCode(null);
-    setLoggedUserId(null);
   };
 
   const handleMessage = (message: { data: string }) => {
@@ -66,13 +105,15 @@ export const Chat = () => {
 
   const handleCreateRoom = async () => {
     try {
+      const token = localStorage.getItem("access_token");
       const response = await axios.get(`${apiBaseUrl}/create-new-room`, {
-        // eslint-disable-next-line camelcase
-        params: {user_id: userId, private: (newRoomPrivacy == "private")},
+        params: { private: (newRoomPrivacy == "private") },
+        headers: { Authorization: `Bearer ${token}` },
+
       });
       const newRoomCode = response.data.room_code;
       setRoomCode(newRoomCode);
-      setSocketUrl(`${apiBaseUrl}/ws/connect/${newRoomCode}?user_id=${userId}`);
+      setSocketUrl(`${apiBaseUrl}/ws/connect/${newRoomCode}?token=${token}`);
       setError("Room created and joined successfully.");
     } catch (error) {
       console.error("Failed to create room:", error);
@@ -88,12 +129,14 @@ export const Chat = () => {
   const joinRoom = async (joinRoomCode: string, joinRoomUserId: number) => {
 
     try {
+      const token = localStorage.getItem("access_token");
       const response = await axios.get(`${apiBaseUrl}/join-room`, {
         // eslint-disable-next-line camelcase
-        params: {room_code: joinRoomCode, user_id: joinRoomUserId},
+        params: { room_code: joinRoomCode },
+        headers: { Authorization: `Bearer ${token}` },
       });
       if (response.data.room_exists) {
-        setSocketUrl(`${apiBaseUrl}/ws/connect/${joinRoomCode}?user_id=${joinRoomUserId}`);
+        setSocketUrl(`${apiBaseUrl}/ws/connect/${joinRoomCode}?token=${token}`);
         setError("Joined room successfully.");
       }
     } catch (error) {
@@ -170,6 +213,7 @@ export const Chat = () => {
       }
       <br/>
       <br/>
+
       <div id="chat"></div>
       <input
         type="text"
