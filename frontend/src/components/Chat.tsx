@@ -47,6 +47,10 @@ export const Chat = () => {
       console.error("Invalid token:", error);
       handleLogout();
     }
+    const joinRoomId = params.roomId?.toString();
+    if (joinRoomId){
+      joinRoom(joinRoomId);
+    }
   }, [navigate]);
 
   useEffect(() => {
@@ -109,6 +113,7 @@ export const Chat = () => {
       });
       const newRoomCode = response.data.room_code;
       setRoomCode(newRoomCode);
+      navigate("/chat/" + newRoomCode);
       setSocketUrl(`${apiBaseUrl}/ws/connect/${newRoomCode}?token=${token}`);
       setError("Room created and joined successfully.");
     } catch (error) {
@@ -119,7 +124,7 @@ export const Chat = () => {
 
   const handleJoinRoom = async (event: FormEvent) => {
     event.preventDefault();
-    await joinRoom(roomCode);
+    navigate("/chat/" + roomCode);
   };
 
   const joinRoom = async (joinRoomCode: string) => {
@@ -133,6 +138,7 @@ export const Chat = () => {
       });
       if (response.data.room_exists) {
         setSocketUrl(`${apiBaseUrl}/ws/connect/${joinRoomCode}?token=${token}`);
+        setRoomCode(joinRoomCode);
         setError("Joined room successfully.");
       }
     } catch (error) {
@@ -173,7 +179,7 @@ export const Chat = () => {
         <button type="submit">Join Room</button>
       </form>
       <br/>
-      <div>Logged in as user: {} in room: {loggedRoomCode}</div>
+      <div>Logged in as user: {userName} in room: {loggedRoomCode}</div>
       {error &&
           <div style={{color: "red"}}>{error}</div>
       }
