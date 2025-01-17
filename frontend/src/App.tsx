@@ -34,7 +34,7 @@ function App() {
             element={isAuthenticated ? <Navigate to="/chat" /> : <Navigate to="/login" />}
           />
           <Route
-            path="/chat"
+            path="/chat/:roomId?"
             element={isAuthenticated ?   <RoomContextProvider><Chat/><Game/></RoomContextProvider> : <Navigate to="/login" />}
           />
           <Route
