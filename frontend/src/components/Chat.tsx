@@ -2,18 +2,19 @@ import {FormEvent, useEffect, useState} from "react";
 import useWebSocket, {ReadyState} from "react-use-websocket";
 import axios from "axios";
 import {apiBaseUrl, baseAppUrl} from "../App";
-import { useNavigate } from "react-router-dom";
+import {useNavigate} from "react-router-dom";
 import {RoomList} from "./RoomList";
 import "./Chat.css";
 import {useParams} from "react-router-dom";
 
-import { jwtDecode } from "jwt-decode";
+import {jwtDecode} from "jwt-decode";
 
-import { useRoom } from "../hooks/useRoom";
+import {useRoom} from "../hooks/useRoom";
+
 
 export const Chat = () => {
   const [currentMessage, setCurrentMessage] = useState("");
-  const { roomCode, setRoomCode } = useRoom();
+  const {roomCode, setRoomCode} = useRoom();
   const [socketUrl, setSocketUrl] = useState<string | null>(null);
   const [messageList, setMessageList] = useState<Array<{ data: string }>>([]);
   const [loggedRoomCode, setLoggedRoomCode] = useState<string | null>(null);
@@ -23,7 +24,6 @@ export const Chat = () => {
 
   const [userName, setUserName] = useState<string | null>(null);
 
-  const apiBaseUrl = "http://0.0.0.0:8000";
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -64,12 +64,8 @@ export const Chat = () => {
     if (params.roomId && params.userId) {
       console.log(params);
       console.log(params.roomId);
-      console.log(params.userId);
-      setRoomCode(params.roomId);
-      const paramUserId = parseInt(params.userId);
-      setUserId(paramUserId);
       console.log("trying to connect in useEffect");
-      joinRoom(params.roomId, paramUserId).then();
+      joinRoom(params.roomId).then();
     }
 
   }, []);
@@ -107,8 +103,8 @@ export const Chat = () => {
     try {
       const token = localStorage.getItem("access_token");
       const response = await axios.get(`${apiBaseUrl}/create-new-room`, {
-        params: { private: (newRoomPrivacy == "private") },
-        headers: { Authorization: `Bearer ${token}` },
+        params: {private: (newRoomPrivacy == "private")},
+        headers: {Authorization: `Bearer ${token}`},
 
       });
       const newRoomCode = response.data.room_code;
@@ -123,17 +119,17 @@ export const Chat = () => {
 
   const handleJoinRoom = async (event: FormEvent) => {
     event.preventDefault();
-    await joinRoom(roomCode, userId);
+    await joinRoom(roomCode);
   };
 
-  const joinRoom = async (joinRoomCode: string, joinRoomUserId: number) => {
+  const joinRoom = async (joinRoomCode: string) => {
 
     try {
       const token = localStorage.getItem("access_token");
       const response = await axios.get(`${apiBaseUrl}/join-room`, {
         // eslint-disable-next-line camelcase
-        params: { room_code: joinRoomCode },
-        headers: { Authorization: `Bearer ${token}` },
+        params: {room_code: joinRoomCode},
+        headers: {Authorization: `Bearer ${token}`},
       });
       if (response.data.room_exists) {
         setSocketUrl(`${apiBaseUrl}/ws/connect/${joinRoomCode}?token=${token}`);
@@ -148,16 +144,6 @@ export const Chat = () => {
   return (
     <div className="Chatroom">
       <h1>Chatroom</h1>
-      <div>
-        <label htmlFor="user_id">User ID:</label>
-        <input
-          type="number"
-          id="user_id"
-          value={userId}
-          onChange={(e) => setUserId(parseInt(e.target.value))}
-          required
-        />
-      </div>
       <br/>
       <div>
         <label htmlFor="visibility-dropdown">Visibility of new room: </label>
@@ -187,30 +173,23 @@ export const Chat = () => {
         <button type="submit">Join Room</button>
       </form>
       <br/>
-      {(loggedUserId &&
-              <div>Logged in as user: {loggedUserId} in room: {loggedRoomCode}</div>)
-        ||
-          <div>Not logged in </div>
-      }
+      <div>Logged in as user: {} in room: {loggedRoomCode}</div>
       {error &&
           <div style={{color: "red"}}>{error}</div>
       }
 
-      {loggedUserId &&
-          <button className="button" onClick={() => {
-            navigator.clipboard.writeText(roomCode);
-          }}>
-              copy room code
-          </button>
-      }
-      {loggedUserId &&
-          <button className="button" onClick={() => {
-            const url = baseAppUrl + "chat/" + roomCode + "/" + userId;
-            navigator.clipboard.writeText(url);
-          }}>
-              copy join url for user {userId}
-          </button>
-      }
+
+      <button className="button" onClick={() => {
+        navigator.clipboard.writeText(roomCode);
+      }}>
+        copy room code
+      </button>
+      <button className="button" onClick={() => {
+        const url = baseAppUrl + "chat/" + roomCode + "/" + 1;
+        navigator.clipboard.writeText(url);
+      }}>
+        copy join url for user {}
+      </button>
       <br/>
       <br/>
 
@@ -230,8 +209,7 @@ export const Chat = () => {
           </p>
         ))}
       </div>
-      <RoomList
-        userId={userId}/>
+      <RoomList userId={1}/>
     </div>
   );
 };
