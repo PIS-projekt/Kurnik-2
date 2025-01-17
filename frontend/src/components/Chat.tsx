@@ -1,7 +1,7 @@
 import {FormEvent, useEffect, useState} from "react";
 import useWebSocket, {ReadyState} from "react-use-websocket";
 import axios from "axios";
-import {apiBaseUrl, baseAppUrl} from "../App";
+import {apiBaseUrl} from "../App";
 import {useNavigate} from "react-router-dom";
 import {RoomList} from "./RoomList";
 import "./Chat.css";

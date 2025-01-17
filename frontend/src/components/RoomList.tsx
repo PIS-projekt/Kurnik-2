@@ -4,11 +4,6 @@ import {apiBaseUrl} from "../App";
 import "./RoomList.css";
 import {useNavigate} from "react-router-dom";
 
-interface RoomListProps {
-  userId: number;
-}
-
-export const RoomList = (props: RoomListProps) => {
 export const RoomList = () => {
   const [roomList, setRoomList] = useState<Array<string>>([]);
   const navigate = useNavigate();
