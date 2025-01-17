@@ -198,7 +198,9 @@ export const Chat = () => {
       </button>
       <br/>
       <br/>
-
+      <div>
+        <button onClick={handleLogout}>Logout</button>
+      </div>
       <div id="chat"></div>
       <input
         type="text"
