@@ -1,0 +1,41 @@
+services:
+  backend:
+    depends_on:
+      - database
+    build:
+      context: backend/
+      dockerfile: Dockerfile
+      target: prod
+    ports:
+      - "8000:8000"
+    environment:
+      - PYTHONUNBUFFERED=1
+      - DB_HOST=pis-db
+    restart: unless-stopped
+  backend-tests:
+    build:
+      context: backend/
+      dockerfile: Dockerfile
+      target: test
+    environment:
+      - PYTHONUNBUFFERED=1
+      - DB_HOST=pis-db
+  database:
+    image: "postgres:16"
+    container_name: pis-db
+    environment:
+      POSTGRES_USER: "admin"
+      POSTGRES_PASSWORD: "admin"
+      POSTGRES_DB: "pis"
+    ports:
+      - "5432:5432"
+    restart: unless-stopped
+  frontend:
+    build:
+      context: frontend/
+      dockerfile: Dockerfile.dev
+    ports:
+      - "2137:80"
+    environment:
+      - NODE_ENV=local
+    restart: unless-stopped
