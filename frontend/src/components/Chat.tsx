@@ -217,7 +217,7 @@ export const Chat = () => {
           </p>
         ))}
       </div>
-      <RoomList userId={1}/>
+      <RoomList/>
     </div>
   );
 };

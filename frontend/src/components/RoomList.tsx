@@ -1,6 +1,6 @@
 import {useEffect, useState} from "react";
 import axios from "axios";
-import {apiBaseUrl, baseAppUrl} from "../App";
+import {apiBaseUrl} from "../App";
 import "./RoomList.css";
 import {useNavigate} from "react-router-dom";
 
@@ -9,6 +9,7 @@ interface RoomListProps {
 }
 
 export const RoomList = (props: RoomListProps) => {
+export const RoomList = () => {
   const [roomList, setRoomList] = useState<Array<string>>([]);
   const navigate = useNavigate();
 
@@ -33,7 +34,6 @@ export const RoomList = (props: RoomListProps) => {
         <button onClick={handleRefresh}>Refresh</button>
 
         {roomList.map((roomId, index) => {
-          const url = baseAppUrl + "chat/" + roomId;
           return (
             <p className="roomIdItem" key={index}>
               <a>{roomId}</a>
