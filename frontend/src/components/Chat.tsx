@@ -178,11 +178,13 @@ export const Chat = () => {
         />
         <button type="submit">Join Room</button>
       </form>
+      <br/>
       <button className="button" onClick={() => {
         navigator.clipboard.writeText(roomCode);
       }}>
         copy room code
       </button>
+      <br/>
       <br/>
       <div>Logged in as user: {userName} in room: {loggedRoomCode}</div>
       {error &&
@@ -191,6 +193,7 @@ export const Chat = () => {
       <div>
         <button className="button" onClick={handleLogout}>Logout</button>
       </div>
+      <br/>
       <div id="chat"></div>
       <input
         type="text"
