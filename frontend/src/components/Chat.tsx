@@ -212,7 +212,7 @@ export const Chat = () => {
       <button onClick={handleSendMessage}>Send Message</button>
       <div id="Chat">
         {messageList.map((message, index) => (
-          <p className="skibido" key={index}>
+          <p className="messageListItem" key={index}>
             {message.data}
           </p>
         ))}
