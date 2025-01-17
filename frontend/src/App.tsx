@@ -7,6 +7,9 @@ import { Register } from "./components/Register";
 import {Game} from "./Games/TicTacToe/Game";
 import {RoomContextProvider} from "./hooks/useRoom";
 
+export const apiBaseUrl = process.env.REACT_APP_BASE_API_URL;
+export const baseAppUrl = process.env.REACT_APP_BASE_URL;
+
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
