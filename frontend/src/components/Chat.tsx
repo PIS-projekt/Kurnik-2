@@ -178,28 +178,18 @@ export const Chat = () => {
         />
         <button type="submit">Join Room</button>
       </form>
-      <br/>
-      <div>Logged in as user: {userName} in room: {loggedRoomCode}</div>
-      {error &&
-          <div style={{color: "red"}}>{error}</div>
-      }
-
-
       <button className="button" onClick={() => {
         navigator.clipboard.writeText(roomCode);
       }}>
         copy room code
       </button>
-      <button className="button" onClick={() => {
-        const url = baseAppUrl + "chat/" + roomCode + "/" + 1;
-        navigator.clipboard.writeText(url);
-      }}>
-        copy join url for user {}
-      </button>
       <br/>
-      <br/>
+      <div>Logged in as user: {userName} in room: {loggedRoomCode}</div>
+      {error &&
+          <div style={{color: "red"}}>{error}</div>
+      }
       <div>
-        <button onClick={handleLogout}>Logout</button>
+        <button className="button" onClick={handleLogout}>Logout</button>
       </div>
       <div id="chat"></div>
       <input

@@ -28,8 +28,8 @@ export const RoomList = () => {
         <h2>Public rooms: </h2>
         <button onClick={handleRefresh}>Refresh</button>
 
-        {roomList.map((roomId, index) => {
-          return (
+        {roomList.map((roomId, index) =>
+          (
             <p className="roomIdItem" key={index}>
               <a>{roomId}</a>
               <button className="button" onClick={() => {
@@ -40,13 +40,8 @@ export const RoomList = () => {
                 navigator.clipboard.writeText(roomId);
               }}> copy join code
               </button>
-              <button className="button" onClick={() => {
-                navigator.clipboard.writeText(url);
-              }}> copy join url for user {props.userId}
-              </button>
             </p>
-          );
-        })}
+          ))}
       </div>
 
     </div>
