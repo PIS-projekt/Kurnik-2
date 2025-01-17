@@ -2,6 +2,7 @@ import {useEffect, useState} from "react";
 import axios from "axios";
 import {apiBaseUrl, baseAppUrl} from "../App";
 import "./RoomList.css";
+import {useNavigate} from "react-router-dom";
 
 interface RoomListProps {
   userId: number;
@@ -9,6 +10,7 @@ interface RoomListProps {
 
 export const RoomList = (props: RoomListProps) => {
   const [roomList, setRoomList] = useState<Array<string>>([]);
+  const navigate = useNavigate();
 
   const handleRefresh = async () => {
     try {
@@ -31,13 +33,12 @@ export const RoomList = (props: RoomListProps) => {
         <button onClick={handleRefresh}>Refresh</button>
 
         {roomList.map((roomId, index) => {
-          const url = baseAppUrl + "chat/" + roomId + "/" + props.userId;
+          const url = baseAppUrl + "chat/" + roomId;
           return (
             <p className="roomIdItem" key={index}>
               <a>{roomId}</a>
-              {/* FIXME THIS DOES NOT WORK ON LOCALHOST due to "unkown protocol". */}
               <button className="button" onClick={() => {
-                window.location.href = url;
+                navigate("/" + "chat/" + roomId);
               }}> Join room
               </button>
               <button className="button" onClick={() => {
