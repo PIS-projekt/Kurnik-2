@@ -45,29 +45,29 @@ pipeline {
         //     }
         // }
 
-        stage('Build frontend') {
-            steps {
-                // dir('frontend') {
-                //     nodejs(nodeJSInstallationName: 'node-23') {
-                //         script {
-                //             echo 'Building the project...'
-                //             sh 'npm run build'
-                //         }
-                //     }
-                // }
-                script {
-                    frontend_build = docker.build("51.144.137.71:8082/kurnik-frontend:${env.GIT_COMMIT}", '-f frontend/Dockerfile frontend/')
-                    frontend_build.push("latest")
-                }
-            }
-        }
+        // stage('Build frontend') {
+        //     steps {
+        //         // dir('frontend') {
+        //         //     nodejs(nodeJSInstallationName: 'node-23') {
+        //         //         script {
+        //         //             echo 'Building the project...'
+        //         //             sh 'npm run build'
+        //         //         }
+        //         //     }
+        //         // }
+        //         script {
+        //             frontend_build = docker.build("51.144.137.71:8082/kurnik-frontend:${env.GIT_COMMIT}", '-f frontend/Dockerfile frontend/')
+        //         }
+        //     }
+        // }
 
         // stage('Upload frontend image to Nexus') {
         //     steps {
         //         script {
-        //             docker.withRegistry('https://nexus.mgarbowski.pl', 'nexus-registry-credentials') {
-        //                 frontend_build.push("latest")
-        //             }
+        //             frontend_build.push("latest")
+        //             frontend_build.push("${env.GIT_COMMIT}")
+        //             // docker.withRegistry('51.144.137.71:8082', 'nexus-registry-credentials') {
+        //             // }
         //         }
         //     }
         // }
@@ -107,14 +107,14 @@ pipeline {
         //     }
         // }
 
-        // stage('Build for Production') {
-        //     steps {
-        //         script {
-        //             backend_build = docker.build("docker-images/pis-backend", "--target prod -f backend/Dockerfile backend")
-        //             echo "Done building"
-        //         }
-        //     }
-        // }
+        stage('Build for Production') {
+            steps {
+                script {
+                    backend_build = docker.build("51.144.137.71:8082/kurnik-backend:${env.GIT_COMMIT}", "--target prod -f backend/Dockerfile backend")
+                    echo "Done building"
+                }
+            }
+        }
 
         // stage('Verify Production Build') {
         //     steps {
@@ -140,16 +140,18 @@ pipeline {
         //     }
         // }
 
-        // stage('Upload backend image to Nexus') {
-        //     steps {
-        //         script {
-        //             docker.withRegistry('https://nexus.mgarbowski.pl', 'nexus-registry-credentials') {
-        //                 backend_build.push("latest")
-        //             }
-        //         }
+        stage('Upload backend image to Nexus') {
+            steps {
+                script {
+                    backend_build.push("latest")
+                    backend_build.push("${env.GIT_COMMIT}")
+                    // docker.withRegistry('https://nexus.mgarbowski.pl', 'nexus-registry-credentials') {
+                    //     backend_build.push("latest")
+                    // }
+                }
 
-        //     }
-        // }
+            }
+        }
 
         stage('deploy to production') {
             // when {
