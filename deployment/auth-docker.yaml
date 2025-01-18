@@ -1,0 +1,27 @@
+---
+- name: Add Docker HTTP registry and login
+  hosts: ci-cd
+  become: true
+  vars_files:
+    - ./vars/docker_registry_credentials.yml
+    - ./vars/vars.yml
+  tasks:
+    - name: Configure Docker daemon with insecure registry
+      ansible.builtin.template:
+        src: ./templates/docker-daemon.json.j2
+        dest: /etc/docker/daemon.json
+        owner: root
+        group: root
+        mode: '0644'
+      notify: Restart Docker
+
+    - name: Login to Nexus Docker registry group repository
+      community.docker.docker_login:
+        registry_url: "{{ docker_repository_url }}"
+        username: "{{ docker_registry.username }}"
+        password: "{{ docker_registry.password }}"
+        reauthorize: true
+
+  handlers:
+    - name: Import handlers
+      ansible.builtin.import_tasks: ./handlers.yaml
