@@ -8,28 +8,28 @@ pipeline {
             }
         }
 
-        // stage('Setup node and install frontend dependencies') {
-        //     steps {
-        //         dir('frontend') {
-        //             nodejs(nodeJSInstallationName: 'node-23') {
-        //                 sh 'npm install'
-        //             }
-        //         }
-        //     }
-        // }
+        stage('Setup node and install frontend dependencies') {
+            steps {
+                dir('frontend') {
+                    nodejs(nodeJSInstallationName: 'node-23') {
+                        sh 'npm install'
+                    }
+                }
+            }
+        }
 
-        // stage('Lint frontend') {
-        //     steps {
-        //         dir('frontend') {
-        //             nodejs(nodeJSInstallationName: 'node-23') {
-        //                 script {
-        //                     echo 'Running ESLint...'
-        //                     sh 'npm run lint'
-        //                 }
-        //             }
-        //         }
-        //     }
-        // }
+        stage('Lint frontend') {
+            steps {
+                dir('frontend') {
+                    nodejs(nodeJSInstallationName: 'node-23') {
+                        script {
+                            echo 'Running ESLint...'
+                            sh 'npm run lint'
+                        }
+                    }
+                }
+            }
+        }
 
         // // TODO: tests don't pass
         // stage('Run frontend tests') {
@@ -45,67 +45,59 @@ pipeline {
         //     }
         // }
 
-        // stage('Build frontend') {
-        //     steps {
-        //         // dir('frontend') {
-        //         //     nodejs(nodeJSInstallationName: 'node-23') {
-        //         //         script {
-        //         //             echo 'Building the project...'
-        //         //             sh 'npm run build'
-        //         //         }
-        //         //     }
-        //         // }
-        //         script {
-        //             frontend_build = docker.build("51.144.137.71:8082/kurnik-frontend:${env.GIT_COMMIT}", '-f frontend/Dockerfile frontend/')
-        //         }
-        //     }
-        // }
+        stage('Build frontend') {
+            steps {
+                script {
+                    frontend_build = docker.build("51.144.137.71:8082/kurnik-frontend:${env.GIT_COMMIT}", '-f frontend/Dockerfile frontend/')
+                }
+            }
+        }
 
-        // stage('Upload frontend image to Nexus') {
-        //     steps {
-        //         script {
-        //             frontend_build.push("latest")
-        //             frontend_build.push("${env.GIT_COMMIT}")
-        //             // docker.withRegistry('51.144.137.71:8082', 'nexus-registry-credentials') {
-        //             // }
-        //         }
-        //     }
-        // }
+        stage('Upload frontend image to Nexus') {
+            steps {
+                script {
+                    frontend_build.push("latest")
+                    frontend_build.push("${env.GIT_COMMIT}")
+                    // docker.withRegistry('51.144.137.71:8082', 'nexus-registry-credentials') {
+                    // }
+                }
+            }
+        }
 
 
-        // stage('Build for Testing') {
-        //     steps {
-        //         script {
-        //             sh "docker build --target test -t backend-tests -f backend/Dockerfile backend/"
-        //         }
-        //     }
-        // }
+        stage('Build for Testing') {
+            steps {
+                script {
+                    sh "docker build --target test -t backend-tests -f backend/Dockerfile backend/"
+                }
+            }
+        }
 
-        // stage('Run Tests') {
-        //     steps {
-        //         script {
-        //             sh "docker run --rm backend-tests"
-        //         }
-        //     }
-        // }
+        stage('Run Tests') {
+            steps {
+                script {
+                    sh "docker run --rm backend-tests"
+                }
+            }
+        }
 
-        // stage('Test Coverage') {
-        //     steps {
-        //         script {
-        //             sh "docker run --rm backend-tests pdm run coverage"
-        //         }
-        //     }
-        // }
+        stage('Test Coverage') {
+            steps {
+                script {
+                    sh "docker run --rm backend-tests pdm run coverage"
+                }
+            }
+        }
 
-        // stage('Linting and Formatting') {
-        //     steps {
-        //         script {
-        //             // Adjust the linting/formatting tools as per your setup
-        //             sh "docker run --rm backend-tests pdm run lint"
-        //             sh "docker run --rm backend-tests pdm run format"
-        //         }
-        //     }
-        // }
+        stage('Linting and Formatting') {
+            steps {
+                script {
+                    // Adjust the linting/formatting tools as per your setup
+                    sh "docker run --rm backend-tests pdm run lint"
+                    sh "docker run --rm backend-tests pdm run format"
+                }
+            }
+        }
 
         stage('Build for Production') {
             steps {
@@ -116,29 +108,29 @@ pipeline {
             }
         }
 
-        // stage('Verify Production Build') {
-        //     steps {
-        //         script {
-        //             echo "Starting the production container from the built image..."
+        stage('Verify Production Build') {
+            steps {
+                script {
+                    echo "Starting the production container from the built image..."
 
-        //             // Start the container
-        //             def prodContainer = backend_build.run("-p 8000:8000")
-        //             def containerId = prodContainer.id
+                    // Start the container
+                    def prodContainer = backend_build.run("-p 8000:8000")
+                    def containerId = prodContainer.id
 
-        //             try {
-        //                 // Run a health check or test endpoint
-        //                 echo "Waiting for the container to initialize..."
-        //                 sleep(10) // Adjust sleep time as needed
-        //                 sh "curl -f http://0.0.0.0:8000 || exit 1"
-        //             } finally {
-        //                 // Clean up the container using shell commands
-        //                 echo "Stopping and removing the container..."
-        //                 sh "docker stop ${containerId}"
-        //                 sh "docker rm -f ${containerId}"
-        //             }
-        //         }
-        //     }
-        // }
+                    try {
+                        // Run a health check or test endpoint
+                        echo "Waiting for the container to initialize..."
+                        sleep(10) // Adjust sleep time as needed
+                        sh "curl -f http://0.0.0.0:8000 || exit 1"
+                    } finally {
+                        // Clean up the container using shell commands
+                        echo "Stopping and removing the container..."
+                        sh "docker stop ${containerId}"
+                        sh "docker rm -f ${containerId}"
+                    }
+                }
+            }
+        }
 
         stage('Upload backend image to Nexus') {
             steps {
