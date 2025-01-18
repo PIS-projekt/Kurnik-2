@@ -12,7 +12,8 @@ services:
     environment:
       - PYTHONUNBUFFERED=1
       - DB_HOST=pis-db
-    restart: unless-stopped
+    restart: always
+
   backend-tests:
     build:
       context: backend/
@@ -45,4 +46,4 @@ services:
       - "80:80"
     environment:
       - NODE_ENV=production
-    restart: unless-stopped
+    restart: always
