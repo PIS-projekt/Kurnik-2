@@ -3,7 +3,7 @@ services:
     depends_on:
       database:
         condition: service_healthy
-    image: "51.144.137.71:8080/kurnik-backend:${BACKEND_IMAGE_TAG:-latest}"
+    image: "51.144.137.71:8082/kurnik-backend:${BACKEND_IMAGE_TAG:-latest}"
     ports:
       - "8000:8000"
     environment:
@@ -36,7 +36,7 @@ services:
       retries: 5
 
   frontend:
-    image: "51.144.137.71:8080/kurnik-frontend:${FRONTEND_IMAGE_TAG:-latest}"
+    image: "51.144.137.71:8082/kurnik-frontend:${FRONTEND_IMAGE_TAG:-latest}"
     ports:
       - "80:80"
     environment:
