@@ -2,7 +2,10 @@ pipeline {
     agent any
 
     stages {
-
+        // TODO: temp
+        when {
+            branch 'SCRUM-37-Deployment-on-remote-server-script'
+        }
 
         stage('Checkout Code') {
             steps {
