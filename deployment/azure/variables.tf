@@ -97,6 +97,28 @@ variable "nsg_rules" {
       destination_port_range     = "8080"
       source_address_prefix      = "*"
       destination_address_prefix = "*"
+    },
+    {
+      name                       = "pis-nsg-rule-8081-dev"
+      priority                   = 1050
+      direction                  = "Inbound"
+      access                     = "Allow"
+      protocol                   = "Tcp"
+      source_port_range          = "*"
+      destination_port_range     = "8081"
+      source_address_prefix      = "*"
+      destination_address_prefix = "*"
+    },
+    {
+      name                       = "pis-nsg-rule-8082-dev"
+      priority                   = 1060
+      direction                  = "Inbound"
+      access                     = "Allow"
+      protocol                   = "Tcp"
+      source_port_range          = "*"
+      destination_port_range     = "8082"
+      source_address_prefix      = "*"
+      destination_address_prefix = "*"
     }
   ]
 }
