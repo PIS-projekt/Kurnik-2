@@ -10,41 +10,41 @@ pipeline {
             }
         }
 
-        // stage('Setup node and install frontend dependencies') {
-        //     steps {
-        //         dir('frontend') {
-        //             nodejs(nodeJSInstallationName: 'node-23') {
-        //                 sh 'npm install'
-        //             }
-        //         }
-        //     }
-        // }
+        stage('Setup node and install frontend dependencies') {
+            steps {
+                dir('frontend') {
+                    nodejs(nodeJSInstallationName: 'node-23') {
+                        sh 'npm install'
+                    }
+                }
+            }
+        }
 
-        // stage('Lint frontend') {
-        //     steps {
-        //         dir('frontend') {
-        //             nodejs(nodeJSInstallationName: 'node-23') {
-        //                 script {
-        //                     echo 'Running ESLint...'
-        //                     sh 'npm run lint'
-        //                 }
-        //             }
-        //         }
-        //     }
-        // }
+        stage('Lint frontend') {
+            steps {
+                dir('frontend') {
+                    nodejs(nodeJSInstallationName: 'node-23') {
+                        script {
+                            echo 'Running ESLint...'
+                            sh 'npm run lint'
+                        }
+                    }
+                }
+            }
+        }
 
-        // stage('Run frontend tests') {
-        //     steps {
-        //         dir('frontend') {
-        //             nodejs(nodeJSInstallationName: 'node-23') {
-        //                 script {
-        //                     echo 'Running tests...'
-        //                     sh 'npm run test'
-        //                 }
-        //             }
-        //         }
-        //     }
-        // }
+        stage('Run frontend tests') {
+            steps {
+                dir('frontend') {
+                    nodejs(nodeJSInstallationName: 'node-23') {
+                        script {
+                            echo 'Running tests...'
+                            sh 'npm run test'
+                        }
+                    }
+                }
+            }
+        }
 
         // stage('Build frontend') {
         //     steps {
@@ -153,9 +153,9 @@ pipeline {
         // }
 
         stage('deploy to production') {
-            // when {
-            //     branch 'SCRUM-37-Deployment-on-remote-server-script'
-            // }
+            when {
+                branch 'SCRUM-37-Deployment-on-remote-server-script'
+            }
             stages {
                 stage('Get user confirmation') {
                     steps {
