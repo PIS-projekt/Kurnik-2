@@ -211,7 +211,7 @@ pipeline {
                                                 rm -rf *
                                                 mv /home/azureuser/package.tar.gz /home/azureuser/kurnik-2
                                                 tar -xzf package.tar.gz
-                                                docker compose up --build -d
+                                                docker compose up -f docker-compose.prod.yaml --build -d
                                             ''' // Command to execute after file transfer
                                         )
                                     ],
