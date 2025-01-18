@@ -21,3 +21,4 @@
           - "8081:8081"
         networks:
           - name: ci_network
+        restart_policy: unless-stopped
