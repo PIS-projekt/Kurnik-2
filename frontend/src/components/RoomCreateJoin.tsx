@@ -20,24 +20,23 @@ interface RoomCreateJoinProps {
 const RoomCreateJoin: FC<RoomCreateJoinProps> = ({ }) => {
     const { joinRoomChat } = useChat()
     const { getToken } = useUser()
-
-    const [roomId, setRoomId] = useState<string>('')
-    const [joinRoomId, setJoinRoomId] = useState<string>('')
     const { roomCode, setRoomCode } = useRoom();
+
+    const [joinRoomId, setJoinRoomId] = useState<string>('')
 
     return (
         <div className='border rounded-sm p-4 mx-auto mt-12 bg-white w-full shadow-md shadow-zinc-800'>
             <div className='flex items-center justify-center gap-2'>
                 <p className='text-3xl font-semibold'>Room:</p>
-                {roomId ?
+                {roomCode ?
                     (
                         <div className='border rounded-md flex items-center py-1'>
-                            <p className='text-xl font-semibold border-r px-3'>{roomId}</p>
+                            <p className='text-xl font-semibold border-r px-3'>{roomCode}</p>
                             <TooltipProvider>
                                 <Tooltip delayDuration={0}>
                                     <TooltipTrigger asChild>
                                         <Button variant='ghost' className='p-0 aspect-square' onClick={() => {
-                                            navigator.clipboard.writeText(roomId)
+                                            navigator.clipboard.writeText(roomCode)
                                             toast.success('Room ID copied to clipboard')
                                         }}>
                                             <IoCopy />
@@ -68,8 +67,7 @@ const RoomCreateJoin: FC<RoomCreateJoinProps> = ({ }) => {
                     (
                         <Button className='' onClick={async () => {
                             const roomId = await api.createRoom(getToken()!)
-                            setRoomId(roomId)
-                            setRoomCode(roomId);
+                            setRoomCode(roomId)
                             joinRoomChat(roomId, getToken()!)
                         }}>
                             <p>create</p>
@@ -85,9 +83,8 @@ const RoomCreateJoin: FC<RoomCreateJoinProps> = ({ }) => {
             <div className='flex items-center justify-center'>
                 <Input value={joinRoomId} placeholder='Room ID' onChange={(e) => setJoinRoomId(e.currentTarget.value)} className='max-w-36 rounded-r-none border-r-0' />
                 <Button className='rounded-l-none' onClick={async () => {
-                    setRoomId(joinRoomId)
+                    setRoomCode(joinRoomId)
                     await api.joinRoom(joinRoomId, getToken()!)
-                    setRoomCode(joinRoomId);
                     joinRoomChat(joinRoomId, getToken()!)
                 }}>
                     <p>join</p>
