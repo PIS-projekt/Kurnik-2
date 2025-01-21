@@ -11,6 +11,7 @@ import { Input } from './ui/input';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from './ui/tooltip';
 import toast from 'react-hot-toast';
 import { useUser } from '../hooks/useUser';
+import { useRoom } from '../hooks/useRoom';
 
 interface RoomCreateJoinProps {
 
@@ -22,6 +23,7 @@ const RoomCreateJoin: FC<RoomCreateJoinProps> = ({ }) => {
 
     const [roomId, setRoomId] = useState<string>('')
     const [joinRoomId, setJoinRoomId] = useState<string>('')
+    const { roomCode, setRoomCode } = useRoom();
 
     return (
         <div className='border rounded-sm p-4 mx-auto mt-12 bg-white w-full shadow-md shadow-zinc-800'>
@@ -67,6 +69,7 @@ const RoomCreateJoin: FC<RoomCreateJoinProps> = ({ }) => {
                         <Button className='' onClick={async () => {
                             const roomId = await api.createRoom(getToken()!)
                             setRoomId(roomId)
+                            setRoomCode(roomId);
                             joinRoomChat(roomId, getToken()!)
                         }}>
                             <p>create</p>
@@ -84,6 +87,7 @@ const RoomCreateJoin: FC<RoomCreateJoinProps> = ({ }) => {
                 <Button className='rounded-l-none' onClick={async () => {
                     setRoomId(joinRoomId)
                     await api.joinRoom(joinRoomId, getToken()!)
+                    setRoomCode(joinRoomId);
                     joinRoomChat(joinRoomId, getToken()!)
                 }}>
                     <p>join</p>
