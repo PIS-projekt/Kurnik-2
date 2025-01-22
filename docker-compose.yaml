@@ -12,8 +12,7 @@ services:
     environment:
       - PYTHONUNBUFFERED=1
       - DB_HOST=pis-db
-    restart: always
-
+    restart: unless-stopped
   backend-tests:
     build:
       context: backend/
@@ -31,13 +30,12 @@ services:
       POSTGRES_DB: "pis"
     ports:
       - "5432:5432"
-    restart: always
+    restart: unless-stopped
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U admin -d pis"]
       interval: 10s
       timeout: 5s
       retries: 5
-
   frontend:
     build:
       context: frontend/
@@ -46,4 +44,4 @@ services:
       - "80:80"
     environment:
       - NODE_ENV=production
-    restart: always
+    restart: unless-stopped
