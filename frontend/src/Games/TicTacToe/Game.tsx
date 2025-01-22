@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useGameBackend } from "./useGameBackend";
 import { Board } from "./Board";
 import { useRoom } from "../../hooks/useRoom";
+import { Button } from "../..//components/ui/button";
 
 interface GameState {
   board: string[][];
@@ -83,16 +84,26 @@ export const Game = () => {
     sendRequest(request);
   };
 
+  const noRoom = () => roomCode == null || roomCode.trim().length === 0;
+
   return (
     <div>
-      <h1>Game</h1>
-      <button onClick={handleJoin}>Join</button>
-      <p>{isGameInProgress && turnMessage}</p>
-      <p>{gameOverMessage}</p>
-      {error && <p>{error}</p>}
-      {gameState && <Board board={gameState.board} onClick={handleBoardClick} disabled={!myTurn} />}
-      {!isGameInProgress && gameState &&
-        <button onClick={resetGame}>Quit game</button>}
+      {!isGameInProgress && <Button
+        onClick={handleJoin}
+        disabled={noRoom()}
+      >
+        {noRoom() ? "Join a room to play" : "Join game"}
+      </Button>}
+      <div className="flex flex-col items-center justify-center h-full">
+        <p>{isGameInProgress && turnMessage}</p>
+        <p>{gameOverMessage}</p>
+        {error && <p>{error}</p>}
+        {gameState && <Board board={gameState.board} onClick={handleBoardClick} disabled={!myTurn} />}
+      </div>
+      {
+        !isGameInProgress && gameState &&
+        <button onClick={resetGame}>Quit game</button>
+      }
     </div >
   );
 };
