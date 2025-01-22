@@ -36,8 +36,13 @@ const RoomCreateJoin: FC<RoomCreateJoinProps> = ({ }) => {
                                 <Tooltip delayDuration={0}>
                                     <TooltipTrigger asChild>
                                         <Button variant='ghost' className='p-0 aspect-square' onClick={() => {
-                                            navigator.clipboard.writeText(roomCode)
-                                            toast.success('Room ID copied to clipboard')
+                                            const textarea = document.createElement('textarea');
+                                            textarea.value = roomCode;
+                                            document.body.appendChild(textarea);
+                                            textarea.select();
+                                            document.execCommand('copy');
+                                            toast.success('Room ID copied to clipboard 📋');
+                                            document.body.removeChild(textarea);
                                         }}>
                                             <IoCopy />
                                         </Button>

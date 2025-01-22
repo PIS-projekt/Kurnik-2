@@ -48,8 +48,9 @@ const ChatComp: FC<ChatCompProps> = ({ className }) => {
             <div className={cn('h-full flex flex-col border border-gray-200 bg-white rounded-b-md border-t-0 p-2 max-h-[80vh]', { 'hidden': closed })}>
                 <div className={cn(`h-full overflow-y-scroll`, messageList.length === 0 ? `flex ` : '')}>
                     {messageList.map((message, index) => {
+                        const [username, text] = message.data.split(':');
                         return (
-                            <MessageComp key={index} message={message.data} username={'user FIX'} />
+                            <MessageComp key={index} message={text} username={username} />
                         )
                     })}
                     {messageList.length === 0 && (
