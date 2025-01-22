@@ -47,7 +47,7 @@ const RoomCreateJoin: FC<RoomCreateJoinProps> = ({ }) => {
                                     </TooltipContent>
                                 </Tooltip>
                             </TooltipProvider>
-                            <TooltipProvider>
+                            {/* <TooltipProvider>
                                 <Tooltip delayDuration={0}>
                                     <TooltipTrigger asChild>
                                         <Button variant='ghost' className='p-0 aspect-square' onClick={() => {
@@ -60,7 +60,7 @@ const RoomCreateJoin: FC<RoomCreateJoinProps> = ({ }) => {
                                         <p>Copy URL</p>
                                     </TooltipContent>
                                 </Tooltip>
-                            </TooltipProvider>
+                            </TooltipProvider> */}
                         </div>
                     )
                     :
