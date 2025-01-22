@@ -22,7 +22,8 @@ const RoomCreateJoin: FC<RoomCreateJoinProps> = ({ }) => {
     const { getToken } = useUser()
     const { roomCode, setRoomCode } = useRoom();
 
-    const [joinRoomId, setJoinRoomId] = useState<string>('')
+    const [joinRoomId, setJoinRoomId] = useState<string>('');
+    const [isPrivate, setIsPrivate] = useState<boolean>(false);
 
     return (
         <div className='border rounded-sm p-4 mx-auto mt-12 bg-white w-full shadow-md shadow-zinc-800'>
@@ -70,14 +71,43 @@ const RoomCreateJoin: FC<RoomCreateJoinProps> = ({ }) => {
                     )
                     :
                     (
-                        <Button className='' onClick={async () => {
-                            const roomId = await api.createRoom(getToken()!)
-                            setRoomCode(roomId)
-                            joinRoomChat(roomId, getToken()!)
-                        }}>
-                            <p>create</p>
-                            <FaPlus />
-                        </Button>
+                        /* Create new room button with isPrivate checkbox */
+                        <div className='flex flex-col items-center gap-2'>
+                            <Button
+                                className='mt-3'
+                                onClick={async () => {
+                                    try {
+                                        const token = getToken();
+                                        if (!token) {
+                                            toast.error('No token found.');
+                                            return;
+                                        }
+                                        // Create the room (private or public) based on isPrivate
+                                        const roomId = await api.createRoom(token, isPrivate);
+                                        setRoomCode(roomId);
+                                        // Immediately join the newly created room
+                                        joinRoomChat(roomId, token);
+                                    } catch (error) {
+                                        console.error('Error creating room:', error);
+                                        toast.error('Failed to create room.');
+                                    }
+                                }}
+                            >
+                                <p>Create</p>
+                                <FaPlus />
+                            </Button>
+                            <div className='flex items-center gap-2'>
+                                <label htmlFor='privateRoom' className='text-sm font-medium'>
+                                    Private
+                                </label>
+                                <input
+                                    id='privateRoom'
+                                    type='checkbox'
+                                    checked={isPrivate}
+                                    onChange={(e) => setIsPrivate(e.target.checked)}
+                                />
+                            </div>
+                        </div>
                     )}
             </div>
             <div className='flex justify-center items-center gap-2 my-6'>
