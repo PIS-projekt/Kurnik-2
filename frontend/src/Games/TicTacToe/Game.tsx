@@ -88,18 +88,22 @@ export const Game = () => {
 
   return (
     <div>
-      <Button
+      {!isGameInProgress && <Button
         onClick={handleJoin}
         disabled={noRoom()}
       >
         {noRoom() ? "Join a room to play" : "Join game"}
-      </Button>
-      <p>{isGameInProgress && turnMessage}</p>
-      <p>{gameOverMessage}</p>
-      {error && <p>{error}</p>}
-      {gameState && <Board board={gameState.board} onClick={handleBoardClick} disabled={!myTurn} />}
-      {!isGameInProgress && gameState &&
-        <button onClick={resetGame}>Quit game</button>}
+      </Button>}
+      <div className="flex flex-col items-center justify-center h-full">
+        <p>{isGameInProgress && turnMessage}</p>
+        <p>{gameOverMessage}</p>
+        {error && <p>{error}</p>}
+        {gameState && <Board board={gameState.board} onClick={handleBoardClick} disabled={!myTurn} />}
+      </div>
+      {
+        !isGameInProgress && gameState &&
+        <button onClick={resetGame}>Quit game</button>
+      }
     </div >
   );
 };
