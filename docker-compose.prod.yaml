@@ -3,16 +3,14 @@ services:
     depends_on:
       database:
         condition: service_healthy
-    build:
-      context: backend/
-      dockerfile: Dockerfile
-      target: prod
+    image: "51.144.137.71:8082/kurnik-backend:${BACKEND_IMAGE_TAG:-latest}"
     ports:
       - "8000:8000"
     environment:
       - PYTHONUNBUFFERED=1
       - DB_HOST=pis-db
-    restart: unless-stopped
+    restart: always
+
   backend-tests:
     build:
       context: backend/
@@ -30,18 +28,17 @@ services:
       POSTGRES_DB: "pis"
     ports:
       - "5432:5432"
-    restart: unless-stopped
+    restart: always
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U admin -d pis"]
       interval: 10s
       timeout: 5s
       retries: 5
+
   frontend:
-    build:
-      context: frontend/
-      dockerfile: Dockerfile
+    image: "51.144.137.71:8082/kurnik-frontend:${FRONTEND_IMAGE_TAG:-latest}"
     ports:
       - "80:80"
     environment:
       - NODE_ENV=production
-    restart: unless-stopped
+    restart: always

@@ -35,7 +35,8 @@ FROM base AS test
 RUN pdm install --no-editable --no-lock
 
 # Copy the test code
-COPY tests ./tests
+# COPY tests ./tests
+COPY . .
 
 # Run the tests
 ENTRYPOINT [ "pdm", "run"]
