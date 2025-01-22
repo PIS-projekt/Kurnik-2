@@ -52,20 +52,6 @@ const RoomCreateJoin: FC<RoomCreateJoinProps> = ({ }) => {
                                     </TooltipContent>
                                 </Tooltip>
                             </TooltipProvider>
-                            {/* <TooltipProvider>
-                                <Tooltip delayDuration={0}>
-                                    <TooltipTrigger asChild>
-                                        <Button variant='ghost' className='p-0 aspect-square' onClick={() => {
-                                            toast.success('Room URL copied to clipboard')
-                                        }}>
-                                            <FaLink />
-                                        </Button>
-                                    </TooltipTrigger>
-                                    <TooltipContent>
-                                        <p>Copy URL</p>
-                                    </TooltipContent>
-                                </Tooltip>
-                            </TooltipProvider> */}
                         </div>
                     )
                     :
@@ -74,6 +60,7 @@ const RoomCreateJoin: FC<RoomCreateJoinProps> = ({ }) => {
                             const roomId = await api.createRoom(getToken()!)
                             setRoomCode(roomId)
                             joinRoomChat(roomId, getToken()!)
+                            toast.success('Created room successfully!');
                         }}>
                             <p>create</p>
                             <FaPlus />
@@ -89,8 +76,13 @@ const RoomCreateJoin: FC<RoomCreateJoinProps> = ({ }) => {
                 <Input value={joinRoomId} placeholder='Room ID' onChange={(e) => setJoinRoomId(e.currentTarget.value)} className='max-w-36 rounded-r-none border-r-0' />
                 <Button className='rounded-l-none' onClick={async () => {
                     setRoomCode(joinRoomId)
-                    await api.joinRoom(joinRoomId, getToken()!)
-                    joinRoomChat(joinRoomId, getToken()!)
+                    try {
+                        await api.joinRoom(joinRoomId, getToken()!)
+                        joinRoomChat(joinRoomId, getToken()!)
+                        toast.success('Joined room ' + joinRoomId + ' successfully!');
+                    } catch (error) {
+                        toast.error("Room does not exist")
+                    }
                 }}>
                     <p>join</p>
                     <FaArrowRightToBracket />
