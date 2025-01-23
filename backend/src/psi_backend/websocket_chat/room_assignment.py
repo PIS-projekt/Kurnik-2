@@ -151,3 +151,8 @@ def generate_room_code() -> RoomCode:
         code = get_new_code()
 
     return code
+
+
+def get_all_rooms() -> list[Chatroom]:
+    """Return a list of all rooms."""
+    return list(rooms.values())

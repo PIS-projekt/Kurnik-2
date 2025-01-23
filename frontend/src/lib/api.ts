@@ -1,10 +1,12 @@
 /* eslint-disable */
 import axios from "axios";
 
+const apiBaseUrl = "http://0.0.0.0:8000";
+
 export const api = {
-    async createRoom(token: string): Promise<string> {
-        const response = await axios.get(`http://0.0.0.0:8000/create-new-room`, {
-            params: { private: false },
+    async createRoom(token: string, isPrivate: boolean): Promise<string> {
+        const response = await axios.get(`${apiBaseUrl}/create-new-room`, {
+            params: { private: isPrivate },
             headers: { Authorization: `Bearer ${token}` },
         });
         const newRoomCode = response.data.room_code;
@@ -12,7 +14,7 @@ export const api = {
     },
 
     async joinRoom(roomCode: string, token: string): Promise<boolean> {
-        const response = await axios.get(`http://0.0.0.0:8000/join-room`, {
+        const response = await axios.get(`${apiBaseUrl}/join-room`, {
             params: { room_code: roomCode },
             headers: { Authorization: `Bearer ${token}` },
         });
@@ -20,7 +22,7 @@ export const api = {
     },
 
     async register(username: string, email: string, password: string) {
-        const response = await fetch("http://0.0.0.0:8000/auth/register", {
+        const response = await fetch(`${apiBaseUrl}/auth/register`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -47,7 +49,7 @@ export const api = {
 
     async login(username: string, password: string) {
 
-        const response = await fetch("http://0.0.0.0:8000/auth/token", {
+        const response = await fetch(`${apiBaseUrl}/auth/token`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/x-www-form-urlencoded",
