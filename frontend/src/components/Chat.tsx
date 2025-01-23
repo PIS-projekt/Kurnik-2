@@ -15,7 +15,7 @@ export const Chat = () => {
   const [error, setError] = useState<string | null>(null);
   const [userName, setUserName] = useState<string | null>(null);
 
-  const apiBaseUrl = "http://0.0.0.0:8000";
+  const apiBaseUrl = process.env.REACT_APP_BASE_API_URL;
   const navigate = useNavigate();
 
   useEffect(() => {

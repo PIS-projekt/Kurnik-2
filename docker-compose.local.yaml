@@ -33,9 +33,9 @@ services:
   frontend:
     build:
       context: frontend/
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile.dev
     ports:
-      - "80:80"
+      - "2137:80"
     environment:
-      - NODE_ENV=production
+      - NODE_ENV=local
     restart: unless-stopped
