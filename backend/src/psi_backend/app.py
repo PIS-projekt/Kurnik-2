@@ -13,6 +13,7 @@ from src.psi_backend.tictactoe.game import tictactoe_router
 from src.psi_backend.websocket_chat.room_assignment import (
     check_room_exists,
     create_room,
+    get_all_rooms,
 )
 
 
@@ -73,3 +74,11 @@ def join_room(room_code: str, _: User = Depends(get_current_user)) -> JoinRoomRe
         )
     else:
         raise HTTPException(status_code=404, detail="Room not found.")
+
+
+@app.get("/get-public-rooms")
+async def get_public_rooms():
+    rooms = get_all_rooms()
+    return {
+        "rooms": [room.id for room in rooms if not room.private],
+    }
