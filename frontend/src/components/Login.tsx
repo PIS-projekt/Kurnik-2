@@ -7,12 +7,13 @@ export function Login({ setIsAuthenticated }: { setIsAuthenticated: (auth: boole
   const [error, setError] = useState("");
   const navigate = useNavigate();
 
+  const apiBaseUrl = process.env.REACT_APP_BASE_API_URL;
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
 
     try {
-      const response = await fetch("http://0.0.0.0:8000/auth/token", {
+      const response = await fetch(apiBaseUrl + "/auth/token", {
         method: "POST",
         headers: {
           "Content-Type": "application/x-www-form-urlencoded",

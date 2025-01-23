@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import {useState} from "react";
+import {useNavigate} from "react-router-dom";
 
 export function Register() {
   const [username, setUsername] = useState("");
@@ -8,14 +8,14 @@ export function Register() {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const navigate = useNavigate();
-
+  const apiBaseUrl = process.env.REACT_APP_BASE_API_URL;
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
     setSuccess("");
 
     try {
-      const response = await fetch("http://0.0.0.0:8000/auth/register", {
+      const response = await fetch(apiBaseUrl + "/auth/register", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -72,9 +72,9 @@ export function Register() {
         </div>
         <button type="submit">Register</button>
       </form>
-      {error && <p style={{ color: "red" }}>{error}</p>}
-      {success && <p style={{ color: "green" }}>{success}</p>}
-      <br />
+      {error && <p style={{color: "red"}}>{error}</p>}
+      {success && <p style={{color: "green"}}>{success}</p>}
+      <br/>
       <button onClick={() => navigate("/login")}>
         Go to Login
       </button>

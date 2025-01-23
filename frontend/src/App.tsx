@@ -22,7 +22,7 @@ function App() {
     <Router>
       <div className="App">
         <h1>Projekt PIS 2024Z</h1>
-        <p>Profile: {process.env.NODE_ENV}</p>
+        <p>Profile: {process.env.REACT_APP_NODE_ENV}</p>
 
         <Routes>
           {/* Redirect to chat if authenticated, otherwise go to login */}
